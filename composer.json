@@ -23,7 +23,8 @@
         "drupal/druxt": "^0.4.1",
         "drupal/jsonapi_views": "1.x-dev",
         "drupal/paragraphs": "^1.12",
-        "drupal/youtube": "^1.2"
+        "drupal/youtube": "^1.2",
+        "drush/drush": "^10.3"
     },
     "conflict": {
         "drupal/drupal": "*"
