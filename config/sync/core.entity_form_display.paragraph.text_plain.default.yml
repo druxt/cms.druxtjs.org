@@ -1,0 +1,23 @@
+uuid: e41e07b5-616d-49ff-ad43-2ab61ebaf866
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.text_plain.field_text
+    - paragraphs.paragraphs_type.text_plain
+id: paragraph.text_plain.default
+targetEntityType: paragraph
+bundle: text_plain
+mode: default
+content:
+  field_text:
+    weight: 0
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textarea
+    region: content
+hidden:
+  created: true
+  status: true
