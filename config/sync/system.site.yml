@@ -1,7 +1,7 @@
 uuid: 90db092e-6f4e-4e6f-ae71-6cfa1faf65b5
-name: 'Drush Site-Install'
-mail: admin@example.com
-slogan: ''
+name: DruxtJS
+mail: admin@druxtjs.org
+slogan: 'A Bridge between frameworks, NuxtJS in the front, Drupal in the back.'
 page:
   403: ''
   404: ''
