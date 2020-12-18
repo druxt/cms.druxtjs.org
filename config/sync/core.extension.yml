@@ -1,6 +1,7 @@
 module:
   block: 0
   breakpoint: 0
+  coffee: 0
   dblog: 0
   dynamic_page_cache: 0
   field: 0
