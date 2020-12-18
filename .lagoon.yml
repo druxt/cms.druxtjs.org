@@ -1,0 +1,32 @@
+docker-compose-yaml: docker-compose.yml
+
+project: cms-druxtjs-org
+
+tasks:
+  post-rollout:
+    - run:
+        name: drush si
+        command: drush -y si standard
+        service: cli
+
+    - run:
+        name: drush en
+        command: drush -y en druxt jsonapi_views
+        service: cli
+
+    - run:
+        name: drush rap
+        command: drush rap anonymous 'access druxt resources'
+        service: cli
+
+
+environments:
+  main:
+    routes:
+      - nginx:
+        - cms.druxtjs.org
+    cronjobs:
+      - name: drush cron
+        schedule: "*/15 * * * *"
+        command: drush cron
+        service: cli
