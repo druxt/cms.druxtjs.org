@@ -6,19 +6,8 @@ tasks:
   post-rollout:
     - run:
         name: drush si
-        command: drush -y si standard
+        command: drush si --existing-config -y
         service: cli
-
-    - run:
-        name: drush en
-        command: drush -y en druxt jsonapi_views
-        service: cli
-
-    - run:
-        name: drush rap
-        command: drush rap anonymous 'access druxt resources'
-        service: cli
-
 
 environments:
   main:
