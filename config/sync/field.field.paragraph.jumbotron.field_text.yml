@@ -1,0 +1,19 @@
+uuid: a3cbaa29-5698-46d9-8b9c-e8fca200a856
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_text
+    - paragraphs.paragraphs_type.jumbotron
+id: paragraph.jumbotron.field_text
+field_name: field_text
+entity_type: paragraph
+bundle: jumbotron
+label: Lead
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long
