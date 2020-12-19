@@ -1,4 +1,4 @@
-uuid: 86da91bb-5a27-40fa-8cfa-ecc9701ecc35
+uuid: 26dd0387-e16c-4f23-98e8-740fd6659956
 langcode: en
 status: true
 dependencies:
@@ -6,9 +6,7 @@ dependencies:
     - system
   theme:
     - stark
-_core:
-  default_config_hash: fRKXNB91UxDvEMkzCR8ZBsawfC6Fqbme2gtobei3gu4
-id: stark_branding
+id: branding
 theme: stark
 region: header
 weight: 0
@@ -16,7 +14,7 @@ provider: null
 plugin: system_branding_block
 settings:
   id: system_branding_block
-  label: 'Site branding'
+  label: Branding
   provider: system
   label_display: '0'
   use_site_logo: true
