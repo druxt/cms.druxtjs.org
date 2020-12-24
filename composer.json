@@ -36,6 +36,11 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
+    "scripts": {
+        "test": [
+            "curl -Ls http://nginx:8080 | grep -i 'DruxtJS'"
+        ]
+    },
     "config": {
         "sort-packages": true
     },
