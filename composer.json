@@ -16,6 +16,7 @@
     ],
     "require": {
         "composer/installers": "^1.9",
+        "cweagans/composer-patches": "^1.7",
         "drupal/coffee": "^1.0",
         "drupal/core-composer-scaffold": "^9",
         "drupal/core-project-message": "^9",
@@ -31,6 +32,11 @@
         "drupal/youtube": "^1.2",
         "drush/drush": "^10.3"
     },
+    "require-dev": {
+        "drupal/core-dev": "^9.1",
+        "phpspec/prophecy-phpunit": "^2.0",
+        "weitzman/drupal-test-traits": "^1.5"
+    },
     "conflict": {
         "drupal/drupal": "*"
     },
@@ -38,7 +44,7 @@
     "prefer-stable": true,
     "scripts": {
         "test": [
-            "curl -Ls http://nginx:8080 | grep -i 'DruxtJS'"
+            "phpunit"
         ]
     },
     "config": {
@@ -75,6 +81,14 @@
             "web/themes/custom/{$name}": [
                 "type:drupal-custom-theme"
             ]
+        },
+        "patches": {
+            "drupal/coffee": {
+                "https://www.drupal.org/project/coffee/issues/3174680#comment-13884808": "https://www.drupal.org/files/issues/2020-10-27/3174680-5-make-test-module-d9-compatible.patch"
+            },
+            "drupal/core": {
+                "https://www.drupal.org/project/drupal/issues/3186443#comment-13926381": "https://www.drupal.org/files/issues/2020-12-04/3186443-1.patch"
+            }
         },
         "drupal-core-project-message": {
             "include-keys": [
