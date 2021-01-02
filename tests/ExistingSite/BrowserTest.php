@@ -12,8 +12,6 @@ class BrowserTest extends ExistingSiteBase {
   public function testHomepage() {
     $this->visit('/');
     $this->assertSession()->statusCodeEquals(200);
-
-    $title = $this->getCurrentPage()->find('css', 'title')->getText();
-    $this->assertEqual($title, 'Log in | DruxtJS');
+    $this->assertSession()->titleEquals('Log in | DruxtJS');
   }
 }
