@@ -29,6 +29,9 @@
         "drupal/jsonapi_views": "1.x-dev",
         "drupal/paragraphs": "^1.12",
         "drupal/paragraphs_ee": "^1.7",
+        "drupal/pathauto": "^1.8",
+        "drupal/redirect": "^1.6",
+        "drupal/schema_metatag": "^2.1",
         "drupal/youtube": "^1.2",
         "drush/drush": "^10.3"
     },
