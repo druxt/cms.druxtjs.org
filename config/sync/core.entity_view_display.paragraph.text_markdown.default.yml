@@ -1,0 +1,20 @@
+uuid: de2ec181-f8a1-4f43-95f6-891572eb4a18
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.text_markdown.field_text
+    - paragraphs.paragraphs_type.text_markdown
+id: paragraph.text_markdown.default
+targetEntityType: paragraph
+bundle: text_markdown
+mode: default
+content:
+  field_text:
+    weight: 0
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: basic_string
+    region: content
+hidden: {  }

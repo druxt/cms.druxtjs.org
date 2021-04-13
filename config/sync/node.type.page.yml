@@ -1,0 +1,11 @@
+uuid: 2e1bc6aa-c60a-4d22-bcee-d264966ff3f5
+langcode: en
+status: true
+dependencies: {  }
+name: Page
+type: page
+description: 'A basic Page content type with a modular content system.'
+help: ''
+new_revision: true
+preview_mode: 1
+display_submitted: false

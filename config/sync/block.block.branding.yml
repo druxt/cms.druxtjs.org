@@ -1,0 +1,23 @@
+uuid: 26dd0387-e16c-4f23-98e8-740fd6659956
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - stark
+id: branding
+theme: stark
+region: header
+weight: 0
+provider: null
+plugin: system_branding_block
+settings:
+  id: system_branding_block
+  label: Branding
+  provider: system
+  label_display: '0'
+  use_site_logo: true
+  use_site_name: true
+  use_site_slogan: true
+visibility: {  }

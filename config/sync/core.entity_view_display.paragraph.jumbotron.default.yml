@@ -1,0 +1,29 @@
+uuid: 00fe1315-8cc9-4752-b14e-0934cd9e6bb8
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.jumbotron.field_text
+    - field.field.paragraph.jumbotron.field_title
+    - paragraphs.paragraphs_type.jumbotron
+id: paragraph.jumbotron.default
+targetEntityType: paragraph
+bundle: jumbotron
+mode: default
+content:
+  field_text:
+    weight: 1
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: basic_string
+    region: content
+  field_title:
+    weight: 0
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+hidden: {  }

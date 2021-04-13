@@ -1,0 +1,42 @@
+uuid: c2029866-b4c8-4c2e-b7ae-ede01aaaf54b
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_content
+    - paragraphs.paragraphs_type.section
+    - paragraphs.paragraphs_type.text_markdown
+    - paragraphs.paragraphs_type.text_plain
+  module:
+    - entity_reference_revisions
+id: paragraph.section.field_content
+field_name: field_content
+entity_type: paragraph
+bundle: section
+label: Content
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    negate: 0
+    target_bundles:
+      text_plain: text_plain
+      text_markdown: text_markdown
+    target_bundles_drag_drop:
+      jumbotron:
+        weight: 5
+        enabled: false
+      section:
+        weight: 3
+        enabled: false
+      text_markdown:
+        enabled: true
+        weight: 7
+      text_plain:
+        enabled: true
+        weight: 4
+field_type: entity_reference_revisions
