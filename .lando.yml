@@ -1,0 +1,5 @@
+name: cms-druxtjs-org
+recipe: lagoon
+config:
+  build:
+    - composer install
