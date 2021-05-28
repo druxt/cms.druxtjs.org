@@ -5,13 +5,8 @@ project: cms-druxtjs-org
 tasks:
   post-rollout:
     - run:
-        name: drush site-install
-        command: drush si foundry -y
-        service: cli
-
-    - run:
-        name: drush tome:import
-        command: drush tome:import -y
+        name: drush tome:install
+        command: drush tome:install -y
         service: cli
 
 environments:
