@@ -6,7 +6,7 @@
     ],
     "uuid": [
         {
-            "value": "2d9619d7-537f-481e-b183-daa47bc85449"
+            "value": "2ce20dfd-af36-4336-b29e-99c7d1380b00"
         }
     ],
     "langcode": [
@@ -32,7 +32,7 @@
     ],
     "timezone": [
         {
-            "value": "Australia\/Melbourne"
+            "value": "UTC"
         }
     ],
     "status": [
@@ -42,13 +42,13 @@
     ],
     "created": [
         {
-            "value": "2021-05-28T01:23:27+00:00",
+            "value": "2021-05-28T03:02:55+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
     "changed": [
         {
-            "value": "2021-05-28T01:23:27+00:00",
+            "value": "2021-05-28T03:02:55+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
@@ -56,11 +56,6 @@
     "default_langcode": [
         {
             "value": true
-        }
-    ],
-    "role_change": [
-        {
-            "target_id": "__role_delegation_empty_field_value__"
         }
     ]
 }
