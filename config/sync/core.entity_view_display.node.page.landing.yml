@@ -12,9 +12,7 @@ dependencies:
     - field.field.node.page.field_image
     - node.type.page
   module:
-    - entity_display_mode
     - entity_reference_revisions
-    - text
     - user
 id: node.page.landing
 targetEntityType: node
@@ -23,7 +21,7 @@ mode: landing
 content:
   field_content:
     type: entity_reference_revisions_entity_view
-    weight: 2
+    weight: 1
     label: hidden
     settings:
       view_mode: default
@@ -31,27 +29,13 @@ content:
     third_party_settings: {  }
     region: content
   field_content_supplementary:
-    weight: 3
+    weight: 2
     label: hidden
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
     type: entity_reference_revisions_entity_view
-    region: content
-  field_description:
-    weight: 1
-    label: hidden
-    settings: {  }
-    third_party_settings: {  }
-    type: text_default
-    region: content
-  field_display:
-    weight: 4
-    label: hidden
-    settings: {  }
-    third_party_settings: {  }
-    type: entity_display_mode_default
     region: content
   field_image:
     type: entity_reference_entity_view
@@ -65,5 +49,7 @@ content:
 hidden:
   content_moderation_control: true
   field_approver: true
+  field_description: true
+  field_display: true
   langcode: true
   links: true
