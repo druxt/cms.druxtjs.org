@@ -19,6 +19,7 @@ module:
   ckeditor: 0
   coffee: 0
   config: 0
+  consumers: 0
   content_lock: 0
   content_lock_timeout: 0
   content_moderation: 0
@@ -27,7 +28,9 @@ module:
   ctools: 0
   datetime: 0
   dblog: 0
+  decoupled_router: 0
   diff: 0
+  druxt: 0
   dynamic_entity_reference: 0
   dynamic_page_cache: 0
   editor: 0
@@ -45,6 +48,11 @@ module:
   google_analytics_reports_api: 0
   help: 0
   image: 0
+  jsonapi: 0
+  jsonapi_hypermedia: 0
+  jsonapi_menu_items: 0
+  jsonapi_resources: 0
+  jsonapi_views: 0
   language: 0
   length_indicator: 0
   link: 0
@@ -73,6 +81,7 @@ module:
   scheduled_transitions: 0
   serialization: 0
   shortcut: 0
+  simple_oauth: 0
   simple_sitemap: 0
   simple_sitemap_engines: 0
   simple_sitemap_views: 0
