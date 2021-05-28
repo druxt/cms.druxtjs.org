@@ -1,7 +1,7 @@
 {
     "uuid": [
         {
-            "value": "0dc890eb-4d5f-409f-ab79-814ef51ec20e"
+            "value": "a9a2c040-de44-402c-ba1d-0f9996ca6b41"
         }
     ],
     "langcode": [
@@ -11,9 +11,9 @@
     ],
     "type": [
         {
-            "target_id": "jumbotron",
+            "target_id": "section",
             "target_type": "paragraphs_type",
-            "target_uuid": "cb8c0371-1de6-4256-9837-ce1c11a5ae08"
+            "target_uuid": "36879357-96f7-4b56-8bf3-f91b01e4638d"
         }
     ],
     "status": [
@@ -23,7 +23,7 @@
     ],
     "created": [
         {
-            "value": "2021-05-28T04:24:29+00:00",
+            "value": "2021-05-28T07:48:09+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
@@ -42,15 +42,10 @@
             "value": true
         }
     ],
-    "field_content": [
-        {
-            "target_type": "paragraph",
-            "target_uuid": "fd4cab6c-4707-4b13-8547-352b99264062"
-        }
-    ],
+    "field_content": [],
     "field_title": [
         {
-            "value": "DruxtJS"
+            "value": "Drupal + Nuxt.js"
         }
     ]
 }

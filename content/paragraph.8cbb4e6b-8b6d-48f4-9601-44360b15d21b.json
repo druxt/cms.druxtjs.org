@@ -1,7 +1,7 @@
 {
     "uuid": [
         {
-            "value": "0dc890eb-4d5f-409f-ab79-814ef51ec20e"
+            "value": "8cbb4e6b-8b6d-48f4-9601-44360b15d21b"
         }
     ],
     "langcode": [
@@ -11,9 +11,9 @@
     ],
     "type": [
         {
-            "target_id": "jumbotron",
+            "target_id": "section",
             "target_type": "paragraphs_type",
-            "target_uuid": "cb8c0371-1de6-4256-9837-ce1c11a5ae08"
+            "target_uuid": "36879357-96f7-4b56-8bf3-f91b01e4638d"
         }
     ],
     "status": [
@@ -23,7 +23,7 @@
     ],
     "created": [
         {
-            "value": "2021-05-28T04:24:29+00:00",
+            "value": "2021-05-28T08:33:01+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
@@ -45,12 +45,16 @@
     "field_content": [
         {
             "target_type": "paragraph",
-            "target_uuid": "fd4cab6c-4707-4b13-8547-352b99264062"
+            "target_uuid": "052db6e7-4d30-418c-b891-1b4116692bca"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "4cdc2dda-67c7-4dcb-bcb9-b6feb3732b87"
         }
     ],
     "field_title": [
         {
-            "value": "DruxtJS"
+            "value": "Fully Decoupled Drupal Sites"
         }
     ]
 }

@@ -1,7 +1,7 @@
 {
     "uuid": [
         {
-            "value": "b89b7128-d8bb-4c72-9c28-fbb052cf5a10"
+            "value": "78f6e608-b83f-4e8f-816d-f88b8a05ab10"
         }
     ],
     "langcode": [
@@ -11,14 +11,14 @@
     ],
     "type": [
         {
-            "target_id": "page",
+            "target_id": "blog",
             "target_type": "node_type",
-            "target_uuid": "c52cd9cb-d0eb-46fd-ac6a-e7f5a32054d5"
+            "target_uuid": "099b71bc-a724-4c2b-aa00-039950b719ec"
         }
     ],
     "revision_timestamp": [
         {
-            "value": "2021-05-28T09:48:36+00:00",
+            "value": "2021-05-28T10:39:39+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
@@ -30,7 +30,7 @@
     ],
     "revision_log": [
         {
-            "value": "Updated the Content field"
+            "value": "Updated the Image field"
         }
     ],
     "status": [
@@ -46,24 +46,24 @@
     ],
     "title": [
         {
-            "value": "Homepage"
+            "value": "How to build a DruxtSite"
         }
     ],
     "created": [
         {
-            "value": "2021-05-28T04:23:33+00:00",
+            "value": "2021-05-28T10:08:59+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
     "changed": [
         {
-            "value": "2021-05-28T09:48:36+00:00",
+            "value": "2021-05-28T10:39:39+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
     "promote": [
         {
-            "value": false
+            "value": true
         }
     ],
     "sticky": [
@@ -81,14 +81,10 @@
             "value": true
         }
     ],
-    "moderation_state": [
-        {
-            "value": "published"
-        }
-    ],
+    "moderation_state": [],
     "path": [
         {
-            "alias": "\/homepage",
+            "alias": "\/blog\/how-build-druxtsite-20210528",
             "langcode": "en",
             "pathauto": 1
         }
@@ -104,31 +100,19 @@
         }
     ],
     "field_approver": [],
-    "field_content": [
-        {
-            "target_type": "paragraph",
-            "target_uuid": "0dc890eb-4d5f-409f-ab79-814ef51ec20e"
-        },
-        {
-            "target_type": "paragraph",
-            "target_uuid": "a9a2c040-de44-402c-ba1d-0f9996ca6b41"
-        },
-        {
-            "target_type": "paragraph",
-            "target_uuid": "8cbb4e6b-8b6d-48f4-9601-44360b15d21b"
-        }
-    ],
+    "field_blog_category": [],
+    "field_content": [],
     "field_content_supplementary": [],
     "field_description": [
         {
-            "value": "<p>Druxt is an open source framework for building Fully Decoupled Drupal integrations with Nuxt.js.<\/p>\r\n",
+            "value": "<p>The DruxtSite module provides an out of the box, Decoupled Drupal site building experience.<\/p>\r\n",
             "format": "formatted"
         }
     ],
-    "field_display": [
+    "field_image": [
         {
-            "value": "landing"
+            "target_type": "media",
+            "target_uuid": "5eb9d282-2315-4879-9acd-4d9b0a3c63df"
         }
-    ],
-    "field_image": []
+    ]
 }

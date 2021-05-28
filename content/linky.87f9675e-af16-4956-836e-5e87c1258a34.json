@@ -1,0 +1,81 @@
+{
+    "uuid": [
+        {
+            "value": "87f9675e-af16-4956-836e-5e87c1258a34"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "user_id": [
+        {
+            "target_type": "user",
+            "target_uuid": "2ce20dfd-af36-4336-b29e-99c7d1380b00"
+        }
+    ],
+    "revision_created": [
+        {
+            "value": "2021-05-28T08:33:30+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "revision_uid": [
+        {
+            "target_type": "user",
+            "target_uuid": "2ce20dfd-af36-4336-b29e-99c7d1380b00"
+        }
+    ],
+    "revision_log": [
+        {
+            "value": "Created new Managed Link"
+        }
+    ],
+    "link": [
+        {
+            "uri": "https:\/\/site.druxtjs.org",
+            "title": "DruxtSite",
+            "options": []
+        }
+    ],
+    "created": [
+        {
+            "value": "2021-05-28T08:33:30+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2021-05-28T08:33:30+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "checked": [
+        {
+            "value": "1970-01-01T00:00:00+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "internal": [],
+    "http_method": [],
+    "http_status": [],
+    "message": [],
+    "destination": [],
+    "excluded": [
+        {
+            "value": false
+        }
+    ],
+    "reason": [],
+    "error": [
+        {
+            "value": false
+        }
+    ],
+    "error_count": [
+        {
+            "value": 0
+        }
+    ]
+}

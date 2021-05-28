@@ -1,0 +1,107 @@
+{
+    "uuid": [
+        {
+            "value": "5eb9d282-2315-4879-9acd-4d9b0a3c63df"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "bundle": [
+        {
+            "target_id": "image",
+            "target_type": "media_type",
+            "target_uuid": "f19fe97d-01de-4806-a85a-07f5e7c49839"
+        }
+    ],
+    "revision_created": [
+        {
+            "value": "2021-05-28T08:56:56+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "revision_user": [
+        {
+            "target_type": "user",
+            "target_uuid": "2ce20dfd-af36-4336-b29e-99c7d1380b00"
+        }
+    ],
+    "revision_log_message": [
+        {
+            "value": "Created new Image"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        {
+            "target_type": "user",
+            "target_uuid": "2ce20dfd-af36-4336-b29e-99c7d1380b00"
+        }
+    ],
+    "name": [
+        {
+            "value": "umami.png"
+        }
+    ],
+    "thumbnail": [
+        {
+            "alt": "DruxtSite Umami Demo",
+            "title": null,
+            "width": 1536,
+            "height": 577,
+            "target_type": "file",
+            "target_uuid": "c439c6e1-09da-4d80-b600-9a54894f863e"
+        }
+    ],
+    "created": [
+        {
+            "value": "2021-05-28T08:56:56+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2021-05-28T08:56:56+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        {
+            "alias": null,
+            "pid": null,
+            "langcode": "en",
+            "pathauto": 0
+        }
+    ],
+    "field_media_caption": [],
+    "field_media_content_owner": [],
+    "field_media_copyright": [],
+    "field_media_description": [],
+    "field_media_image": [
+        {
+            "alt": "DruxtSite Umami Demo",
+            "title": "",
+            "width": 1536,
+            "height": 577,
+            "target_type": "file",
+            "target_uuid": "c439c6e1-09da-4d80-b600-9a54894f863e"
+        }
+    ],
+    "field_media_usage_terms": []
+}
