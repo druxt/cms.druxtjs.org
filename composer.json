@@ -26,7 +26,7 @@
     "drupal/core-composer-scaffold": "^9.1",
     "drupal/core-recommended": "^9.1",
     "drupal/diff": "^1.0",
-    "drupal/druxt": "^1.0",
+    "drupal/druxt": "1.0.0-beta2",
     "drupal/entity_browser": "^2.5",
     "drupal/entity_browser_enhanced": "^1.0",
     "drupal/entity_display_mode": "1.x-dev",
