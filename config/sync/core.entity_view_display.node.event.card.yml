@@ -1,0 +1,76 @@
+uuid: e417ca8e-3bfb-4559-8ee8-61752430a10f
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.card
+    - field.field.node.event.field_approver
+    - field.field.node.event.field_content
+    - field.field.node.event.field_content_supplementary
+    - field.field.node.event.field_date
+    - field.field.node.event.field_description
+    - field.field.node.event.field_image
+    - node.type.event
+  module:
+    - advanced_text_formatter
+    - datetime
+    - user
+id: node.event.card
+targetEntityType: node
+bundle: event
+mode: card
+content:
+  field_date:
+    weight: 1
+    label: hidden
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  field_description:
+    weight: 2
+    label: hidden
+    settings:
+      trim_length: '160'
+      ellipsis: '1'
+      word_boundary: '1'
+      filter: input
+      format: plain_text
+      allowed_html:
+        - a
+        - b
+        - br
+        - dd
+        - dl
+        - dt
+        - em
+        - i
+        - li
+        - ol
+        - p
+        - strong
+        - u
+        - ul
+      use_summary: 0
+      token_replace: 0
+      autop: 0
+    third_party_settings: {  }
+    type: advanced_text
+    region: content
+  field_image:
+    weight: 0
+    label: hidden
+    settings:
+      view_mode: card
+      link: false
+    third_party_settings: {  }
+    type: entity_reference_entity_view
+    region: content
+hidden:
+  field_approver: true
+  field_content: true
+  field_content_supplementary: true
+  langcode: true
+  links: true

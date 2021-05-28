@@ -1,0 +1,20 @@
+uuid: 508dd4f3-9e3d-4733-8cca-5e3cc341fc07
+langcode: en
+status: true
+dependencies: {  }
+id: approver_news
+label: 'Approver: News'
+weight: -1
+is_admin: null
+permissions:
+  - 'access contextual links'
+  - 'access toolbar'
+  - 'create document media'
+  - 'create image media'
+  - 'create video media'
+  - 'edit any document media'
+  - 'edit any image media'
+  - 'edit any video media'
+  - 'view all media revisions'
+  - 'view news revisions'
+  - 'view the administration theme'

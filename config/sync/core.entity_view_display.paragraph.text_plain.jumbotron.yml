@@ -1,0 +1,21 @@
+uuid: 8e2fb70d-1545-4370-82b3-9d01b02efca0
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.paragraph.jumbotron
+    - field.field.paragraph.text_plain.field_text_plain
+    - paragraphs.paragraphs_type.text_plain
+id: paragraph.text_plain.jumbotron
+targetEntityType: paragraph
+bundle: text_plain
+mode: jumbotron
+content:
+  field_text_plain:
+    weight: 0
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: basic_string
+    region: content
+hidden: {  }

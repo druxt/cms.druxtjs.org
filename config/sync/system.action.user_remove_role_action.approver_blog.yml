@@ -1,0 +1,14 @@
+uuid: b85e8d8b-b19d-4a21-8c37-afac28d2d878
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.approver_blog
+  module:
+    - user
+id: user_remove_role_action.approver_blog
+label: 'Remove the Approver: Blog role from the selected user(s)'
+type: user
+plugin: user_remove_role_action
+configuration:
+  rid: approver_blog

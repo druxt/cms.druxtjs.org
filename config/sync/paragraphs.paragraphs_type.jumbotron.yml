@@ -1,0 +1,15 @@
+uuid: cb8c0371-1de6-4256-9837-ce1c11a5ae08
+langcode: en
+status: true
+dependencies:
+  module:
+    - paragraphs_ee
+third_party_settings:
+  paragraphs_ee:
+    paragraphs_categories: {  }
+id: jumbotron
+label: Jumbotron
+icon_uuid: null
+icon_default: null
+description: 'A lightweight, flexible component that can optionally extend the entire viewport to showcase key marketing messages on your site.'
+behavior_plugins: {  }

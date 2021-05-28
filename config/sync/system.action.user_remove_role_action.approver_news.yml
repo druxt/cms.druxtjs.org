@@ -1,0 +1,14 @@
+uuid: ae026aa5-46a2-4c33-825d-d075e38f613d
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.approver_news
+  module:
+    - user
+id: user_remove_role_action.approver_news
+label: 'Remove the Approver: News role from the selected user(s)'
+type: user
+plugin: user_remove_role_action
+configuration:
+  rid: approver_news

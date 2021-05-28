@@ -1,0 +1,43 @@
+uuid: b381b3b8-289d-4adf-b6ea-9e8806637913
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_approver
+    - node.type.news
+id: node.news.field_approver
+field_name: field_approver
+entity_type: node
+bundle: news
+label: Approver
+description: 'Select who, if anyone, needs to approve yourt content before it goes live.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:user'
+  handler_settings:
+    include_anonymous: false
+    filter:
+      type: role
+      role:
+        approver_news: approver_news
+        api_frontend: '0'
+        author_blog: '0'
+        author_event: '0'
+        author_news: '0'
+        author_page: '0'
+        approver_blog: '0'
+        approver_event: '0'
+        approver_page: '0'
+        approver: '0'
+        admin_content: '0'
+        admin_users: '0'
+        admin_developer: '0'
+    target_bundles: null
+    sort:
+      field: name
+      direction: ASC
+    auto_create: false
+field_type: entity_reference

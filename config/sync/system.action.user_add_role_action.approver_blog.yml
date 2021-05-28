@@ -1,0 +1,14 @@
+uuid: 19bacee1-48b9-4dc4-a753-7f05da1f80e7
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.approver_blog
+  module:
+    - user
+id: user_add_role_action.approver_blog
+label: 'Add the Approver: Blog role to the selected user(s)'
+type: user
+plugin: user_add_role_action
+configuration:
+  rid: approver_blog

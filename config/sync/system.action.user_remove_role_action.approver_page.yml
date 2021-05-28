@@ -1,0 +1,14 @@
+uuid: 5d20f15b-e170-4c65-b226-3c1c29d2318d
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.approver_page
+  module:
+    - user
+id: user_remove_role_action.approver_page
+label: 'Remove the Approver: Page role from the selected user(s)'
+type: user
+plugin: user_remove_role_action
+configuration:
+  rid: approver_page

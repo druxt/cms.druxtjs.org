@@ -1,0 +1,14 @@
+uuid: 16136f78-9a79-4253-9ccc-81ff9453e6f7
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.approver_page
+  module:
+    - user
+id: user_add_role_action.approver_page
+label: 'Add the Approver: Page role to the selected user(s)'
+type: user
+plugin: user_add_role_action
+configuration:
+  rid: approver_page

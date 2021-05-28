@@ -1,0 +1,47 @@
+uuid: c65f4c2a-e8dc-43b5-814b-56c79491fb21
+langcode: en
+status: true
+dependencies: {  }
+id: author_event
+label: 'Author: Event'
+weight: -6
+is_admin: null
+permissions:
+  - 'access contextual links'
+  - 'access toolbar'
+  - 'create document media'
+  - 'create event content'
+  - 'create image media'
+  - 'create paragraph content card'
+  - 'create paragraph content card_group'
+  - 'create paragraph content entity_reference'
+  - 'create paragraph content jumbotron'
+  - 'create paragraph content link'
+  - 'create paragraph content media'
+  - 'create paragraph content section'
+  - 'create paragraph content text_formatted'
+  - 'create paragraph content text_markdown'
+  - 'create paragraph content text_plain'
+  - 'create video media'
+  - 'edit any document media'
+  - 'edit any event content'
+  - 'edit any image media'
+  - 'edit any video media'
+  - 'revert event revisions'
+  - 'translate event node'
+  - 'update paragraph content card'
+  - 'update paragraph content card_group'
+  - 'update paragraph content entity_reference'
+  - 'update paragraph content jumbotron'
+  - 'update paragraph content link'
+  - 'update paragraph content media'
+  - 'update paragraph content section'
+  - 'update paragraph content text_formatted'
+  - 'update paragraph content text_markdown'
+  - 'update paragraph content text_plain'
+  - 'use yoast seo'
+  - 'view all media revisions'
+  - 'view any unpublished content'
+  - 'view event revisions'
+  - 'view latest version'
+  - 'view the administration theme'

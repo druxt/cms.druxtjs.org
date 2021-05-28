@@ -1,0 +1,14 @@
+uuid: 552baeea-8d45-4898-8ff0-567522a18d48
+langcode: en
+status: true
+dependencies: {  }
+id: admin_content
+label: 'Admin: Content'
+weight: 3
+is_admin: null
+permissions:
+  - 'access admin audit trail'
+  - 'access contextual links'
+  - 'delete orphan revisions'
+  - 'view any unpublished content'
+  - 'view latest version'

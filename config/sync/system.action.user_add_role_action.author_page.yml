@@ -1,0 +1,14 @@
+uuid: d4a6a7b2-5280-444b-b911-bd124eb3f3c6
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.author_page
+  module:
+    - user
+id: user_add_role_action.author_page
+label: 'Add the Author: Page role to the selected user(s)'
+type: user
+plugin: user_add_role_action
+configuration:
+  rid: author_page

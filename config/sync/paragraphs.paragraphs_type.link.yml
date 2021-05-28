@@ -1,0 +1,16 @@
+uuid: aee921a6-52e7-42fb-9c3e-1069150c7a6a
+langcode: en
+status: true
+dependencies:
+  module:
+    - paragraphs_ee
+third_party_settings:
+  paragraphs_ee:
+    paragraphs_categories:
+      basics: basics
+id: link
+label: Link
+icon_uuid: null
+icon_default: null
+description: 'A link to content within or external to this website.'
+behavior_plugins: {  }

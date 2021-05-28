@@ -1,0 +1,15 @@
+uuid: 4f41f78a-6a55-42a3-9d09-39855b0a066b
+langcode: en
+status: true
+dependencies:
+  module:
+    - video_embed_media
+id: video
+label: Video
+description: 'Add a Vimeo or Youtube video.'
+source: video_embed_field
+queue_thumbnail_downloads: true
+new_revision: true
+source_configuration:
+  source_field: field_media_video_embed_field
+field_map: {  }

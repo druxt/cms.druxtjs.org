@@ -1,0 +1,25 @@
+uuid: be80855a-b421-41d3-963c-e180c90ae484
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.media.field_media
+    - paragraphs.paragraphs_type.media
+id: paragraph.media.default
+targetEntityType: paragraph
+bundle: media
+mode: default
+content:
+  field_media:
+    weight: 0
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
+hidden:
+  created: true
+  status: true

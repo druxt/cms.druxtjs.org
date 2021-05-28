@@ -1,0 +1,20 @@
+uuid: 9e8145de-8b0a-4d27-909e-4dcaeeff34e6
+langcode: en
+status: true
+dependencies: {  }
+id: approver_blog
+label: 'Approver: Blog'
+weight: -3
+is_admin: null
+permissions:
+  - 'access contextual links'
+  - 'access toolbar'
+  - 'create document media'
+  - 'create image media'
+  - 'create video media'
+  - 'edit any document media'
+  - 'edit any image media'
+  - 'edit any video media'
+  - 'view all media revisions'
+  - 'view blog revisions'
+  - 'view the administration theme'

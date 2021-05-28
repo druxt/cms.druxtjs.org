@@ -1,0 +1,14 @@
+uuid: 6213e1a8-b96d-48fd-abd5-503d97eda7f2
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.approver_news
+  module:
+    - user
+id: user_add_role_action.approver_news
+label: 'Add the Approver: News role to the selected user(s)'
+type: user
+plugin: user_add_role_action
+configuration:
+  rid: approver_news

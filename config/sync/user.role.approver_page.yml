@@ -1,0 +1,20 @@
+uuid: 066a8eb2-b35a-49c8-8ec8-82dc92ab8a4d
+langcode: en
+status: true
+dependencies: {  }
+id: approver_page
+label: 'Approver: Page'
+weight: 0
+is_admin: null
+permissions:
+  - 'access contextual links'
+  - 'access toolbar'
+  - 'create document media'
+  - 'create image media'
+  - 'create video media'
+  - 'edit any document media'
+  - 'edit any image media'
+  - 'edit any video media'
+  - 'view all media revisions'
+  - 'view page revisions'
+  - 'view the administration theme'

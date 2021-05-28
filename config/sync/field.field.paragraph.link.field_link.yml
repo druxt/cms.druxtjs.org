@@ -1,0 +1,85 @@
+uuid: a962f2fe-a38d-4a60-be21-e7133f6a35a7
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_link
+    - node.type.blog
+    - node.type.event
+    - node.type.news
+    - node.type.page
+    - paragraphs.paragraphs_type.link
+  module:
+    - dynamic_entity_reference
+id: paragraph.link.field_link
+field_name: field_link
+entity_type: paragraph
+bundle: link
+label: Link
+description: 'Select ''Content'' to link to internal content and start to type the title, or ''Managed Link'' to create an external link.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  node:
+    handler: 'default:node'
+    handler_settings:
+      target_bundles:
+        blog: blog
+        event: event
+        news: news
+        page: page
+      sort:
+        field: _none
+        direction: ASC
+      auto_create: false
+      auto_create_bundle: blog
+  linky:
+    handler: 'default:linky'
+    handler_settings:
+      target_bundles: null
+      sort:
+        field: _none
+        direction: ASC
+      auto_create: true
+  content_moderation_state:
+    handler: 'default:content_moderation_state'
+    handler_settings: {  }
+  crop:
+    handler: 'default:crop'
+    handler_settings: {  }
+  block_content:
+    handler: 'default:block_content'
+    handler_settings: {  }
+  menu_link_content:
+    handler: 'default:menu_link_content'
+    handler_settings: {  }
+  file:
+    handler: 'default:file'
+    handler_settings: {  }
+  media:
+    handler: 'default:media'
+    handler_settings: {  }
+  paragraph:
+    handler: 'default:paragraph'
+    handler_settings: {  }
+  redirect:
+    handler: 'default:redirect'
+    handler_settings: {  }
+  shortcut:
+    handler: 'default:shortcut'
+    handler_settings: {  }
+  taxonomy_term:
+    handler: 'default:taxonomy_term'
+    handler_settings: {  }
+  path_alias:
+    handler: 'default:path_alias'
+    handler_settings: {  }
+  user:
+    handler: 'default:user'
+    handler_settings: {  }
+  scheduled_transition:
+    handler: 'default:scheduled_transition'
+    handler_settings: {  }
+field_type: dynamic_entity_reference

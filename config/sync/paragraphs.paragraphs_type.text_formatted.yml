@@ -1,0 +1,16 @@
+uuid: 71da2b1b-bfa1-4dae-8638-7f791512512d
+langcode: en
+status: true
+dependencies:
+  module:
+    - paragraphs_ee
+third_party_settings:
+  paragraphs_ee:
+    paragraphs_categories:
+      basics: basics
+id: text_formatted
+label: 'Text: Formatted'
+icon_uuid: null
+icon_default: null
+description: 'Text component with formatting options.'
+behavior_plugins: {  }

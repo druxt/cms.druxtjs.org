@@ -1,0 +1,20 @@
+uuid: b2cb1aed-ac39-4563-b5be-fa38f001693c
+langcode: en
+status: true
+dependencies: {  }
+id: approver_event
+label: 'Approver: Event'
+weight: -2
+is_admin: null
+permissions:
+  - 'access contextual links'
+  - 'access toolbar'
+  - 'create document media'
+  - 'create image media'
+  - 'create video media'
+  - 'edit any document media'
+  - 'edit any image media'
+  - 'edit any video media'
+  - 'view all media revisions'
+  - 'view event revisions'
+  - 'view the administration theme'

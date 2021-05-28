@@ -1,0 +1,14 @@
+uuid: 77c39aa7-80a1-4949-9a37-d7a552932803
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.author_event
+  module:
+    - user
+id: user_add_role_action.author_event
+label: 'Add the Author: Event role to the selected user(s)'
+type: user
+plugin: user_add_role_action
+configuration:
+  rid: author_event

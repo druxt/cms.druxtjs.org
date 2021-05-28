@@ -1,0 +1,43 @@
+uuid: debd4ee3-04e5-4cc7-804f-0a0a42c80d53
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_approver
+    - node.type.blog
+id: node.blog.field_approver
+field_name: field_approver
+entity_type: node
+bundle: blog
+label: Approver
+description: 'Select who, if anyone, needs to approve yourt content before it goes live.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:user'
+  handler_settings:
+    include_anonymous: false
+    filter:
+      type: role
+      role:
+        approver_blog: approver_blog
+        api_frontend: '0'
+        author_blog: '0'
+        author_event: '0'
+        author_news: '0'
+        author_page: '0'
+        approver_event: '0'
+        approver_news: '0'
+        approver_page: '0'
+        approver: '0'
+        admin_content: '0'
+        admin_users: '0'
+        admin_developer: '0'
+    target_bundles: null
+    sort:
+      field: name
+      direction: ASC
+    auto_create: false
+field_type: entity_reference

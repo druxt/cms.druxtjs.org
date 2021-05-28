@@ -1,0 +1,68 @@
+uuid: f4630fab-35a2-4c79-b339-a2bc8473b6b6
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.event.field_approver
+    - field.field.node.event.field_content
+    - field.field.node.event.field_content_supplementary
+    - field.field.node.event.field_date
+    - field.field.node.event.field_description
+    - field.field.node.event.field_image
+    - node.type.event
+  module:
+    - advanced_text_formatter
+    - datetime
+    - user
+id: node.event.teaser
+targetEntityType: node
+bundle: event
+mode: teaser
+content:
+  field_date:
+    type: datetime_default
+    weight: 0
+    region: content
+    label: hidden
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+  field_description:
+    type: advanced_text
+    weight: 1
+    region: content
+    label: hidden
+    settings:
+      trim_length: '160'
+      ellipsis: '1'
+      word_boundary: '1'
+      filter: input
+      format: plain_text
+      allowed_html:
+        - a
+        - b
+        - br
+        - dd
+        - dl
+        - dt
+        - em
+        - i
+        - li
+        - ol
+        - p
+        - strong
+        - u
+        - ul
+      use_summary: 0
+      token_replace: 0
+      autop: 0
+    third_party_settings: {  }
+hidden:
+  field_approver: true
+  field_content: true
+  field_content_supplementary: true
+  field_image: true
+  langcode: true
+  links: true

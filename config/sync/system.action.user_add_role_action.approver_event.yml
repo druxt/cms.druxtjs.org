@@ -1,0 +1,14 @@
+uuid: 55389ba2-c0b1-4db7-a7c5-0249eb079801
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.approver_event
+  module:
+    - user
+id: user_add_role_action.approver_event
+label: 'Add the Approver: Event role to the selected user(s)'
+type: user
+plugin: user_add_role_action
+configuration:
+  rid: approver_event

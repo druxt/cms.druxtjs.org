@@ -1,0 +1,14 @@
+uuid: 757c7ebd-e6a0-4c94-bbd1-133d94a2786a
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.author_news
+  module:
+    - user
+id: user_remove_role_action.author_news
+label: 'Remove the Author: News role from the selected user(s)'
+type: user
+plugin: user_remove_role_action
+configuration:
+  rid: author_news

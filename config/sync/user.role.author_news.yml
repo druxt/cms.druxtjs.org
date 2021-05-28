@@ -1,0 +1,47 @@
+uuid: 9f71d957-9631-49eb-84ec-cb42ad8e7f34
+langcode: en
+status: true
+dependencies: {  }
+id: author_news
+label: 'Author: News'
+weight: -5
+is_admin: null
+permissions:
+  - 'access contextual links'
+  - 'access toolbar'
+  - 'create document media'
+  - 'create image media'
+  - 'create news content'
+  - 'create paragraph content card'
+  - 'create paragraph content card_group'
+  - 'create paragraph content entity_reference'
+  - 'create paragraph content jumbotron'
+  - 'create paragraph content link'
+  - 'create paragraph content media'
+  - 'create paragraph content section'
+  - 'create paragraph content text_formatted'
+  - 'create paragraph content text_markdown'
+  - 'create paragraph content text_plain'
+  - 'create video media'
+  - 'edit any document media'
+  - 'edit any image media'
+  - 'edit any news content'
+  - 'edit any video media'
+  - 'revert news revisions'
+  - 'translate news node'
+  - 'update paragraph content card'
+  - 'update paragraph content card_group'
+  - 'update paragraph content entity_reference'
+  - 'update paragraph content jumbotron'
+  - 'update paragraph content link'
+  - 'update paragraph content media'
+  - 'update paragraph content section'
+  - 'update paragraph content text_formatted'
+  - 'update paragraph content text_markdown'
+  - 'update paragraph content text_plain'
+  - 'use yoast seo'
+  - 'view all media revisions'
+  - 'view any unpublished content'
+  - 'view latest version'
+  - 'view news revisions'
+  - 'view the administration theme'

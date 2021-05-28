@@ -1,0 +1,31 @@
+uuid: 5f8b0485-8cba-448b-9934-cccad1063977
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.media.video.field_media_video_embed_field
+    - media.type.video
+  module:
+    - video_embed_field
+id: media.video.default
+targetEntityType: media
+bundle: video
+mode: default
+content:
+  field_media_video_embed_field:
+    label: visually_hidden
+    weight: 0
+    settings:
+      responsive: true
+      width: 854
+      height: 480
+      autoplay: false
+    third_party_settings: {  }
+    type: video_embed_field_video
+    region: content
+hidden:
+  created: true
+  langcode: true
+  name: true
+  thumbnail: true
+  uid: true

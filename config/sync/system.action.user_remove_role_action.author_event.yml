@@ -1,0 +1,14 @@
+uuid: 1ae5238b-d0e4-4015-b05a-72b10f023ffa
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.author_event
+  module:
+    - user
+id: user_remove_role_action.author_event
+label: 'Remove the Author: Event role from the selected user(s)'
+type: user
+plugin: user_remove_role_action
+configuration:
+  rid: author_event

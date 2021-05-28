@@ -1,0 +1,34 @@
+uuid: 85e24346-5ac3-4523-8ab3-634dadecb6fb
+langcode: en
+status: true
+dependencies: {  }
+id: admin_users
+label: 'Admin: Users'
+weight: 4
+is_admin: null
+permissions:
+  - 'access admin audit trail'
+  - 'access toolbar'
+  - 'access user profiles'
+  - 'assign admin_users role'
+  - 'assign approver role'
+  - 'assign approver_blog role'
+  - 'assign approver_event role'
+  - 'assign approver_news role'
+  - 'assign approver_page role'
+  - 'assign author_blog role'
+  - 'assign author_event role'
+  - 'assign author_news role'
+  - 'assign author_page role'
+  - 'masquerade as approver'
+  - 'masquerade as approver_blog'
+  - 'masquerade as approver_event'
+  - 'masquerade as approver_news'
+  - 'masquerade as approver_page'
+  - 'masquerade as authenticated'
+  - 'masquerade as author'
+  - 'masquerade as author_blog'
+  - 'masquerade as author_event'
+  - 'masquerade as author_news'
+  - 'masquerade as author_page'
+  - 'view the administration theme'

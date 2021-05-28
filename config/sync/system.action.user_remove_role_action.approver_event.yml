@@ -1,0 +1,14 @@
+uuid: 0946e288-56cc-4be7-8220-65d83860101f
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.approver_event
+  module:
+    - user
+id: user_remove_role_action.approver_event
+label: 'Remove the Approver: Event role from the selected user(s)'
+type: user
+plugin: user_remove_role_action
+configuration:
+  rid: approver_event

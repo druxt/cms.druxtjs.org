@@ -1,0 +1,14 @@
+uuid: a1182ed5-66b3-4af9-beeb-7adf196eb142
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.author_news
+  module:
+    - user
+id: user_add_role_action.author_news
+label: 'Add the Author: News role to the selected user(s)'
+type: user
+plugin: user_add_role_action
+configuration:
+  rid: author_news

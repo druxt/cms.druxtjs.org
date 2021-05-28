@@ -1,0 +1,10 @@
+uuid: 9746fba9-2459-4745-a5d9-a994fd06335a
+langcode: en
+status: true
+dependencies: {  }
+id: card
+label: Card
+icon_uuid: null
+icon_default: null
+description: 'Create a static card that links to an external site.'
+behavior_plugins: {  }
