@@ -1,0 +1,126 @@
+{
+    "uuid": [
+        {
+            "value": "b89b7128-d8bb-4c72-9c28-fbb052cf5a10"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "page",
+            "target_type": "node_type",
+            "target_uuid": "c52cd9cb-d0eb-46fd-ac6a-e7f5a32054d5"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2021-05-28T04:25:11+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "revision_uid": [
+        {
+            "target_type": "user",
+            "target_uuid": "2ce20dfd-af36-4336-b29e-99c7d1380b00"
+        }
+    ],
+    "revision_log": [
+        {
+            "value": "Created new Page"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        {
+            "target_type": "user",
+            "target_uuid": "2ce20dfd-af36-4336-b29e-99c7d1380b00"
+        }
+    ],
+    "title": [
+        {
+            "value": "Homepage"
+        }
+    ],
+    "created": [
+        {
+            "value": "2021-05-28T04:23:33+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2021-05-28T04:25:11+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "moderation_state": [
+        {
+            "value": "published"
+        }
+    ],
+    "path": [
+        {
+            "alias": "\/homepage",
+            "langcode": "en",
+            "pathauto": 1
+        }
+    ],
+    "content_translation_source": [
+        {
+            "value": "und"
+        }
+    ],
+    "content_translation_outdated": [
+        {
+            "value": false
+        }
+    ],
+    "field_approver": [],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "0dc890eb-4d5f-409f-ab79-814ef51ec20e"
+        }
+    ],
+    "field_content_supplementary": [],
+    "field_description": [
+        {
+            "value": "<p>Druxt is an open source framework for building Fully Decoupled Drupal integrations with Nuxt.js.<\/p>\r\n",
+            "format": "formatted"
+        }
+    ],
+    "field_display": [
+        {
+            "value": "landing"
+        }
+    ],
+    "field_image": []
+}

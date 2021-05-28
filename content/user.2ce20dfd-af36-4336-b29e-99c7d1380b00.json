@@ -57,5 +57,10 @@
         {
             "value": true
         }
+    ],
+    "role_change": [
+        {
+            "target_id": "__role_delegation_empty_field_value__"
+        }
     ]
 }

@@ -1,0 +1,113 @@
+{
+    "uuid": [
+        {
+            "value": "61dd3b32-4fef-4a7c-823b-44193ed6a023"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "blog",
+            "target_type": "node_type",
+            "target_uuid": "099b71bc-a724-4c2b-aa00-039950b719ec"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2021-05-28T04:26:44+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "revision_uid": [
+        {
+            "target_type": "user",
+            "target_uuid": "2ce20dfd-af36-4336-b29e-99c7d1380b00"
+        }
+    ],
+    "revision_log": [
+        {
+            "value": "Created new Blog"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        {
+            "target_type": "user",
+            "target_uuid": "2ce20dfd-af36-4336-b29e-99c7d1380b00"
+        }
+    ],
+    "title": [
+        {
+            "value": "Welcome to the new DruxtJS.org"
+        }
+    ],
+    "created": [
+        {
+            "value": "2021-05-28T04:25:44+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2021-05-28T04:26:44+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "promote": [
+        {
+            "value": true
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "moderation_state": [],
+    "path": [
+        {
+            "alias": "\/blog\/welcome-new-druxtjsorg-20210528",
+            "langcode": "en",
+            "pathauto": 1
+        }
+    ],
+    "content_translation_source": [
+        {
+            "value": "und"
+        }
+    ],
+    "content_translation_outdated": [
+        {
+            "value": false
+        }
+    ],
+    "field_approver": [],
+    "field_blog_category": [],
+    "field_content": [],
+    "field_content_supplementary": [],
+    "field_description": [
+        {
+            "value": "<p>DruxtJS.org is the new home for Druxt documentation and information.<\/p>\r\n",
+            "format": "formatted"
+        }
+    ],
+    "field_image": []
+}

@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "f5de5b59-175c-4591-a382-37399431169f"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/61dd3b32-4fef-4a7c-823b-44193ed6a023"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/blog\/welcome-new-druxtjsorg-20210528"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}
