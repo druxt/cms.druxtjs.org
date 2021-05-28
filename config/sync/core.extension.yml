@@ -12,6 +12,7 @@ module:
   admin_toolbar_links_access_filter: 0
   admin_toolbar_tools: 0
   advanced_text_formatter: 0
+  anonymous_redirect: 0
   big_pipe: 0
   block: 0
   block_content: 0
