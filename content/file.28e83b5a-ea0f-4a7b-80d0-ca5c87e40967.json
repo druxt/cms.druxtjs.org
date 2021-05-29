@@ -1,0 +1,55 @@
+{
+    "uuid": [
+        {
+            "value": "28e83b5a-ea0f-4a7b-80d0-ca5c87e40967"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "uid": [
+        {
+            "target_type": "user",
+            "target_uuid": "2ce20dfd-af36-4336-b29e-99c7d1380b00"
+        }
+    ],
+    "filename": [
+        {
+            "value": "logo.png"
+        }
+    ],
+    "uri": [
+        {
+            "value": "public:\/\/2021-05\/logo.png"
+        }
+    ],
+    "filemime": [
+        {
+            "value": "image\/png"
+        }
+    ],
+    "filesize": [
+        {
+            "value": 4444
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2021-05-29T06:43:33+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2021-05-29T06:43:47+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ]
+}

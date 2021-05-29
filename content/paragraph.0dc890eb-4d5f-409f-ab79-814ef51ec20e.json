@@ -45,6 +45,10 @@
     "field_content": [
         {
             "target_type": "paragraph",
+            "target_uuid": "94ab4a6a-34a6-40e4-8328-4022df3552a8"
+        },
+        {
+            "target_type": "paragraph",
             "target_uuid": "fd4cab6c-4707-4b13-8547-352b99264062"
         }
     ],
