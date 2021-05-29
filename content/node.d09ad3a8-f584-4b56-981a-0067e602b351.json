@@ -1,7 +1,7 @@
 {
     "uuid": [
         {
-            "value": "78f6e608-b83f-4e8f-816d-f88b8a05ab10"
+            "value": "d09ad3a8-f584-4b56-981a-0067e602b351"
         }
     ],
     "langcode": [
@@ -18,7 +18,7 @@
     ],
     "revision_timestamp": [
         {
-            "value": "2021-05-29T09:24:56+00:00",
+            "value": "2021-05-29T09:21:16+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
@@ -35,7 +35,7 @@
     ],
     "status": [
         {
-            "value": false
+            "value": true
         }
     ],
     "uid": [
@@ -46,18 +46,18 @@
     ],
     "title": [
         {
-            "value": "How to build a DruxtSite"
+            "value": "Setting up Drupal for Decoupling"
         }
     ],
     "created": [
         {
-            "value": "2021-05-28T10:08:59+00:00",
+            "value": "2021-05-29T09:18:33+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
     "changed": [
         {
-            "value": "2021-05-29T09:24:56+00:00",
+            "value": "2021-05-29T09:21:16+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
@@ -84,7 +84,7 @@
     "moderation_state": [],
     "path": [
         {
-            "alias": "\/blog\/how-build-druxtsite-20210528",
+            "alias": "\/blog\/setting-drupal-decoupling-20210529",
             "langcode": "en",
             "pathauto": 1
         }
@@ -103,21 +103,16 @@
     "field_blog_category": [
         {
             "target_type": "taxonomy_term",
-            "target_uuid": "a620e9b6-16a8-44aa-af1c-ab2bfbc6ba01"
+            "target_uuid": "2819b03a-ffb7-4496-a258-602f33be7be5"
         }
     ],
     "field_content": [],
     "field_content_supplementary": [],
     "field_description": [
         {
-            "value": "<p>The DruxtSite module provides an out of the box, Decoupled Drupal site building experience.<\/p>\r\n",
+            "value": "<p>Druxt connects Nuxt.js to Drupal using the JSON:API server.<\/p>\r\n",
             "format": "formatted"
         }
     ],
-    "field_image": [
-        {
-            "target_type": "media",
-            "target_uuid": "5eb9d282-2315-4879-9acd-4d9b0a3c63df"
-        }
-    ]
+    "field_image": []
 }

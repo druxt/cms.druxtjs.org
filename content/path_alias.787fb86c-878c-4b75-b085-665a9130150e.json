@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "787fb86c-878c-4b75-b085-665a9130150e"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/78f6e608-b83f-4e8f-816d-f88b8a05ab10"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/blog\/20210528\/how-build-druxtsite"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

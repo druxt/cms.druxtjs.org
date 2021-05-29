@@ -7,16 +7,16 @@ dependencies:
 id: blog
 label: Blog
 type: 'canonical_entities:node'
-pattern: 'blog/[node:title]-[node:created:custom:Ymd]'
+pattern: 'blog/[node:created:custom:Ymd]/[node:title]'
 selection_criteria:
-  b8a8da64-1025-4421-8ccf-7940bcd44239:
+  b7da1e24-60ed-440b-ab9c-25a0839f4c6f:
     id: node_type
     bundles:
       blog: blog
     negate: false
     context_mapping:
       node: node
-    uuid: b8a8da64-1025-4421-8ccf-7940bcd44239
+    uuid: b7da1e24-60ed-440b-ab9c-25a0839f4c6f
 selection_logic: and
 weight: -5
 relationships: {  }

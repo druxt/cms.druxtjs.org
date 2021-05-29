@@ -1,7 +1,7 @@
 {
     "uuid": [
         {
-            "value": "72403556-daf5-4193-96f1-896a3ed0b8cd"
+            "value": "9ddb441a-0d26-42db-8969-fd8a9eff1e81"
         }
     ],
     "langcode": [
@@ -11,12 +11,12 @@
     ],
     "path": [
         {
-            "value": "\/node\/b89b7128-d8bb-4c72-9c28-fbb052cf5a10"
+            "value": "\/node\/d09ad3a8-f584-4b56-981a-0067e602b351"
         }
     ],
     "alias": [
         {
-            "value": "\/homepage"
+            "value": "\/blog\/20210529\/setting-drupal-decoupling"
         }
     ],
     "status": [
