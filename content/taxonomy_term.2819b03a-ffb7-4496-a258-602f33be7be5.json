@@ -1,0 +1,108 @@
+{
+    "uuid": [
+        {
+            "value": "2819b03a-ffb7-4496-a258-602f33be7be5"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "vid": [
+        {
+            "target_id": "blog",
+            "target_type": "taxonomy_vocabulary",
+            "target_uuid": "77c0abf9-a0e0-49c9-be33-91f226458e78"
+        }
+    ],
+    "revision_created": [
+        {
+            "value": "2021-05-29T06:23:22+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "revision_user": [
+        {
+            "target_type": "user",
+            "target_uuid": "2ce20dfd-af36-4336-b29e-99c7d1380b00"
+        }
+    ],
+    "revision_log_message": [
+        {
+            "value": "Created new Blog"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "name": [
+        {
+            "value": "Drupal"
+        }
+    ],
+    "description": [
+        {
+            "value": "<p>Drupal is an open source PHP based content management system.<\/p>\r\n",
+            "format": "formatted"
+        }
+    ],
+    "weight": [
+        {
+            "value": 0
+        }
+    ],
+    "parent": [
+        {
+            "target_id": null
+        }
+    ],
+    "changed": [
+        {
+            "value": "2021-05-29T06:23:22+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        {
+            "alias": "",
+            "pid": null,
+            "langcode": "en",
+            "pathauto": 0
+        }
+    ],
+    "content_translation_source": [
+        {
+            "value": "und"
+        }
+    ],
+    "content_translation_outdated": [
+        {
+            "value": false
+        }
+    ],
+    "content_translation_uid": [
+        {
+            "target_type": "user",
+            "target_uuid": "2ce20dfd-af36-4336-b29e-99c7d1380b00"
+        }
+    ],
+    "content_translation_created": [
+        {
+            "value": "2021-05-29T06:23:22+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ]
+}

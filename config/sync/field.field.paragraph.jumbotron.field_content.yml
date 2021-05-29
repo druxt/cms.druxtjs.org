@@ -6,6 +6,7 @@ dependencies:
     - field.storage.paragraph.field_content
     - paragraphs.paragraphs_type.jumbotron
     - paragraphs.paragraphs_type.link
+    - paragraphs.paragraphs_type.media
     - paragraphs.paragraphs_type.text_formatted
     - paragraphs.paragraphs_type.text_markdown
     - paragraphs.paragraphs_type.text_plain
@@ -27,6 +28,7 @@ settings:
     negate: 0
     target_bundles:
       link: link
+      media: media
       text_formatted: text_formatted
       text_markdown: text_markdown
       text_plain: text_plain
@@ -47,8 +49,8 @@ settings:
         enabled: true
         weight: 15
       media:
+        enabled: true
         weight: 16
-        enabled: false
       section:
         weight: 17
         enabled: false

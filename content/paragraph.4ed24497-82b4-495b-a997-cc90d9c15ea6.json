@@ -1,7 +1,7 @@
 {
     "uuid": [
         {
-            "value": "a9a2c040-de44-402c-ba1d-0f9996ca6b41"
+            "value": "4ed24497-82b4-495b-a997-cc90d9c15ea6"
         }
     ],
     "langcode": [
@@ -23,7 +23,7 @@
     ],
     "created": [
         {
-            "value": "2021-05-28T07:48:09+00:00",
+            "value": "2021-05-29T03:16:59+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
@@ -45,12 +45,12 @@
     "field_content": [
         {
             "target_type": "paragraph",
-            "target_uuid": "a3a9d6b7-18d4-4c58-a23c-b98fb5f5ea12"
+            "target_uuid": "a3719301-822b-42ab-82c9-aaf98be95da0"
         }
     ],
     "field_title": [
         {
-            "value": "Drupal + Nuxt.js"
+            "value": "Community support"
         }
     ]
 }

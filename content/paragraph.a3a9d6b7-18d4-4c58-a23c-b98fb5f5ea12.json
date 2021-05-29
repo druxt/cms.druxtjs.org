@@ -1,7 +1,7 @@
 {
     "uuid": [
         {
-            "value": "a9a2c040-de44-402c-ba1d-0f9996ca6b41"
+            "value": "a3a9d6b7-18d4-4c58-a23c-b98fb5f5ea12"
         }
     ],
     "langcode": [
@@ -11,9 +11,9 @@
     ],
     "type": [
         {
-            "target_id": "section",
+            "target_id": "text_markdown",
             "target_type": "paragraphs_type",
-            "target_uuid": "36879357-96f7-4b56-8bf3-f91b01e4638d"
+            "target_uuid": "b2e4470f-5db0-4fe3-a0bc-545f0af9e561"
         }
     ],
     "status": [
@@ -23,7 +23,7 @@
     ],
     "created": [
         {
-            "value": "2021-05-28T07:48:09+00:00",
+            "value": "2021-05-29T01:19:36+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
@@ -42,15 +42,9 @@
             "value": true
         }
     ],
-    "field_content": [
+    "field_text_markdown": [
         {
-            "target_type": "paragraph",
-            "target_uuid": "a3a9d6b7-18d4-4c58-a23c-b98fb5f5ea12"
-        }
-    ],
-    "field_title": [
-        {
-            "value": "Drupal + Nuxt.js"
+            "value": "Druxt brings the power of the Drupal content management system together with the flexibility of the Nuxt.js frontend framework."
         }
     ]
 }

@@ -18,7 +18,7 @@
     ],
     "revision_timestamp": [
         {
-            "value": "2021-05-28T10:39:39+00:00",
+            "value": "2021-05-29T06:25:01+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
@@ -30,7 +30,7 @@
     ],
     "revision_log": [
         {
-            "value": "Updated the Image field"
+            "value": "Updated the Category field"
         }
     ],
     "status": [
@@ -57,7 +57,7 @@
     ],
     "changed": [
         {
-            "value": "2021-05-28T10:39:39+00:00",
+            "value": "2021-05-29T06:25:01+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
@@ -100,7 +100,16 @@
         }
     ],
     "field_approver": [],
-    "field_blog_category": [],
+    "field_blog_category": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "2819b03a-ffb7-4496-a258-602f33be7be5"
+        },
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "a620e9b6-16a8-44aa-af1c-ab2bfbc6ba01"
+        }
+    ],
     "field_content": [],
     "field_content_supplementary": [],
     "field_description": [
