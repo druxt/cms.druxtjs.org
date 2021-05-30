@@ -35,7 +35,7 @@
     ],
     "status": [
         {
-            "value": false
+            "value": true
         }
     ],
     "uid": [
@@ -57,7 +57,7 @@
     ],
     "changed": [
         {
-            "value": "2021-05-29T09:24:56+00:00",
+            "value": "2021-05-29T22:36:34+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
@@ -84,7 +84,7 @@
     "moderation_state": [],
     "path": [
         {
-            "alias": "\/blog\/how-build-druxtsite-20210528",
+            "alias": "\/blog\/20210528\/how-build-druxtsite",
             "langcode": "en",
             "pathauto": 1
         }

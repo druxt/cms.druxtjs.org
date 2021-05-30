@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.field.paragraph.code.field_code
     - field.field.paragraph.code.field_language
+    - field.field.paragraph.code.field_title
     - paragraphs.paragraphs_type.code
 id: paragraph.code.default
 targetEntityType: paragraph
@@ -17,6 +18,14 @@ content:
     settings: {  }
     third_party_settings: {  }
     type: basic_string
+    region: content
+  field_title:
+    weight: 1
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
     region: content
 hidden:
   field_language: true

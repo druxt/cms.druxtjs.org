@@ -1,7 +1,7 @@
 {
     "uuid": [
         {
-            "value": "5c8e1397-0376-4fdf-b8e1-a4320c6ec35f"
+            "value": "e2a9d815-7cc0-4346-acda-bcedd6f851bd"
         }
     ],
     "langcode": [
@@ -16,7 +16,7 @@
     ],
     "revision_created": [
         {
-            "value": "2021-05-29T03:00:52+00:00",
+            "value": "2021-05-30T02:06:34+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
@@ -38,7 +38,7 @@
     ],
     "title": [
         {
-            "value": "API"
+            "value": "Getting started"
         }
     ],
     "description": [],
@@ -49,7 +49,7 @@
     ],
     "link": [
         {
-            "uri": "https:\/\/docs.druxtjs.org\/api",
+            "uri": "entity:node\/5b1d4159-e2cf-46f6-9855-7cab3179407c",
             "title": "",
             "options": []
         }
@@ -66,7 +66,7 @@
     ],
     "weight": [
         {
-            "value": -50
+            "value": 0
         }
     ],
     "expanded": [
@@ -74,10 +74,14 @@
             "value": false
         }
     ],
-    "parent": [],
+    "parent": [
+        {
+            "value": "menu_link_content:564a8e34-234f-4f90-9b5c-22cc8cd600ba"
+        }
+    ],
     "changed": [
         {
-            "value": "2021-05-30T02:05:33+00:00",
+            "value": "2021-05-30T02:11:40+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],

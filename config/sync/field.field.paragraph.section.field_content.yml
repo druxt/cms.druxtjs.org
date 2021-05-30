@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.storage.paragraph.field_content
     - paragraphs.paragraphs_type.card_group
+    - paragraphs.paragraphs_type.code
     - paragraphs.paragraphs_type.link
     - paragraphs.paragraphs_type.media
     - paragraphs.paragraphs_type.section
@@ -33,6 +34,7 @@ settings:
       link: link
       media: media
       section: section
+      code: code
       text_markdown: text_markdown
       text_plain: text_plain
     target_bundles_drag_drop:
@@ -42,6 +44,9 @@ settings:
       card_group:
         enabled: true
         weight: -13
+      code:
+        enabled: true
+        weight: 14
       entity_reference:
         weight: 13
         enabled: false

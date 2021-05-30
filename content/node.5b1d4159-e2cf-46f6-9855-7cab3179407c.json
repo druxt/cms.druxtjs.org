@@ -1,7 +1,7 @@
 {
     "uuid": [
         {
-            "value": "d09ad3a8-f584-4b56-981a-0067e602b351"
+            "value": "5b1d4159-e2cf-46f6-9855-7cab3179407c"
         }
     ],
     "langcode": [
@@ -11,14 +11,14 @@
     ],
     "type": [
         {
-            "target_id": "blog",
+            "target_id": "page",
             "target_type": "node_type",
-            "target_uuid": "099b71bc-a724-4c2b-aa00-039950b719ec"
+            "target_uuid": "c52cd9cb-d0eb-46fd-ac6a-e7f5a32054d5"
         }
     ],
     "revision_timestamp": [
         {
-            "value": "2021-05-30T00:13:18+00:00",
+            "value": "2021-05-30T08:17:02+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
@@ -30,7 +30,7 @@
     ],
     "revision_log": [
         {
-            "value": "Updated the Content field"
+            "value": "Updated the Menu link and Content fields"
         }
     ],
     "status": [
@@ -46,24 +46,24 @@
     ],
     "title": [
         {
-            "value": "Setting up Drupal for Decoupled development"
+            "value": "Getting started"
         }
     ],
     "created": [
         {
-            "value": "2021-05-29T09:18:33+00:00",
+            "value": "2021-05-29T22:59:43+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
     "changed": [
         {
-            "value": "2021-05-30T00:13:18+00:00",
+            "value": "2021-05-30T08:17:02+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
     "promote": [
         {
-            "value": true
+            "value": false
         }
     ],
     "sticky": [
@@ -81,10 +81,14 @@
             "value": true
         }
     ],
-    "moderation_state": [],
+    "moderation_state": [
+        {
+            "value": "published"
+        }
+    ],
     "path": [
         {
-            "alias": "\/blog\/20210529\/setting-drupal-decoupled-development",
+            "alias": "\/guide\/getting-started",
             "langcode": "en",
             "pathauto": 1
         }
@@ -100,31 +104,30 @@
         }
     ],
     "field_approver": [],
-    "field_blog_category": [
-        {
-            "target_type": "taxonomy_term",
-            "target_uuid": "2819b03a-ffb7-4496-a258-602f33be7be5"
-        }
-    ],
     "field_content": [
         {
             "target_type": "paragraph",
-            "target_uuid": "98da6198-7d5a-45ca-97d5-a33edd7774cd"
+            "target_uuid": "fc3723fb-9d76-4465-8323-3e2530f6ff02"
         },
         {
             "target_type": "paragraph",
-            "target_uuid": "d2396155-0223-4c42-9b2e-d959b3240231"
+            "target_uuid": "c397c832-1bb9-47af-8eb7-2982e52b70b6"
         },
         {
             "target_type": "paragraph",
-            "target_uuid": "88886cd6-64e0-42cb-9e58-16e55c5d54ef"
+            "target_uuid": "6b8ecea4-c6d8-4162-8009-b61798543c58"
         }
     ],
     "field_content_supplementary": [],
     "field_description": [
         {
-            "value": "<p>Druxt connects Nuxt.js to Drupal using the JSON:API server.<\/p>\r\n",
+            "value": "<p>Getting started with DruxtJS.<\/p>\r\n",
             "format": "formatted"
+        }
+    ],
+    "field_display": [
+        {
+            "value": "default"
         }
     ],
     "field_image": []

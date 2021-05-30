@@ -18,7 +18,7 @@
     ],
     "revision_timestamp": [
         {
-            "value": "2021-05-28T04:26:44+00:00",
+            "value": "2021-05-29T10:58:42+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
@@ -30,7 +30,7 @@
     ],
     "revision_log": [
         {
-            "value": "Created new Blog"
+            "value": "Updated the Content field"
         }
     ],
     "status": [
@@ -57,7 +57,7 @@
     ],
     "changed": [
         {
-            "value": "2021-05-28T04:26:44+00:00",
+            "value": "2021-05-29T10:58:42+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
@@ -84,7 +84,7 @@
     "moderation_state": [],
     "path": [
         {
-            "alias": "\/blog\/welcome-new-druxtjsorg-20210528",
+            "alias": "\/blog\/20210528\/welcome-new-druxtjsorg",
             "langcode": "en",
             "pathauto": 1
         }
@@ -101,7 +101,12 @@
     ],
     "field_approver": [],
     "field_blog_category": [],
-    "field_content": [],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "5ee8250b-12f0-4b4e-a85a-8c99ffae116c"
+        }
+    ],
     "field_content_supplementary": [],
     "field_description": [
         {

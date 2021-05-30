@@ -8,3 +8,4 @@ weight: -9
 is_admin: null
 permissions:
   - 'access druxt resources'
+  - 'view linky entities'

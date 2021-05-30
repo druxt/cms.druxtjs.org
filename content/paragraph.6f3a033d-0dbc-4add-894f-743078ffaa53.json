@@ -1,0 +1,50 @@
+{
+    "uuid": [
+        {
+            "value": "6f3a033d-0dbc-4add-894f-743078ffaa53"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "text_markdown",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b2e4470f-5db0-4fe3-a0bc-545f0af9e561"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2021-05-30T07:13:44+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text_markdown": [
+        {
+            "value": "### 1. [Install Drupal](https:\/\/www.drupal.org\/docs\/installing-drupal)\r\n\r\n### 2. Download the [Druxt module](https:\/\/www.drupal.org\/project\/druxt)\r\n```sh\r\ncomposer require drupal\/druxt\r\n```\r\n\r\n### 3. Install the module\r\n\r\n```sh\r\ndrush en druxt\r\n```\r\n\r\n### 4. Add the \"access druxt resources\" permission to a user\/role\r\n\r\n```sh\r\ndrush rap [ROLE] 'access druxt resources'\r\n```"
+        }
+    ]
+}

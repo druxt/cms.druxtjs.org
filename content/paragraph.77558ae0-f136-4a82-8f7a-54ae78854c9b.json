@@ -1,7 +1,7 @@
 {
     "uuid": [
         {
-            "value": "0dc890eb-4d5f-409f-ab79-814ef51ec20e"
+            "value": "77558ae0-f136-4a82-8f7a-54ae78854c9b"
         }
     ],
     "langcode": [
@@ -11,9 +11,9 @@
     ],
     "type": [
         {
-            "target_id": "jumbotron",
+            "target_id": "code",
             "target_type": "paragraphs_type",
-            "target_uuid": "cb8c0371-1de6-4256-9837-ce1c11a5ae08"
+            "target_uuid": "b95847cb-3418-4515-9e2b-f80f19dbe8e4"
         }
     ],
     "status": [
@@ -23,7 +23,7 @@
     ],
     "created": [
         {
-            "value": "2021-05-28T04:24:29+00:00",
+            "value": "2021-05-30T07:16:47+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
@@ -42,23 +42,19 @@
             "value": true
         }
     ],
-    "field_content": [
+    "field_code": [
         {
-            "target_type": "paragraph",
-            "target_uuid": "94ab4a6a-34a6-40e4-8328-4022df3552a8"
-        },
+            "value": "composer require drupal\/druxt && drush en druxt && drush rap anonymous 'access druxt resources'"
+        }
+    ],
+    "field_language": [
         {
-            "target_type": "paragraph",
-            "target_uuid": "fd4cab6c-4707-4b13-8547-352b99264062"
-        },
-        {
-            "target_type": "paragraph",
-            "target_uuid": "02449a13-e88c-49a8-8325-f3d75ef29c88"
+            "value": "sh"
         }
     ],
     "field_title": [
         {
-            "value": "DruxtJS"
+            "value": "TL;DR"
         }
     ]
 }

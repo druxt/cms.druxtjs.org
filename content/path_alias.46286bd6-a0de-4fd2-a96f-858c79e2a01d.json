@@ -1,7 +1,7 @@
 {
     "uuid": [
         {
-            "value": "9ddb441a-0d26-42db-8969-fd8a9eff1e81"
+            "value": "46286bd6-a0de-4fd2-a96f-858c79e2a01d"
         }
     ],
     "langcode": [
@@ -11,12 +11,12 @@
     ],
     "path": [
         {
-            "value": "\/node\/d09ad3a8-f584-4b56-981a-0067e602b351"
+            "value": "\/node\/5b1d4159-e2cf-46f6-9855-7cab3179407c"
         }
     ],
     "alias": [
         {
-            "value": "\/blog\/20210529\/setting-drupal-decoupled-development"
+            "value": "\/guide\/getting-started"
         }
     ],
     "status": [

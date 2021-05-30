@@ -49,7 +49,7 @@
     ],
     "link": [
         {
-            "uri": "https:\/\/docs.druxtjs.org\/guide",
+            "uri": "entity:node\/caa3b725-f559-48e4-99ec-23d7c6f0632c",
             "title": "",
             "options": []
         }
@@ -66,18 +66,18 @@
     ],
     "weight": [
         {
-            "value": -49
+            "value": -48
         }
     ],
     "expanded": [
         {
-            "value": false
+            "value": true
         }
     ],
     "parent": [],
     "changed": [
         {
-            "value": "2021-05-29T03:01:39+00:00",
+            "value": "2021-05-30T02:05:33+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],

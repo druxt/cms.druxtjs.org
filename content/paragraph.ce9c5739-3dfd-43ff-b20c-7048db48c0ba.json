@@ -1,0 +1,50 @@
+{
+    "uuid": [
+        {
+            "value": "ce9c5739-3dfd-43ff-b20c-7048db48c0ba"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "text_markdown",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b2e4470f-5db0-4fe3-a0bc-545f0af9e561"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2021-05-30T08:14:20+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text_markdown": [
+        {
+            "value": "### 1. [Install Nuxt](https:\/\/nuxtjs.org\/guide\/installation\/)\r\n\r\n### 2. Install the Druxt module\r\n\r\n```sh\r\nnpm i druxt\r\n```\r\n\r\n### 3. Add the module and configuration to **nuxt.config.js**:\r\n\r\n```js\r\nmodule.exports = {\r\n  modules: [\r\n    'druxt'\r\n  ],\r\n  druxt: {\r\n    baseUrl: 'https:\/\/demo-api.druxtjs.org'\r\n  }\r\n}\r\n```"
+        }
+    ]
+}

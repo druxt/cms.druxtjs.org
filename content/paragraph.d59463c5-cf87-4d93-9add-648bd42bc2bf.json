@@ -1,7 +1,7 @@
 {
     "uuid": [
         {
-            "value": "94ab4a6a-34a6-40e4-8328-4022df3552a8"
+            "value": "d59463c5-cf87-4d93-9add-648bd42bc2bf"
         }
     ],
     "langcode": [
@@ -11,9 +11,9 @@
     ],
     "type": [
         {
-            "target_id": "media",
+            "target_id": "text_markdown",
             "target_type": "paragraphs_type",
-            "target_uuid": "b6b88d1a-0278-4841-bb9a-d16436f93cdb"
+            "target_uuid": "b2e4470f-5db0-4fe3-a0bc-545f0af9e561"
         }
     ],
     "status": [
@@ -23,7 +23,7 @@
     ],
     "created": [
         {
-            "value": "2021-05-29T06:43:25+00:00",
+            "value": "2021-05-30T07:47:34+00:00",
             "format": "Y-m-d\\TH:i:sP"
         }
     ],
@@ -37,11 +37,14 @@
             "value": true
         }
     ],
-    "revision_translation_affected": [],
-    "field_media": [
+    "revision_translation_affected": [
         {
-            "target_type": "media",
-            "target_uuid": "89ccced7-990b-43a9-8136-9c3f26c0edd0"
+            "value": true
+        }
+    ],
+    "field_text_markdown": [
+        {
+            "value": "### Development stack\r\n\r\nDruxt requires a Drupal backend and a Nuxt.js frontend, and each comes with it's own requirements."
         }
     ]
 }

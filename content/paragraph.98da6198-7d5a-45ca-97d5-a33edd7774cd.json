@@ -1,0 +1,46 @@
+{
+    "uuid": [
+        {
+            "value": "98da6198-7d5a-45ca-97d5-a33edd7774cd"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "text_markdown",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b2e4470f-5db0-4fe3-a0bc-545f0af9e561"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2021-05-29T09:30:41+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [],
+    "field_text_markdown": [
+        {
+            "value": "Drupal is a powerful, open source content management system (CMS) with a large community of contributors.\r\n\r\nBut while frontend developers turn towards modern, reactive Javascript frameworks like Vue and React, Drupal remains heavily coupled to its PHP based Twig templating language.\r\n\r\nThankfully, through the power of Decoupled or Headless Drupal, you can have the best of both world."
+        }
+    ]
+}

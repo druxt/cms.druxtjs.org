@@ -1,0 +1,46 @@
+{
+    "uuid": [
+        {
+            "value": "d2396155-0223-4c42-9b2e-d959b3240231"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "text_markdown",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b2e4470f-5db0-4fe3-a0bc-545f0af9e561"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2021-05-29T10:54:29+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [],
+    "field_text_markdown": [
+        {
+            "value": "## Introducing the Druxt module for Drupal\r\n\r\nThe Druxt module for Drupal makes it quick and easy to setup a connection between a Drupal backend and a Nuxt.js frontend.\r\n\r\nBy leveraging Drupal's own JSON:API module and eco-system, the Druxt module helps provide a great frontend developer experience without reinventing the wheel."
+        }
+    ]
+}
