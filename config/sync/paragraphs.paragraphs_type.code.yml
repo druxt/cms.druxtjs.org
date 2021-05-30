@@ -1,0 +1,16 @@
+uuid: b95847cb-3418-4515-9e2b-f80f19dbe8e4
+langcode: en
+status: true
+dependencies:
+  module:
+    - paragraphs_ee
+third_party_settings:
+  paragraphs_ee:
+    paragraphs_categories:
+      basics: basics
+id: code
+label: Code
+icon_uuid: null
+icon_default: null
+description: ''
+behavior_plugins: {  }

@@ -1,0 +1,33 @@
+uuid: a4cb188a-34e2-4186-829f-88b166e84006
+langcode: en
+status: true
+dependencies:
+  module:
+    - options
+    - paragraphs
+id: paragraph.field_language
+field_name: field_language
+entity_type: paragraph
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: php
+      label: PHP
+    -
+      value: js
+      label: Javascript
+    -
+      value: sh
+      label: Shell
+    -
+      value: vue
+      label: Vue.js
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false
