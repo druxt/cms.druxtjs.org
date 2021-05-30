@@ -26,6 +26,7 @@
     "drupal/content_lock": "^2.2",
     "drupal/core-composer-scaffold": "^9.1",
     "drupal/core-recommended": "^9.1",
+    "drupal/devel": "^4.1",
     "drupal/diff": "^1.0",
     "drupal/druxt": "1.0.0-beta2",
     "drupal/entity_browser": "^2.5",
@@ -139,6 +140,10 @@
       },
       "drupal/focal_point": {
         "Preview link accidentally closes the media library https://www.drupal.org/project/focal_point/issues/3162210#comment-13855854": "https://www.drupal.org/files/issues/2020-10-11/preview_link_accidentally_closes_the_media_library-3162210-19.patch"
+      },
+      "drupal/jsonapi_menu_items": {
+        "https://www.drupal.org/project/jsonapi_menu_items/issues/3198306": "https://git.drupalcode.org/project/jsonapi_menu_items/-/merge_requests/4.diff",
+        "https://www.drupal.org/project/jsonapi_menu_items/issues/3213317": "https://git.drupalcode.org/project/jsonapi_menu_items/-/merge_requests/5.diff"
       }
     }
   }
