@@ -2,3 +2,4 @@
 
 composer install
 ddev start
+ddev drush tome:install -y
