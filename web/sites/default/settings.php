@@ -290,7 +290,7 @@ $settings['config_sync_directory'] = '../config';
  *   $settings['hash_salt'] = file_get_contents('/home/example/salt.txt');
  * @endcode
  */
-$settings['hash_salt'] = '';
+$settings['hash_salt'] = '9jl8a1CY8JS6GSCNwWekHCaIrh7xIZGbKaykJ5-FlKmOc_4u8O3XGbTz5b5g8Zk2Xx7OC9Y2bg';
 
 /**
  * Deployment identifier.
@@ -755,6 +755,16 @@ $settings['entity_update_backup'] = TRUE;
  * node migrations.
  */
 $settings['migrate_node_migrate_type_classic'] = FALSE;
+
+$databases['default']['default'] = [
+  'driver' => 'mysql',
+  'database' => getenv('MARIADB_DATABASE') ?: 'drupal',
+  'username' => getenv('MARIADB_USERNAME') ?: 'drupal',
+  'password' => getenv('MARIADB_PASSWORD') ?: 'drupal',
+  'host' => getenv('MARIADB_HOST') ?: 'mariadb',
+  'port' => getenv('MARIADB_PORT') ?: '3306',
+  'prefix' => '',
+];
 
 // Automatically generated include for settings managed by ddev.
 if (file_exists(__DIR__ . '/settings.ddev.php') && getenv('IS_DDEV_PROJECT') == 'true') {
