@@ -1,0 +1,5 @@
+enable_redirect: true
+redirect_url: /user/login
+_core:
+  default_config_hash: 7W0OZCDLDWnVvdsXF32v3ieBb-NVaDu3KTv_zlLF5dw
+redirect_url_overrides: "/jsonapi\r\n/jsonapi/*\r\n/user\r\n/user/*"
