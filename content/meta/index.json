@@ -2,5 +2,16 @@
     "shortcut.31f547c3-651a-4564-94bd-069b7f51d508": [],
     "shortcut.7a7a51ee-2d8a-41ee-b498-e92775111bd8": [],
     "user.fa4cc90c-e0c2-4af9-9075-6c36297b3a13": [],
-    "user.ffa54b8f-934f-4b06-a53a-5e1ccc88dc4d": []
+    "user.ffa54b8f-934f-4b06-a53a-5e1ccc88dc4d": [],
+    "user.d352fb9e-8eff-4312-bcfe-b8ae93b7362b": [],
+    "paragraph.bba2731c-810b-46f5-b9c7-92510961fe94": [],
+    "node.cffd6342-c22b-4ff5-b48c-ef87129312cf": [
+        "user.fa4cc90c-e0c2-4af9-9075-6c36297b3a13",
+        "paragraph.46433398-f7a1-48a7-ab93-73eef82f08f3",
+        "paragraph.bba2731c-810b-46f5-b9c7-92510961fe94"
+    ],
+    "paragraph.46433398-f7a1-48a7-ab93-73eef82f08f3": [],
+    "path_alias.8b892b8d-40c1-4981-ac08-72aebf6b3f82": [
+        "node.cffd6342-c22b-4ff5-b48c-ef87129312cf"
+    ]
 }

@@ -1,0 +1,116 @@
+{
+    "uuid": [
+        {
+            "value": "cffd6342-c22b-4ff5-b48c-ef87129312cf"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "article",
+            "target_type": "node_type",
+            "target_uuid": "54ac77db-b51a-4771-a457-0100324b8b40"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2021-10-17T21:14:34+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "revision_uid": [
+        {
+            "target_type": "user",
+            "target_uuid": "fa4cc90c-e0c2-4af9-9075-6c36297b3a13"
+        }
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        {
+            "target_type": "user",
+            "target_uuid": "fa4cc90c-e0c2-4af9-9075-6c36297b3a13"
+        }
+    ],
+    "title": [
+        {
+            "value": "Hello world"
+        }
+    ],
+    "created": [
+        {
+            "value": "2021-10-17T04:17:56+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2021-10-17T21:14:34+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "promote": [
+        {
+            "value": true
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        {
+            "alias": null,
+            "pid": null,
+            "langcode": "en"
+        }
+    ],
+    "body": [
+        {
+            "value": "<p>Welcome to the new Druxt blog, written in Drupal, displayed in Nuxt.<\/p>\r\n\r\n<p>This is the first of what is hoped to be many posts by many authors to help bring the good word of Druxt to the masses.<\/p>\r\n",
+            "format": "basic_html",
+            "summary": "Welcome to the new Druxt blog, written in Drupal, displayed in Nuxt."
+        }
+    ],
+    "comment": [
+        {
+            "status": 2,
+            "cid": 0,
+            "last_comment_timestamp": 1634444358,
+            "last_comment_name": null,
+            "last_comment_uid": 1,
+            "comment_count": 0
+        }
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "46433398-f7a1-48a7-ab93-73eef82f08f3"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "bba2731c-810b-46f5-b9c7-92510961fe94"
+        }
+    ],
+    "field_image": [],
+    "field_tags": []
+}

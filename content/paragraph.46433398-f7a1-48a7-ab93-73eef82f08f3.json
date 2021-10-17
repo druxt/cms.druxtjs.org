@@ -1,0 +1,56 @@
+{
+    "uuid": [
+        {
+            "value": "46433398-f7a1-48a7-ab93-73eef82f08f3"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "5ebc23b3-d5ab-408d-b952-5b953e1ff85f"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2021-10-17T20:30:52+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "<p>My name is Stuart Clark,<\/p>\r\n\r\n<p>I'm an Australian technophile, partner of 1 and parent of 2.<\/p>\r\n\r\n<p>A Drupal developer by trade and choice, having first started using Drupal around 15 years ago and never having found a reasons to stop. I've built and contributed to hundreds of modules over those years, and will continue doing so in the future.<\/p>\r\n\r\n<p>I'm a partner at Realityloop, Drupal specialists based in Victoria, Australia, where I've been working with clients and the community for over 10 years.<\/p>\r\n\r\n<p>As well as being a Drupalist, I'm a strong proponent of Vue.js and Nuxt.js, both of which I have been using for around 4 years. While Drupal brings a lot of power to the backend, Vue and Nuxt bring what Drupal lacks to the Frontend.<\/p>\r\n\r\n<p>And I'm the creator and lead developer DruxtJS.<\/p>\r\n",
+            "format": "basic_html"
+        }
+    ],
+    "field_title": [
+        {
+            "value": "Who am I?"
+        }
+    ]
+}

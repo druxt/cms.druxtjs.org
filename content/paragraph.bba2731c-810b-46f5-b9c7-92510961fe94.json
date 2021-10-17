@@ -1,0 +1,56 @@
+{
+    "uuid": [
+        {
+            "value": "bba2731c-810b-46f5-b9c7-92510961fe94"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "5ebc23b3-d5ab-408d-b952-5b953e1ff85f"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2021-10-17T04:19:18+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "<p>Druxt is a fully open source framework built to bring together two great frameworks, Drupal and Nuxt.<\/p>\r\n\r\n<p>The primary goal for Druxt is to make it easier for Frontend developers to build modern user experiences for Drupal using reactive javascript technologies, without needing to first learn PHP and how to \"Do it the Drupal way\".<\/p>\r\n\r\n<p>Druxt's fully decoupled approach to Drupal allows you to take full control of the frontend within Nuxt, but still allows you to take advantage of Drupals powerful site building and data modelling capabilities so you don't have to reinvent the wheel.<\/p>\r\n\r\n<p>Druxt is made up of 8 primary modules, each exposing some part of Drupal functionality to the frontend; Entities, Views, Blocks and more.<\/p>\r\n",
+            "format": "basic_html"
+        }
+    ],
+    "field_title": [
+        {
+            "value": "What is Druxt?"
+        }
+    ]
+}
