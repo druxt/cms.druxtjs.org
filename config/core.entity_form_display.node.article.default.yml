@@ -11,10 +11,8 @@ dependencies:
     - image.style.thumbnail
     - node.type.article
   module:
-    - comment
     - image
     - paragraphs
-    - path
     - text
 _core:
   default_config_hash: 6VUXB1jTUjK5zjkfMa2Kd2WW4sFUlgfBlfJSx01qLpU
@@ -33,12 +31,6 @@ content:
       placeholder: ''
       show_summary: false
     third_party_settings: {  }
-  comment:
-    type: comment_default
-    weight: 20
-    region: content
-    settings: {  }
-    third_party_settings: {  }
   created:
     type: datetime_timestamp
     weight: 10
@@ -47,7 +39,7 @@ content:
     third_party_settings: {  }
   field_content:
     type: entity_reference_paragraphs
-    weight: 121
+    weight: 2
     settings:
       title: Paragraph
       title_plural: Paragraphs
@@ -75,12 +67,6 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-  path:
-    type: path
-    weight: 30
-    region: content
-    settings: {  }
-    third_party_settings: {  }
   promote:
     type: boolean_checkbox
     settings:
@@ -93,13 +79,6 @@ content:
     settings:
       display_label: true
     weight: 120
-    region: content
-    third_party_settings: {  }
-  sticky:
-    type: boolean_checkbox
-    settings:
-      display_label: true
-    weight: 16
     region: content
     third_party_settings: {  }
   title:
@@ -120,4 +99,7 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-hidden: {  }
+hidden:
+  comment: true
+  path: true
+  sticky: true
