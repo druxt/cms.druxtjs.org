@@ -1,7 +1,7 @@
 uuid: 64768be7-1c25-494f-b641-253f402930ec
-name: 'Drush Site-Install'
-mail: admin@example.com
-slogan: ''
+name: DruxtCMS
+mail: stu@rtclark.net
+slogan: 'Drupal in the backend'
 page:
   403: ''
   404: ''
