@@ -25,6 +25,7 @@
         "drupal/gin": "^3.0@alpha",
         "drupal/gin_login": "^1.0",
         "drupal/paragraphs": "^1.12",
+        "drupal/pathauto": "^1.8",
         "drupal/tome": "^1.4",
         "drush/drush": "^10.6"
     },
