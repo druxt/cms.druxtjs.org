@@ -47,7 +47,7 @@
         "drupal/focal_point": "^1.5",
         "drupal/gin": "^3.0@beta",
         "drupal/gin_login": "^1.1",
-        "drupal/gin_toolbar": "^1.0.0-beta9@beta",
+        "drupal/gin_toolbar": "^1.0@beta",
         "drupal/jsonapi_hypermedia": "^1.6",
         "drupal/jsonapi_node_preview": "^1.0@beta",
         "drupal/jsonapi_node_preview_tab": "1.0.x-dev",
