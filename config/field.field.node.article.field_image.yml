@@ -1,40 +1,29 @@
-uuid: ae652364-d07e-44a6-acea-5f04f6c97463
+uuid: 41a5c0b3-54ee-450f-9294-04a7e6ba493e
 langcode: en
 status: true
 dependencies:
   config:
     - field.storage.node.field_image
+    - media.type.image
     - node.type.article
-  module:
-    - image
-_core:
-  default_config_hash: tgJzhA7Swh4M_gWU5FwFe5lPxPj5rebpMbvhpdNrERs
 id: node.article.field_image
 field_name: field_image
 entity_type: node
 bundle: article
 label: Image
-description: ''
+description: "This will be used for social meta tags and certain feature displays for this item throughout the site.\r\n<ul>\r\n<li>It will be cropped and resized appropriately for display.</li>\r\n<li>The ideal size to make your image is 1200 x 1200 or larger with a square aspect ratio due to how different social networks handle images.</li>\r\n<li>If no image is provided a site default one will be used for the social meta image.</li>\r\n</ul>"
 required: false
-translatable: true
+translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:
-  file_directory: '[date:custom:Y]-[date:custom:m]'
-  file_extensions: 'png gif jpg jpeg'
-  max_filesize: ''
-  max_resolution: ''
-  min_resolution: ''
-  alt_field: true
-  title_field: false
-  alt_field_required: true
-  title_field_required: false
-  default_image:
-    uuid: null
-    alt: ''
-    title: ''
-    width: null
-    height: null
-  handler: 'default:file'
-  handler_settings: {  }
-field_type: image
+  handler: 'default:media'
+  handler_settings:
+    target_bundles:
+      image: image
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: true
+    auto_create_bundle: ''
+field_type: entity_reference

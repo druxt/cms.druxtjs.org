@@ -1,4 +1,4 @@
-uuid: a5db1dcb-4f25-42b9-94be-0fc89795ca71
+uuid: 9e4682f7-78a5-4ca7-9328-3299da4912c9
 langcode: en
 status: true
 dependencies:
@@ -17,6 +17,6 @@ plugin: help_block
 settings:
   id: help_block
   label: Help
-  provider: help
   label_display: '0'
+  provider: help
 visibility: {  }
