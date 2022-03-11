@@ -5,8 +5,18 @@ project: cms-druxtjs-org
 tasks:
   post-rollout:
     - run:
-        name: drush tome:install
+        name: Install Drupal via Tome sync
         command: drush tome:install -y
+        service: cli
+
+    - run:
+        name: Rebuild node access
+        command: drush php-eval 'node_access_rebuild();'
+        service: cli
+
+    - run:
+        name: Rebuild cache
+        command: drush cache:rebuild
         service: cli
 
 environments:
