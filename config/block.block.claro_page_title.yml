@@ -1,6 +1,6 @@
-uuid: d655dc4f-0588-4753-85d5-74cdead178c1
+uuid: 907fdefd-dda1-4eb2-a3b3-3e2911861f15
 langcode: en
-status: true
+status: false
 dependencies:
   theme:
     - claro
@@ -15,6 +15,6 @@ plugin: page_title_block
 settings:
   id: page_title_block
   label: 'Page title'
-  provider: core
   label_display: '0'
+  provider: core
 visibility: {  }

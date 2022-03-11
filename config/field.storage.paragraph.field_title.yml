@@ -1,4 +1,4 @@
-uuid: f8cdbd30-d982-47eb-a45c-a89b91a0fa95
+uuid: 8ec5512e-c6d2-4dc3-9bf2-1481fd37e968
 langcode: en
 status: true
 dependencies:
@@ -10,8 +10,8 @@ entity_type: paragraph
 type: string
 settings:
   max_length: 255
-  is_ascii: false
   case_sensitive: false
+  is_ascii: false
 module: core
 locked: false
 cardinality: 1

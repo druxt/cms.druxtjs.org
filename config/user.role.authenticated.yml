@@ -1,28 +1,31 @@
-uuid: 394e90be-ec4b-444d-92a5-636e66ed3ca3
+uuid: 4ef0789d-7916-4778-87d3-09c666e44547
 langcode: en
 status: true
 dependencies:
-  config:
-    - filter.format.basic_html
   module:
-    - comment
-    - contact
-    - filter
-    - search
-    - shortcut
+    - exclude_node_title
+    - gin_toolbar
+    - media
+    - paragraphs_type_permissions
     - system
 _core:
-  default_config_hash: I44QAB4es39lNzMQWiJLq2dfjX7VRSOzT_5KzAcUq_M
+  default_config_hash: dJ0L2DNSj5q6XVZAGsuVDpJTh5UeYkIPwKrUOOpr8YI
 id: authenticated
 label: 'Authenticated user'
-weight: 1
+weight: -8
 is_admin: false
 permissions:
-  - 'access comments'
   - 'access content'
-  - 'access shortcuts'
-  - 'access site-wide contact form'
-  - 'post comments'
-  - 'search content'
-  - 'skip comment approval'
-  - 'use text format basic_html'
+  - 'access secondary toolbar'
+  - 'use exclude node title'
+  - 'view media'
+  - 'view paragraph content card'
+  - 'view paragraph content card_group'
+  - 'view paragraph content entity_reference'
+  - 'view paragraph content jumbotron'
+  - 'view paragraph content link'
+  - 'view paragraph content listing'
+  - 'view paragraph content media'
+  - 'view paragraph content section'
+  - 'view paragraph content text_formatted'
+  - 'view paragraph content text_markdown'

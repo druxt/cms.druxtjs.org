@@ -1,14 +1,15 @@
-uuid: 64768be7-1c25-494f-b641-253f402930ec
-name: DruxtCMS
-mail: stu@rtclark.net
-slogan: 'Drupal in the backend'
+_core:
+  default_config_hash: yXadRE77Va-G6dxhd2kPYapAvbnSvTF6hO4oXiOEynI
+langcode: en
+uuid: c014c208-2bbf-45d1-b9ef-4c7a5f1063b9
+name: Foundry
+mail: info@client-domain.com
+slogan: ''
 page:
   403: ''
   404: ''
-  front: /node
+  front: /user/login
 admin_compact_mode: false
 weight_select_max: 100
-langcode: en
 default_langcode: en
-_core:
-  default_config_hash: yTxtFqBHnEWxQswuWvkjE8mKw2t8oKuCL1q8KnfHuGE
+mail_notification: ''
