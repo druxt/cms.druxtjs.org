@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e910e7580e6c95125ff688d8fa0163dc",
+    "content-hash": "e48629dd580d4a4ab96fac870a14a1f2",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -3627,11 +3627,17 @@
         },
         {
             "name": "drupal/gin",
-            "version": "dev-3.x",
+            "version": "3.0.0-beta1",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/gin.git",
-                "reference": "fae37424477565bd7de0a00b5c8e9c47e9e27227"
+                "reference": "8.x-3.0-beta1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/gin-8.x-3.0-beta1.zip",
+                "reference": "8.x-3.0-beta1",
+                "shasum": "dbe47c411408c6877b8b4c04e45f82b7c229a786"
             },
             "require": {
                 "drupal/core": "^8.9 || ^9 || ^10",
@@ -3639,15 +3645,12 @@
             },
             "type": "drupal-theme",
             "extra": {
-                "branch-alias": {
-                    "dev-3.x": "3.x-dev"
-                },
                 "drupal": {
-                    "version": "8.x-3.0-alpha37+72-dev",
-                    "datestamp": "1646748821",
+                    "version": "8.x-3.0-beta1",
+                    "datestamp": "1646929485",
                     "security-coverage": {
                         "status": "not-covered",
-                        "message": "Dev releases are not covered by Drupal security advisories."
+                        "message": "Beta releases are not covered by Drupal security advisories."
                     }
                 }
             },
@@ -3681,26 +3684,29 @@
         },
         {
             "name": "drupal/gin_login",
-            "version": "dev-1.x",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/gin_login.git",
-                "reference": "a0c75f2226c432e7d5b156f41417367e8f7fd09a"
+                "reference": "8.x-1.1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/gin_login-8.x-1.1.zip",
+                "reference": "8.x-1.1",
+                "shasum": "830b7bc7de4934dc75b7f292c263ab43c04cb95d"
             },
             "require": {
                 "drupal/core": "^8 || ^9 || ^10"
             },
             "type": "drupal-module",
             "extra": {
-                "branch-alias": {
-                    "dev-1.x": "1.x-dev"
-                },
                 "drupal": {
-                    "version": "8.x-1.0+4-dev",
-                    "datestamp": "1645176069",
+                    "version": "8.x-1.1",
+                    "datestamp": "1646929980",
                     "security-coverage": {
-                        "status": "not-covered",
-                        "message": "Dev releases are not covered by Drupal security advisories."
+                        "status": "covered",
+                        "message": "Covered by Drupal's security advisory policy"
                     }
                 }
             },
@@ -3737,26 +3743,29 @@
         },
         {
             "name": "drupal/gin_toolbar",
-            "version": "dev-1.x",
+            "version": "1.0.0-beta21",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/gin_toolbar.git",
-                "reference": "802a3b763162f2bfcdc692b1710228dfa0b87f6a"
+                "reference": "8.x-1.0-beta21"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/gin_toolbar-8.x-1.0-beta21.zip",
+                "reference": "8.x-1.0-beta21",
+                "shasum": "25522839cc22b25410cd478902096a649fd9ab61"
             },
             "require": {
                 "drupal/core": "^8 || ^9 || ^10"
             },
             "type": "drupal-module",
             "extra": {
-                "branch-alias": {
-                    "dev-1.x": "1.x-dev"
-                },
                 "drupal": {
-                    "version": "8.x-1.0-beta20+10-dev",
-                    "datestamp": "1644787973",
+                    "version": "8.x-1.0-beta21",
+                    "datestamp": "1646929714",
                     "security-coverage": {
                         "status": "not-covered",
-                        "message": "Dev releases are not covered by Drupal security advisories."
+                        "message": "Beta releases are not covered by Drupal security advisories."
                     }
                 }
             },
@@ -15119,9 +15128,8 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "drupal-tome/tome_drush": 20,
-        "drupal/gin": 20,
-        "drupal/gin_login": 20,
-        "drupal/gin_toolbar": 20,
+        "drupal/gin": 10,
+        "drupal/gin_toolbar": 10,
         "drupal/jsonapi_node_preview": 10,
         "drupal/jsonapi_node_preview_tab": 20,
         "drupal/layout_paragraphs": 20,
