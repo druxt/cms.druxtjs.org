@@ -16,7 +16,7 @@
     },
     "require": {
         "php": ">=8.1",
-        "composer/installers": "^2.0",
+        "composer/installers": "^2.1",
         "cweagans/composer-patches": "^1.7",
         "drupal-tome/tome_drush": "dev-master",
         "drupal/admin_audit_trail": "^1.0",
@@ -46,7 +46,7 @@
         "drupal/field_tools": "^1.0",
         "drupal/focal_point": "^1.5",
         "drupal/gin": "^3.0@beta",
-        "drupal/gin_login": "^1.1",
+        "drupal/gin_login": "^1.2",
         "drupal/gin_toolbar": "^1.0@beta",
         "drupal/jsonapi_hypermedia": "^1.6",
         "drupal/jsonapi_node_preview": "^1.0@beta",
