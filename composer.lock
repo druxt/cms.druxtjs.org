@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "95fa105f035f9893dc9f880a95b2dd1c",
+    "content-hash": "8896cc122aae2b285c60ae06197e86ec",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -3605,17 +3605,17 @@
         },
         {
             "name": "drupal/gin",
-            "version": "3.0.0-beta2",
+            "version": "3.0.0-beta3",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/gin.git",
-                "reference": "8.x-3.0-beta2"
+                "reference": "8.x-3.0-beta3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/gin-8.x-3.0-beta2.zip",
-                "reference": "8.x-3.0-beta2",
-                "shasum": "5f38fab22d33ec4ec5e696f5bc804d8accb456a2"
+                "url": "https://ftp.drupal.org/files/projects/gin-8.x-3.0-beta3.zip",
+                "reference": "8.x-3.0-beta3",
+                "shasum": "1478b2500ca90ca1d9638f51c0d74bdd1aa564f3"
             },
             "require": {
                 "drupal/core": "^8.9 || ^9 || ^10",
@@ -3624,8 +3624,8 @@
             "type": "drupal-theme",
             "extra": {
                 "drupal": {
-                    "version": "8.x-3.0-beta2",
-                    "datestamp": "1649710290",
+                    "version": "8.x-3.0-beta3",
+                    "datestamp": "1653469967",
                     "security-coverage": {
                         "status": "not-covered",
                         "message": "Beta releases are not covered by Drupal security advisories."
@@ -3633,6 +3633,11 @@
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
+            "scripts": {
+                "phpcs": [
+                    "phpcs -s --runtime-set ignore_warnings_on_exit 1 --runtime-set ignore_errors_on_exit 0 'web/modules/custom'"
+                ]
+            },
             "license": [
                 "GPL-2.0-or-later"
             ],
@@ -3780,17 +3785,17 @@
         },
         {
             "name": "drupal/jsonapi_hypermedia",
-            "version": "1.6.0",
+            "version": "1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/jsonapi_hypermedia.git",
-                "reference": "8.x-1.6"
+                "reference": "8.x-1.7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/jsonapi_hypermedia-8.x-1.6.zip",
-                "reference": "8.x-1.6",
-                "shasum": "10f9e9fdfe8ae465d277f13c1d98e9389b14dec1"
+                "url": "https://ftp.drupal.org/files/projects/jsonapi_hypermedia-8.x-1.7.zip",
+                "reference": "8.x-1.7",
+                "shasum": "02726ac9629e3304198ca2f8a56a2641fa47ac81"
             },
             "require": {
                 "drupal/core": "^8.8 || ^9.0"
@@ -3798,8 +3803,8 @@
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "8.x-1.6",
-                    "datestamp": "1582916946",
+                    "version": "8.x-1.7",
+                    "datestamp": "1651244596",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
@@ -3905,29 +3910,29 @@
         },
         {
             "name": "drupal/jsonapi_node_preview",
-            "version": "1.0.0-beta1",
+            "version": "1.0.0-beta2",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/jsonapi_node_preview.git",
-                "reference": "1.0.0-beta1"
+                "reference": "1.0.0-beta2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/jsonapi_node_preview-1.0.0-beta1.zip",
-                "reference": "1.0.0-beta1",
-                "shasum": "f44a9f6d8275cb8e43b333218bc37ed00889b5e6"
+                "url": "https://ftp.drupal.org/files/projects/jsonapi_node_preview-1.0.0-beta2.zip",
+                "reference": "1.0.0-beta2",
+                "shasum": "d339c7cdb36ea6acf61367f87ff5d7bd10873a28"
             },
             "require": {
-                "drupal/core": "^9"
+                "drupal/core": ">=9"
             },
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "1.0.0-beta1",
-                    "datestamp": "1643152565",
+                    "version": "1.0.0-beta2",
+                    "datestamp": "1651613908",
                     "security-coverage": {
                         "status": "not-covered",
-                        "message": "Project has not opted into security advisory coverage!"
+                        "message": "Beta releases are not covered by Drupal security advisories."
                     }
                 }
             },
@@ -5886,17 +5891,17 @@
         },
         {
             "name": "drupal/tome",
-            "version": "1.6.0",
+            "version": "1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/tome.git",
-                "reference": "8.x-1.6"
+                "reference": "8.x-1.7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/tome-8.x-1.6.zip",
-                "reference": "8.x-1.6",
-                "shasum": "b24f3112af4a27a8746dcd077a40ac658bf459af"
+                "url": "https://ftp.drupal.org/files/projects/tome-8.x-1.7.zip",
+                "reference": "8.x-1.7",
+                "shasum": "be2486b47330e4c5641ad57b509285ed8aa53982"
             },
             "require": {
                 "drupal/core": "^8 || ^9",
@@ -5915,8 +5920,8 @@
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "8.x-1.6",
-                    "datestamp": "1646489617",
+                    "version": "8.x-1.7",
+                    "datestamp": "1650988449",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
@@ -5945,7 +5950,7 @@
         },
         {
             "name": "drupal/tome_base",
-            "version": "1.6.0",
+            "version": "1.7.0",
             "require": {
                 "drupal/core": "^8 || ^9",
                 "drupal/tome": "^1"
@@ -5953,8 +5958,8 @@
             "type": "metapackage",
             "extra": {
                 "drupal": {
-                    "version": "8.x-1.6",
-                    "datestamp": "1646489617",
+                    "version": "8.x-1.7",
+                    "datestamp": "1650988449",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
@@ -5983,7 +5988,7 @@
         },
         {
             "name": "drupal/tome_static",
-            "version": "1.6.0",
+            "version": "1.7.0",
             "require": {
                 "drupal/core": "^8 || ^9",
                 "drupal/tome": "^1",
@@ -5992,8 +5997,8 @@
             "type": "metapackage",
             "extra": {
                 "drupal": {
-                    "version": "8.x-1.6",
-                    "datestamp": "1646489617",
+                    "version": "8.x-1.7",
+                    "datestamp": "1650988449",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
@@ -6022,7 +6027,7 @@
         },
         {
             "name": "drupal/tome_sync",
-            "version": "1.6.0",
+            "version": "1.7.0",
             "require": {
                 "drupal/core": "^8 || ^9",
                 "drupal/tome": "^1",
@@ -6031,8 +6036,8 @@
             "type": "metapackage",
             "extra": {
                 "drupal": {
-                    "version": "8.x-1.6",
-                    "datestamp": "1646489617",
+                    "version": "8.x-1.7",
+                    "datestamp": "1650988449",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
@@ -9113,16 +9118,16 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v4.4.37",
+            "version": "v4.4.41",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "b17d76d7ed179f017aad646e858c90a2771af15d"
+                "reference": "40790bdf293b462798882ef6da72bb49a4a6633a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/b17d76d7ed179f017aad646e858c90a2771af15d",
-                "reference": "b17d76d7ed179f017aad646e858c90a2771af15d",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/40790bdf293b462798882ef6da72bb49a4a6633a",
+                "reference": "40790bdf293b462798882ef6da72bb49a4a6633a",
                 "shasum": ""
             },
             "require": {
@@ -9155,7 +9160,7 @@
             "description": "Finds files and directories via an intuitive fluent interface",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/finder/tree/v4.4.37"
+                "source": "https://github.com/symfony/finder/tree/v4.4.41"
             },
             "funding": [
                 {
@@ -9171,7 +9176,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-01-02T09:41:36+00:00"
+            "time": "2022-04-14T15:36:10+00:00"
         },
         {
             "name": "symfony/http-client-contracts",
@@ -10653,16 +10658,16 @@
         },
         {
             "name": "symfony/string",
-            "version": "v6.0.3",
+            "version": "v6.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/string.git",
-                "reference": "522144f0c4c004c80d56fa47e40e17028e2eefc2"
+                "reference": "ac0aa5c2282e0de624c175b68d13f2c8f2e2649d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/string/zipball/522144f0c4c004c80d56fa47e40e17028e2eefc2",
-                "reference": "522144f0c4c004c80d56fa47e40e17028e2eefc2",
+                "url": "https://api.github.com/repos/symfony/string/zipball/ac0aa5c2282e0de624c175b68d13f2c8f2e2649d",
+                "reference": "ac0aa5c2282e0de624c175b68d13f2c8f2e2649d",
                 "shasum": ""
             },
             "require": {
@@ -10718,7 +10723,7 @@
                 "utf8"
             ],
             "support": {
-                "source": "https://github.com/symfony/string/tree/v6.0.3"
+                "source": "https://github.com/symfony/string/tree/v6.0.8"
             },
             "funding": [
                 {
@@ -10734,7 +10739,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-01-02T09:55:41+00:00"
+            "time": "2022-04-22T08:18:02+00:00"
         },
         {
             "name": "symfony/translation",
