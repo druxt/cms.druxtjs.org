@@ -1,0 +1,149 @@
+{
+    "uuid": [
+        {
+            "value": "35f864f6-0f61-447b-9e27-ed5fea88d44e"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "page",
+            "target_type": "node_type",
+            "target_uuid": "c52cd9cb-d0eb-46fd-ac6a-e7f5a32054d5"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2022-04-26T01:15:35+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "revision_uid": [
+        {
+            "target_type": "user",
+            "target_uuid": "17ff4585-efbd-4c98-b810-0a26f00af1fb"
+        }
+    ],
+    "revision_log": [
+        {
+            "value": "Updated the Content and Meta tags fields"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        {
+            "target_type": "user",
+            "target_uuid": "17ff4585-efbd-4c98-b810-0a26f00af1fb"
+        }
+    ],
+    "title": [
+        {
+            "value": "Introduction"
+        }
+    ],
+    "created": [
+        {
+            "value": "2022-04-26T01:06:09+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2022-04-26T01:15:35+00:00",
+            "format": "Y-m-d\\TH:i:sP"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [],
+    "path": [
+        {
+            "alias": "\/guide",
+            "langcode": "en",
+            "pathauto": 0
+        }
+    ],
+    "content_translation_source": [
+        {
+            "value": "und"
+        }
+    ],
+    "content_translation_outdated": [
+        {
+            "value": false
+        }
+    ],
+    "field_display_title": [
+        {
+            "value": "Introduction"
+        }
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "787e5601-98bf-4704-84fc-c852b5c46a39"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "3c8cdb27-6f8a-4ce2-a7eb-1b5877cce841"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "99a9a610-d584-4d44-9be2-5bd806321dbe"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "bcd26e95-70db-432c-b9bf-3a40eb9bbec7"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "924cad93-32f7-4b7e-8179-a7759c683b5f"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "fbf0f9cc-29bc-4076-8088-24d6fb70b1ee"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "56211bca-6dc4-4bc4-838d-83ea42fea491"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "8830e98d-45e7-4f32-986d-a000f931ab44"
+        }
+    ],
+    "field_content_supplementary": [],
+    "field_description": [
+        {
+            "value": "Druxt is a framework for building Fully Decoupled Drupal and Nuxt.js applications and sites. It allows you to leverage the content modelling and management power of Drupal, and build elegant user experiences with Nuxt.js."
+        }
+    ],
+    "field_display": [
+        {
+            "value": "default"
+        }
+    ],
+    "field_image": [],
+    "field_meta_tags": []
+}
