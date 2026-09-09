@@ -1,4 +1,4 @@
-FROM amazeeio/php:8.1-cli-drupal
+FROM amazeeio/php:8.4-cli-drupal
 
 COPY composer.* /app/
 # RUN composer global remove hirak/prestissimo
