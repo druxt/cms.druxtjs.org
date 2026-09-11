@@ -107,6 +107,31 @@ final class DocsBlockTest extends UnitTestCase {
   }
 
   /**
+   * Each block row says which section it sits in, and the region.
+   */
+  public function testRowsCarryTheirPlacement(): void {
+    $this->write('a', [
+      ['type' => 'text', 'markdown' => 'one'],
+      ['type' => 'diagram', 'source' => 'a', 'syntax' => 'mermaid', 'group' => 'g'],
+      ['type' => 'diagram', 'source' => 'b', 'syntax' => 'mermaid', 'group' => 'g'],
+      ['type' => 'text', 'markdown' => 'two'],
+    ]);
+    $rows = $this->rows();
+    self::assertSame([0, 1, 1, 2], array_column($rows, 'layout_section'));
+    self::assertSame(['content', 'first', 'second', 'content'], array_column($rows, 'layout_region'));
+  }
+
+  /**
+   * A group wider than any layout stops the run and names the page.
+   */
+  public function testAGroupTooWideNamesThePage(): void {
+    $this->write('wide', array_fill(0, 4, ['type' => 'diagram', 'source' => 'x', 'syntax' => 'mermaid', 'group' => 'g']));
+    $this->expectException(MigrateException::class);
+    $this->expectExceptionMessageMatches('/wide\.md: Group "g" has 4 blocks/');
+    $this->rows();
+  }
+
+  /**
    * Writes one intermediate representation document.
    */
   private function write(string $name, array $blocks): void {

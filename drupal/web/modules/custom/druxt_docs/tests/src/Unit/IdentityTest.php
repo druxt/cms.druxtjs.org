@@ -45,6 +45,8 @@ final class IdentityTest extends UnitTestCase {
       Identity::media('/images/theming.png'),
       Identity::file('/images/theming.png'),
       Identity::section('how-to'),
+      Identity::user('stuart-clark'),
+      Identity::consumer('druxtjs_org'),
     ];
     $this->assertCount(count($uuids), array_unique($uuids));
   }
@@ -66,7 +68,18 @@ final class IdentityTest extends UnitTestCase {
       Identity::media('stuart-clark'),
       Identity::file('stuart-clark'),
       Identity::alias('stuart-clark'),
+      Identity::consumer('stuart-clark'),
     ]);
+  }
+
+  /**
+   * A consumer's UUID is stable per client ID, and distinct from a user's.
+   */
+  public function testConsumerIsStableAndDistinct(): void {
+    $consumer = Identity::consumer('druxtjs_org');
+    $this->assertSame($consumer, Identity::consumer('druxtjs_org'));
+    $this->assertNotSame($consumer, Identity::consumer('another_frontend'));
+    $this->assertNotSame($consumer, Identity::user('druxtjs_org'));
   }
 
 }
