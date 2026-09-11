@@ -19,15 +19,19 @@
 //   node scripts/build-ir.mjs --source <checkout> [--out <dir>] [--check]
 //
 //   --source  a git checkout of the documentation repository.
+//   --out     directory to write the documents to, with every image the
+//             pages embed copied under static/, so the importer reads one
+//             directory and never the checkout.
 //   --check   round-trip every page and report, writing nothing.
 
-import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { createRequire } from 'node:module'
 import {
   CODE_LANGUAGES,
   CONTENT_DIR,
   DIAGRAM_SYNTAXES,
+  STATIC_DIR,
   calloutType,
   classify,
   extractImages,
@@ -328,6 +332,12 @@ export function build(root) {
       defects.add(file, 1, `internal link resolves to neither an authored page nor generated output: ${link.target}`)
     }
 
+    for (const image of extractImages(doc.body)) {
+      if (!image.src.startsWith('/') || !existsSync(path.join(root, STATIC_DIR, image.src))) {
+        defects.add(file, 1, `image is not a file under ${STATIC_DIR}: ${image.src}`)
+      }
+    }
+
     const { blocks, presentation } = buildBlocks(doc, defects)
 
     documents.push({
@@ -437,5 +447,12 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     delete document.sourceBody
     writeFileSync(path.join(out, name), `${JSON.stringify(document, null, 2)}\n`)
   }
-  process.stdout.write(`${documents.length} documents written to ${out}\n`)
+
+  const images = new Set(documents.flatMap((doc) => doc.images.map((image) => image.src)))
+  for (const src of images) {
+    const target = path.join(out, 'static', src)
+    mkdirSync(path.dirname(target), { recursive: true })
+    copyFileSync(path.join(source, STATIC_DIR, src), target)
+  }
+  process.stdout.write(`${documents.length} documents and ${images.size} images written to ${out}\n`)
 }

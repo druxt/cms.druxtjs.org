@@ -16,6 +16,9 @@ import path from 'node:path'
 /** Where the documentation repository keeps the authored markdown. */
 const CONTENT_DIR = 'docs/nuxt/content'
 
+/** Where the documentation repository keeps the files the markdown embeds. */
+const STATIC_DIR = 'docs/nuxt/static'
+
 /** Paths served by docgen output rather than by authored markdown. */
 const GENERATED_PREFIXES = ['/api', '/components', '/modules']
 const GENERATED_EXACT = new Set(['/how-to/contributing'])
@@ -308,6 +311,7 @@ export {
   DIAGRAM_SYNTAXES,
   GENERATED_EXACT,
   GENERATED_PREFIXES,
+  STATIC_DIR,
   calloutType,
   classify,
   extractImages,

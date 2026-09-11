@@ -1,0 +1,13 @@
+services:
+  druxt_docs.importer:
+    class: Drupal\druxt_docs\Importer
+    arguments:
+      - '@entity_type.manager'
+      - '@file_system'
+      - '@database'
+      - '@?tome_sync.importer'
+  # Above tome_sync's path normalizer, which sits at 8.
+  serializer.normalizer.druxt_docs_path:
+    class: Drupal\druxt_docs\Normalizer\PathItemNormalizer
+    tags:
+      - { name: normalizer, priority: 20 }
