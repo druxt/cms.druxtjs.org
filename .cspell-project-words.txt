@@ -3,6 +3,7 @@
 aarch
 automerge
 bmewburn
+brotli
 bsdtar
 callout
 callouts
@@ -28,6 +29,7 @@ fatalled
 freetype
 frontmatter
 getsockname
+hsts
 hverlin
 intelephense
 knip
@@ -43,6 +45,7 @@ loglevel
 markdownlint
 maxlength
 mktemp
+nosniff
 nproc
 nuxt
 nvmrc
