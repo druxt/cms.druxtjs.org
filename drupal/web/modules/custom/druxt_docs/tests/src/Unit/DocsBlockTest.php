@@ -141,6 +141,8 @@ final class DocsBlockTest extends UnitTestCase {
       'section' => 'how-to',
       'title' => ucfirst($name),
       'blocks' => $blocks,
+      'commit' => ['sha' => str_repeat('a', 40), 'subject' => 'docs: write ' . $name],
+      'revisions' => [],
     ]));
   }
 

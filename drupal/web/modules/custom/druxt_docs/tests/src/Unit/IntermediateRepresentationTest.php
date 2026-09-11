@@ -58,6 +58,8 @@ final class IntermediateRepresentationTest extends UnitTestCase {
       'section' => 'how-to',
       'title' => 'Theme Druxt components',
       'blocks' => [['type' => 'text', 'markdown' => 'Hello.']],
+      'commit' => ['sha' => str_repeat('a', 40), 'subject' => 'docs: theme Druxt components'],
+      'revisions' => [],
     ];
   }
 
@@ -103,6 +105,21 @@ final class IntermediateRepresentationTest extends UnitTestCase {
     $this->assertNull(IntermediateRepresentation::load($this->directory, $error));
     $this->assertStringContainsString('title', (string) $error);
     $this->assertStringContainsString('blocks', (string) $error);
+  }
+
+  /**
+   * A document without its history must not import as a page with none.
+   *
+   * An empty history is a page with one version. A missing one is a builder
+   * that stopped writing it, and every page would import without its past.
+   */
+  public function testMissingHistoryReports(): void {
+    $document = $this->document();
+    unset($document['commit'], $document['revisions']);
+    $this->write('no-history.json', $document);
+
+    $this->assertNull(IntermediateRepresentation::load($this->directory, $error));
+    $this->assertStringContainsString('commit, revisions', (string) $error);
   }
 
   /**
