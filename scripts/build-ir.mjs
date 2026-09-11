@@ -217,10 +217,11 @@ function buildBlocks(doc, defects) {
 /**
  * The headings a page renders, with the ids the site gives them.
  *
- * Computed here because Drupal has no native shape for it and deriving it in
- * the browser after mount breaks deep links on first paint under static
- * generation. Headings inside fenced code are excluded: the tokenizer has
- * already separated them, so a `# comment` in a shell example cannot appear.
+ * Drupal computes the same list from a page's paragraphs whenever field_toc
+ * is read, and the import fails unless the two agree, so this is the
+ * reference that port is held to. Headings inside fenced code are excluded:
+ * the tokenizer has already separated them, so a `# comment` in a shell
+ * example cannot appear.
  *
  * @param {object} doc - A document from readDocument().
  * @returns {object[]} `{id, depth, text}` per heading.

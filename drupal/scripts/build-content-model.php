@@ -344,12 +344,8 @@ ensure_field('node', 'doc_page', 'field_is_landing', 'boolean', 'Section landing
 // what makes a re-import idempotent rather than duplicating.
 ensure_field('node', 'doc_page', 'field_source_path', 'string', 'Source path', ['max_length' => 255], [], TRUE);
 
-// Computed at import from the source headings, in the shape @nuxt/content
-// produces today (id, depth, text), stored as JSON. Drupal has no native
-// shape for this, and deriving it in the browser after mount breaks deep
-// links on first paint under static generation. Computing it once at import
-// makes it data, which means validation can check it like everything else.
-ensure_field('node', 'doc_page', 'field_toc', 'string_long', 'Table of contents');
+// The table of contents is not stored: druxt_docs computes field_toc from
+// field_content whenever it is read.
 
 ensure_field(
   'node',

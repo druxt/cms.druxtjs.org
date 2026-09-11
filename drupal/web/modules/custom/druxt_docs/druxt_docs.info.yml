@@ -9,6 +9,7 @@ dependencies:
   - drupal:path
   - drupal:taxonomy
   - paragraphs:paragraphs
+  - layout_paragraphs:layout_paragraphs
   - drupal:migrate
   - migrate_plus:migrate_plus
   - migrate_tools:migrate_tools

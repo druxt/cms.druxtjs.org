@@ -57,7 +57,6 @@ process:
     migration: docs_section
     source: section
     no_stub: true
-  field_toc: toc
   field_content:
     plugin: docs_paragraph_references
     source: items
