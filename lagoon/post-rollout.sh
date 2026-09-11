@@ -14,6 +14,8 @@ else
   echo "Installing the site from its committed configuration."
   # A password drush did not generate is one it does not print into the deploy log.
   drush site:install --existing-config --yes --account-pass="$(head -c 32 /dev/urandom | base64)"
+  # Without this, the first import on Lagoon found no migrations and the web found no field types.
+  drush cache:rebuild
 fi
 
 pages=$(drush php:eval 'echo \Drupal::entityQuery("node")->accessCheck(FALSE)->condition("type", "doc_page")->count()->execute();')
