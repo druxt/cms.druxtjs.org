@@ -53,6 +53,26 @@ git status -- config/sync
 Content is not exported. The database is the source of truth, and the
 importer seeds it from the pinned documentation.
 
+## Previewing a page
+
+**Preview** on a page's edit form opens the preview in the admin theme,
+with three tabs. All three show the unsaved changes.
+
+| Tab | Shows |
+| --- | --- |
+| Frontend | The frontend's preview page in a frame, at phone, tablet or full width |
+| Drupal | The page's content in the admin theme, its paragraphs styled like the frontend's |
+| JSON:API | The `jsonapi_node_preview` document, with the page's paragraphs included |
+
+The Frontend tab needs the frontend's preview URL in `settings.php`.
+`{uuid}` and `{view_mode}` are filled in for each preview:
+
+```php
+$settings['druxt_docs_preview_url'] = '/druxt/node/preview?vm={view_mode}#/jsonapi/node/doc_page/{uuid}/preview';
+```
+
+Without it, the tab says the frontend preview isn't configured.
+
 ## The documentation source
 
 `docs-source.json` pins the documentation repository and the exact commit
