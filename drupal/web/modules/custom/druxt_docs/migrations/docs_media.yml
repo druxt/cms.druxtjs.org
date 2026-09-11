@@ -3,9 +3,12 @@ label: 'Documentation images'
 migration_group: druxt_docs
 migration_dependencies:
   required:
+    - docs_user
     - docs_file
 source:
   plugin: docs_image
+  constants:
+    author: stuart-clark
 process:
   uuid:
     plugin: docs_identity
@@ -19,8 +22,10 @@ process:
     plugin: default_value
     default_value: 1
   uid:
-    plugin: default_value
-    default_value: 0
+    plugin: migration_lookup
+    migration: docs_user
+    source: constants/author
+    no_stub: true
   'field_media_image/target_id':
     plugin: migration_lookup
     migration: docs_file

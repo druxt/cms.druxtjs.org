@@ -7,9 +7,8 @@ namespace Drupal\druxt_docs;
 /**
  * The documentation sections.
  *
- * Shared by the importer and the migration so that both create the same
- * four terms. Terms are content, not configuration, so a provisioned site
- * has none and whichever seeds the site creates them.
+ * Read by the section migration. Terms are content, not configuration, so
+ * a provisioned site has none and seeding creates them.
  *
  * Written out rather than derived from each section's landing page. Three
  * of the four landing titles happen to equal their term today and the

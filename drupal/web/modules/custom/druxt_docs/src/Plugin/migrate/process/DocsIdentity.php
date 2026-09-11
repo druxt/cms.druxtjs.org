@@ -47,6 +47,7 @@ final class DocsIdentity extends ProcessPluginBase {
       'media' => Identity::media($value),
       'file' => Identity::file($value),
       'section' => Identity::section($value),
+      'user' => Identity::user($value),
       'paragraph' => $this->paragraph($value),
       default => throw new MigrateException(sprintf('docs_identity: "%s" is not a kind of identifier this site derives.', $kind)),
     };
