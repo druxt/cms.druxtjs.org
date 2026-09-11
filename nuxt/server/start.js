@@ -6,6 +6,7 @@
  * against it (the display schemas and decoupled settings are read at build
  * time), then serves pre-rendered pages first and renders the rest live.
  */
+const fs = require('fs')
 const http = require('http')
 const path = require('path')
 const { spawn } = require('child_process')
@@ -68,6 +69,20 @@ const main = async () => {
   // Canonical links and share cards name this environment's own origin.
   const origin = env.SITE_ORIGIN || env.DRUXT_FRONTEND_URL || serviceRoute(env.LAGOON_ROUTES, 'nuxt')
   if (origin) env.SITE_ORIGIN = origin.replace(/\/+$/, '')
+
+  // The machine-readable indexes `nuxt generate` used to write, from the same corpus.
+  try {
+    const { readContent } = require('../lib/content-index')
+    const { buildSitemap } = require('../lib/sitemap')
+    const { buildLlmsTxt } = require('../lib/llms-txt')
+    const docs = readContent(path.join(rootDir, 'content'))
+    const siteOrigin = env.SITE_ORIGIN || 'https://druxtjs.org'
+    fs.writeFileSync(path.join(rootDir, 'static', 'sitemap.xml'), buildSitemap(docs, { origin: siteOrigin }))
+    fs.writeFileSync(path.join(rootDir, 'static', 'llms.txt'), buildLlmsTxt(docs, { origin: siteOrigin }))
+    log(`wrote sitemap.xml and llms.txt for ${docs.length} documents`)
+  } catch (error) {
+    log(`sitemap.xml and llms.txt not written: ${error.message}`)
+  }
 
   const started = Date.now()
   await nuxt(['build'])
