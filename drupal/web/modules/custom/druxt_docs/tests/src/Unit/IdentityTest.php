@@ -49,4 +49,24 @@ final class IdentityTest extends UnitTestCase {
     $this->assertCount(count($uuids), array_unique($uuids));
   }
 
+  /**
+   * An author's UUID is stable, and no other kind of entity can take it.
+   *
+   * A reseed has to find the same account, or every page would be
+   * reassigned to a new one.
+   */
+  public function testUserIsStableAndDistinct(): void {
+    $user = Identity::user('stuart-clark');
+    $this->assertMatchesRegularExpression('/^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $user);
+    $this->assertSame($user, Identity::user('stuart-clark'));
+    $this->assertNotSame($user, Identity::user('someone-else'));
+    $this->assertNotContains($user, [
+      Identity::page('stuart-clark'),
+      Identity::section('stuart-clark'),
+      Identity::media('stuart-clark'),
+      Identity::file('stuart-clark'),
+      Identity::alias('stuart-clark'),
+    ]);
+  }
+
 }
