@@ -1,0 +1,24 @@
+id: docs_paragraph_text
+label: 'Documentation prose blocks'
+migration_group: druxt_docs
+source:
+  plugin: docs_block
+  types:
+    - text
+process:
+  uuid:
+    plugin: docs_identity
+    kind: paragraph
+    source:
+      - page
+      - index
+  langcode:
+    plugin: default_value
+    default_value: en
+  'field_text/value': markdown
+  'field_text/format':
+    plugin: default_value
+    default_value: docs_markdown
+destination:
+  plugin: entity_reference_revisions:paragraph
+  default_bundle: docs_text
