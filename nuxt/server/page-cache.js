@@ -2,17 +2,36 @@
  * Pre-rendered pages, served ahead of live rendering.
  *
  * Pages render into a directory of HTML files, as `nuxt generate` writes
- * them. A stored page is served from its file, and one older than the time
- * to live is served while a fresh copy renders behind it. A page that is not
- * stored yet renders live, and is stored once it has answered 200.
+ * them, each beside its brotli and gzip copies. A stored page is served from
+ * its file, and one older than the time to live is served while a fresh copy
+ * renders behind it. A page that is not stored yet renders live, and is
+ * stored once it has answered 200.
  */
 const fs = require('fs')
 const path = require('path')
+const zlib = require('zlib')
 
 /** Paths the frontend serves that are not pages: its assets, its APIs and Drupal's. */
 const NOT_PAGES = /^\/(_nuxt|_content|_decoupled|__webpack_hmr|jsonapi|router|sites)(\/|$)/
 const ASSET = /\.(js|mjs|css|map|json|xml|txt|ico|png|jpe?g|gif|svg|webp|avif|woff2?|ttf|webmanifest|pdf)$/i
 const LINK = /href="(\/[^"#?]*)/g
+
+/** Sent with every response. Framing is left alone, because Drupal's preview frames the site. */
+const SECURITY_HEADERS = {
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+}
+
+/** The compressed copies stored beside each page, in order of preference. */
+const ENCODINGS = [
+  {
+    suffix: '.br',
+    encoding: 'br',
+    compress: (html) => zlib.brotliCompressSync(html, { params: { [zlib.constants.BROTLI_PARAM_QUALITY]: 9 } }),
+  },
+  { suffix: '.gz', encoding: 'gzip', compress: (html) => zlib.gzipSync(html, { level: 9 }) },
+]
 
 /**
  * Whether a request asks for a page rather than an asset or an API.
@@ -43,15 +62,35 @@ const createPageCache = ({ dir, ttl, render, log = () => {} }) => {
     return file.startsWith(root + path.sep) ? file : null
   }
 
-  const read = async (pathname) => {
+  const write = async (file, body) => {
+    const partial = `${file}.${process.pid}.partial`
+    await fs.promises.writeFile(partial, body)
+    await fs.promises.rename(partial, file)
+  }
+
+  /**
+   * A stored page, in the best encoding the client accepts.
+   *
+   * @param {string} pathname - The page path.
+   * @param {string} [accept] - The request's Accept-Encoding header.
+   * @returns {Promise<object|null>} `{ body, encoding, modified, stale }`, or null.
+   */
+  const read = async (pathname, accept = '') => {
     const file = fileFor(pathname)
     if (!file) return null
-    try {
-      const [html, stats] = await Promise.all([fs.promises.readFile(file, 'utf8'), fs.promises.stat(file)])
-      return { html, modified: stats.mtime, stale: Date.now() - stats.mtimeMs >= ttl }
-    } catch (e) {
-      return null
+    const choices = [...ENCODINGS.filter((e) => accept.includes(e.encoding)), { suffix: '', encoding: null }]
+    for (const { suffix, encoding } of choices) {
+      try {
+        const [body, stats] = await Promise.all([fs.promises.readFile(file + suffix), fs.promises.stat(file + suffix)])
+        // Floored: a file written this millisecond carries a fractional time
+        // that would otherwise read as newer than the clock.
+        const age = Date.now() - Math.floor(stats.mtimeMs)
+        return { body, encoding, modified: stats.mtime, stale: age >= ttl }
+      } catch (e) {
+        // This copy is missing: try the next.
+      }
     }
+    return null
   }
 
   const store = (pathname) => {
@@ -64,13 +103,12 @@ const createPageCache = ({ dir, ttl, render, log = () => {} }) => {
         // Gone, moved or failing: the next request renders live.
         const reason = error ? error.statusCode || 'error' : redirected ? 'redirect' : 'empty'
         log(`cache: ${pathname} not stored: ${reason}`)
-        await fs.promises.rm(file, { force: true })
+        await Promise.all(['', ...ENCODINGS.map((e) => e.suffix)].map((s) => fs.promises.rm(file + s, { force: true })))
         return null
       }
       await fs.promises.mkdir(path.dirname(file), { recursive: true })
-      const partial = `${file}.${process.pid}.partial`
-      await fs.promises.writeFile(partial, html)
-      await fs.promises.rename(partial, file)
+      for (const { suffix, compress } of ENCODINGS) await write(file + suffix, compress(html))
+      await write(file, html)
       return html
     })()
       .catch((e) => {
@@ -131,6 +169,10 @@ const crawl = async ({ seeds, store, concurrency = 2, limit = 5000 }) => {
 const createHandler =
   ({ cache, live, noindex = false }) =>
   async (req, res) => {
+    for (const [name, value] of Object.entries(SECURITY_HEADERS)) res.setHeader(name, value)
+    if (String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() === 'https') {
+      res.setHeader('Strict-Transport-Security', 'max-age=31536000')
+    }
     if (noindex) res.setHeader('X-Robots-Tag', 'noindex, nofollow')
     let url
     try {
@@ -149,7 +191,7 @@ const createHandler =
     }
     if (!cache || search) return live(req, res)
 
-    const page = await cache.read(pathname)
+    const page = await cache.read(pathname, String(req.headers['accept-encoding'] || ''))
     if (!page) {
       res.setHeader('X-Docs-Cache', 'MISS')
       res.on('finish', () => {
@@ -161,16 +203,19 @@ const createHandler =
     res.setHeader('X-Docs-Cache', page.stale ? 'STALE' : 'HIT')
     const since = Date.parse(req.headers['if-modified-since'] || '')
     if (since >= Math.floor(page.modified.getTime() / 1000) * 1000) {
-      res.writeHead(304)
+      res.writeHead(304, { Vary: 'Accept-Encoding' })
       return res.end()
     }
-    res.writeHead(200, {
+    const headers = {
       'Content-Type': 'text/html; charset=utf-8',
-      'Content-Length': Buffer.byteLength(page.html),
+      'Content-Length': page.body.length,
       'Last-Modified': page.modified.toUTCString(),
       'Cache-Control': 'no-cache',
-    })
-    return res.end(req.method === 'HEAD' ? undefined : page.html)
+      Vary: 'Accept-Encoding',
+    }
+    if (page.encoding) headers['Content-Encoding'] = page.encoding
+    res.writeHead(200, headers)
+    return res.end(req.method === 'HEAD' ? undefined : page.body)
   }
 
-module.exports = { createHandler, createPageCache, crawl, isPage }
+module.exports = { SECURITY_HEADERS, createHandler, createPageCache, crawl, isPage }
