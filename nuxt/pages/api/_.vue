@@ -56,8 +56,7 @@ export default {
 
   computed: {
     /**
-     * Whether the layout's module header is already this page's header,
-     * carrying the same title and the same source link.
+     * Whether the layout's module header above already names this page.
      *
      * @param {object} vm - The component ViewModel.
      * @param {object} vm.$route - The current route.
