@@ -1,8 +1,9 @@
 _core:
-  default_config_hash: aHR8WZAJAQbKTa2aqG_EhWMaGH5tsYDKc6UFH9EG4u8
+  default_config_hash: CtxVIMTFDH2fgjMUrrKRV9BQH6Jg7NmbqnzZk0C09DE
 exposed_objects:
   - system.site
 expose_theme_settings: true
+expose_theme_manifest: true
 excluded_keys:
   - 'system.site:mail'
   - 'system.site:mail_notification'
