@@ -9,10 +9,17 @@ import http from 'node:http'
 import { existsSync, mkdtempSync, rmSync, utimesSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
+import { brotliDecompressSync, gunzipSync } from 'node:zlib'
 import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
-const { createHandler, createPageCache, crawl, isPage } = require('../nuxt/server/page-cache.js')
+const {
+  SECURITY_HEADERS,
+  createHandler,
+  createPageCache,
+  crawl,
+  isPage,
+} = require('../nuxt/server/page-cache.js')
 const { backendReady, serviceRoute, waitForBackend } = require('../nuxt/server/backend.js')
 
 // Serve a request listener on a free port for the length of one callback.
@@ -31,9 +38,12 @@ const request = (url, { method = 'GET', headers = {} } = {}) =>
   new Promise((resolve, reject) => {
     http
       .request(url, { method, headers }, (res) => {
-        let body = ''
-        res.on('data', (chunk) => (body += chunk))
-        res.on('end', () => resolve({ status: res.statusCode, headers: res.headers, body }))
+        const chunks = []
+        res.on('data', (chunk) => chunks.push(chunk))
+        res.on('end', () => {
+          const raw = Buffer.concat(chunks)
+          resolve({ status: res.statusCode, headers: res.headers, body: raw.toString(), raw })
+        })
       })
       .on('error', reject)
       .end()
@@ -85,9 +95,29 @@ describe('createPageCache', () => {
       assert.equal(await cache.store('/a/b'), '<p>a</p>')
       assert.ok(existsSync(path.join(dir, 'a', 'b', 'index.html')))
       const page = await cache.read('/a/b')
-      assert.equal(page.html, '<p>a</p>')
+      assert.equal(page.body.toString(), '<p>a</p>')
+      assert.equal(page.encoding, null)
       assert.equal(page.stale, false)
       assert.equal(await cache.read('/missing'), null)
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
+  test('keeps brotli and gzip copies, and reads the one the client accepts', async () => {
+    const dir = tempDir()
+    try {
+      const html = `<p>${'compressible '.repeat(200)}</p>`
+      const cache = createPageCache({ dir, ttl: 60000, render: async () => ({ html }) })
+      await cache.store('/c')
+      const br = await cache.read('/c', 'gzip, deflate, br')
+      assert.equal(br.encoding, 'br')
+      assert.equal(brotliDecompressSync(br.body).toString(), html)
+      assert.ok(br.body.length < html.length)
+      const gz = await cache.read('/c', 'gzip')
+      assert.equal(gz.encoding, 'gzip')
+      assert.equal(gunzipSync(gz.body).toString(), html)
+      assert.equal((await cache.read('/c', '')).encoding, null)
     } finally {
       rmSync(dir, { recursive: true, force: true })
     }
@@ -106,7 +136,7 @@ describe('createPageCache', () => {
     }
   })
 
-  test('drops a page that now fails or redirects', async () => {
+  test('drops a page, and its compressed copies, when it now fails or redirects', async () => {
     const dir = tempDir()
     try {
       let result = { html: 'x' }
@@ -118,9 +148,12 @@ describe('createPageCache', () => {
         log: (line) => lines.push(line),
       })
       await cache.store('/gone')
+      assert.ok(existsSync(`${cache.fileFor('/gone')}.br`))
       result = { html: 'error page', error: { statusCode: 404 } }
       assert.equal(await cache.store('/gone'), null)
-      assert.equal(await cache.read('/gone'), null)
+      assert.equal(await cache.read('/gone', 'br, gzip'), null)
+      assert.equal(existsSync(`${cache.fileFor('/gone')}.br`), false)
+      assert.equal(existsSync(`${cache.fileFor('/gone')}.gz`), false)
       result = { html: '', redirected: { path: '/elsewhere' } }
       assert.equal(await cache.store('/moved'), null)
       assert.equal(existsSync(cache.fileFor('/moved')), false)
@@ -225,6 +258,44 @@ describe('createHandler', () => {
     } finally {
       rmSync(dir, { recursive: true, force: true })
     }
+  })
+
+  test('serves a stored page compressed when the client accepts it', async () => {
+    const dir = tempDir()
+    try {
+      const html = `<p>${'stored '.repeat(300)}</p>`
+      const cache = createPageCache({ dir, ttl: 60000, render: async () => ({ html }) })
+      await cache.store('/page')
+      await withServer(createHandler({ cache, live: live() }), async (base) => {
+        const br = await request(`${base}/page`, { headers: { 'Accept-Encoding': 'gzip, br' } })
+        assert.equal(br.headers['content-encoding'], 'br')
+        assert.equal(br.headers.vary, 'Accept-Encoding')
+        assert.equal(Number(br.headers['content-length']), br.raw.length)
+        assert.equal(brotliDecompressSync(br.raw).toString(), html)
+        const gz = await request(`${base}/page`, { headers: { 'Accept-Encoding': 'gzip' } })
+        assert.equal(gz.headers['content-encoding'], 'gzip')
+        assert.equal(gunzipSync(gz.raw).toString(), html)
+        const plain = await request(`${base}/page`)
+        assert.equal(plain.headers['content-encoding'], undefined)
+        assert.equal(plain.body, html)
+      })
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
+  test('sends the security headers on every response, and HSTS only over https', async () => {
+    await withServer(createHandler({ cache: null, live: live() }), async (base) => {
+      for (const target of [`${base}/`, `${base}/jsonapi/x`]) {
+        const res = await request(target)
+        for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
+          assert.equal(res.headers[name.toLowerCase()], value, `${name} on ${target}`)
+        }
+        assert.equal(res.headers['strict-transport-security'], undefined)
+      }
+      const tls = await request(`${base}/`, { headers: { 'X-Forwarded-Proto': 'https,http' } })
+      assert.equal(tls.headers['strict-transport-security'], 'max-age=31536000')
+    })
   })
 
   test('never stores a page that did not answer 200', async () => {
