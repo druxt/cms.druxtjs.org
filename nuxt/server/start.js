@@ -2,7 +2,7 @@
 /**
  * Start the site in production.
  *
- * Holds the port with a holding page while Drupal comes up, builds the app
+ * Holds the port with the starting page while Drupal comes up, builds the app
  * against it (the display schemas and decoupled settings are read at build
  * time), then serves pre-rendered pages first and renders the rest live.
  */
@@ -12,6 +12,7 @@ const path = require('path')
 const { spawn } = require('child_process')
 const { serviceRoute, waitForBackend } = require('./backend')
 const { createHandler, createPageCache, crawl } = require('./page-cache')
+const { createStartingHandler } = require('./starting')
 
 const rootDir = path.join(__dirname, '..')
 const env = process.env
@@ -20,33 +21,14 @@ const host = env.HOST || '0.0.0.0'
 const baseUrl = env.DRUXT_BASE_URL || 'http://nginx:8080'
 const log = (message) => process.stdout.write(`start: ${message}\n`)
 
-const HOLDING = `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="refresh" content="15">
-<meta name="robots" content="noindex">
-<title>DruxtJS is starting</title>
-<style>body{font:16px/1.5 system-ui,sans-serif;max-width:32rem;margin:15vh auto;padding:0 1rem}</style>
-</head>
-<body>
-<h1>DruxtJS is starting</h1>
-<p>The site builds against Drupal as it starts. This page reloads itself until it is ready.</p>
-</body>
-</html>
-`
-
-// Until the app is ready, every request gets the holding page.
-let handler = (req, res) => {
-  res.writeHead(503, {
-    'Content-Type': 'text/html; charset=utf-8',
-    'Retry-After': '15',
-    'Cache-Control': 'no-store',
-    'X-Robots-Tag': 'noindex',
-  })
-  res.end(req.method === 'HEAD' ? undefined : HOLDING)
+// What the starting page reports until the app takes the port.
+const state = { phase: 'waiting', since: new Date().toISOString() }
+const setPhase = (phase) => {
+  state.phase = phase
+  state.since = new Date().toISOString()
 }
+
+let handler = createStartingHandler(state)
 const server = http.createServer((req, res) => handler(req, res))
 
 const nuxt = (args, extraEnv) =>
@@ -61,10 +43,11 @@ const nuxt = (args, extraEnv) =>
 
 const main = async () => {
   await new Promise((resolve) => server.listen(port, host, resolve))
-  log(`holding page on http://${host}:${port}`)
+  log(`starting page on http://${host}:${port}`)
 
   await waitForBackend(baseUrl, { log })
   log(`Drupal is ready at ${baseUrl}`)
+  setPhase('building')
 
   // Canonical links and share cards name this environment's own origin.
   const origin = env.SITE_ORIGIN || env.DRUXT_FRONTEND_URL || serviceRoute(env.LAGOON_ROUTES, 'nuxt')
@@ -87,6 +70,7 @@ const main = async () => {
   const started = Date.now()
   await nuxt(['build'])
   log(`built in ${Math.round((Date.now() - started) / 1000)}s`)
+  setPhase('starting')
 
   const { loadNuxt } = require('nuxt')
   const app = await loadNuxt({ for: 'start', rootDir })
@@ -117,7 +101,11 @@ for (const signal of ['SIGINT', 'SIGTERM']) {
   })
 }
 
-main().catch((error) => {
+main().catch(async (error) => {
   process.stderr.write(`start: ${error.stack || error}\n`)
+  setPhase('failed')
+  // Show the failure for a moment, then exit so the platform restarts us.
+  const grace = Number(env.START_FAIL_GRACE || 30) * 1000
+  await new Promise((resolve) => setTimeout(resolve, grace))
   process.exit(1)
 })

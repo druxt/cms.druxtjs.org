@@ -30,8 +30,8 @@ the same with `nginx` for Drupal.
 1. Lagoon builds the images. The `nuxt` image clones the druxt.js commit
    pinned in `docs-source.json` and runs docgen, which writes the generated
    pages that `npm run docs:generate` writes locally.
-2. The containers start. Until Drupal is ready, `nuxt` answers every
-   request with a holding page that reloads itself.
+2. The containers start. Until the app is ready, `nuxt` answers every
+   request with the starting page, which names the step it is on.
 3. The post-rollout task, `lagoon/post-rollout.sh`, runs in `cli`. On a new
    environment it installs Drupal from `drupal/config/sync` and imports the
    documentation from the pinned commit. On an existing one it runs
@@ -44,6 +44,28 @@ the same with `nginx` for Drupal.
 The app builds when it starts, not in the image, because it reads Drupal
 while it builds: druxt-schema reads the display settings, and the decoupled
 settings module reads the site's settings and theme.
+
+## The starting page
+
+`nuxt/server/starting.html` holds the port until the app is ready. It is a
+single self-contained document. The logo sits above the step in words, with a
+bar of three segments under it.
+
+| Phase      | What is happening                             |
+| ---------- | --------------------------------------------- |
+| `waiting`  | Drupal is still installing and importing      |
+| `building` | The app is building against Drupal            |
+| `starting` | The build is done and the server is coming up |
+| `failed`   | The build failed, and the container restarts  |
+
+The page asks `GET /__status` every 2.5 seconds, which answers
+`{ phase, step, steps, since }`. Once the app takes the port that path is
+gone, so the next poll gets a 404 and the page reloads into the real site.
+Past five minutes it adds a line saying it is taking longer than usual,
+worked out on the page from `since`, so the endpoint doesn't track it.
+
+With JavaScript off the page reloads itself every 15 seconds, and shows the
+phase the server knew when it was served.
 
 ## The page cache
 
@@ -64,13 +86,14 @@ than the time to live: the next request gets the old copy and renders the
 new one, and the request after that gets the new one. A deployment starts
 with an empty cache.
 
-| Variable         | Default             | What it does                                  |
-| ---------------- | ------------------- | --------------------------------------------- |
-| `DRUXT_BASE_URL` | `http://nginx:8080` | Where the server reaches Drupal               |
-| `SITE_ORIGIN`    | The `nuxt` route    | The origin in canonical links and share cards |
-| `DOCS_CACHE_TTL` | `300`               | Seconds before a stored page renders again    |
-| `DOCS_CACHE`     | On                  | `0` renders every page live                   |
-| `DOCS_CACHE_DIR` | `nuxt/.cache/pages` | Where the stored pages go                     |
+| Variable           | Default             | What it does                                             |
+| ------------------ | ------------------- | -------------------------------------------------------- |
+| `DRUXT_BASE_URL`   | `http://nginx:8080` | Where the server reaches Drupal                          |
+| `SITE_ORIGIN`      | The `nuxt` route    | The origin in canonical links and share cards            |
+| `DOCS_CACHE_TTL`   | `300`               | Seconds before a stored page renders again               |
+| `DOCS_CACHE`       | On                  | `0` renders every page live                              |
+| `DOCS_CACHE_DIR`   | `nuxt/.cache/pages` | Where the stored pages go                                |
+| `START_FAIL_GRACE` | `30`                | Seconds the failed page shows before the container exits |
 
 A stored page is also kept as brotli and gzip copies, and the server sends the
 one the browser accepts, with `Vary: Accept-Encoding`.
@@ -104,8 +127,8 @@ the driver fails to install on that database.
 ## Not done yet
 
 - The app builds each time the `nuxt` container starts, which takes a few
-  minutes behind the holding page. A deployment shows the holding page for
-  that long, and so does a development environment waking from idle.
+  minutes behind the starting page. A deployment shows it for that long, and
+  so does a development environment waking from idle.
 - The share cards are only written by `nuxt generate`, so this server does
   not have them yet. It writes `sitemap.xml` and `llms.txt` into `static/`
   as it starts.

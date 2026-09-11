@@ -21,6 +21,7 @@ const {
   isPage,
 } = require('../nuxt/server/page-cache.js')
 const { backendReady, serviceRoute, waitForBackend } = require('../nuxt/server/backend.js')
+const { PAGE, createStartingHandler } = require('../nuxt/server/starting.js')
 
 // Serve a request listener on a free port for the length of one callback.
 const withServer = async (listener, callback) => {
@@ -434,5 +435,72 @@ describe('backend', () => {
     assert.equal(checks, 3)
     assert.equal(lines.length, 1)
     assert.match(lines[0], /^waiting for Drupal at http:\/\/drupal/)
+  })
+})
+
+describe('starting page', () => {
+  const newState = () => ({ phase: 'waiting', since: '2026-09-12T00:00:00.000Z' })
+
+  test('answers every path with the page, and asks for a retry', async () => {
+    await withServer(createStartingHandler(newState()), async (base) => {
+      for (const target of ['/', '/tutorials/getting-started', '/_nuxt/app.js']) {
+        const res = await request(`${base}${target}`)
+        assert.equal(res.status, 503, target)
+        assert.equal(res.headers['content-type'], 'text/html; charset=utf-8')
+        assert.equal(res.headers['retry-after'], '15')
+        assert.equal(res.headers['cache-control'], 'no-store')
+        assert.equal(res.headers['x-robots-tag'], 'noindex')
+        assert.ok(res.body.includes('Waiting for the content'), target)
+      }
+      assert.equal((await request(`${base}/`, { method: 'HEAD' })).body, '')
+    })
+  })
+
+  test('reports the phase, and the step the page draws', async () => {
+    const state = newState()
+    await withServer(createStartingHandler(state), async (base) => {
+      const read = async () => {
+        const res = await request(`${base}/__status`)
+        assert.equal(res.status, 200)
+        assert.equal(res.headers['content-type'], 'application/json; charset=utf-8')
+        assert.equal(res.headers['cache-control'], 'no-store')
+        return JSON.parse(res.body)
+      }
+      assert.deepEqual(await read(), {
+        phase: 'waiting',
+        step: 1,
+        steps: 3,
+        since: '2026-09-12T00:00:00.000Z',
+      })
+      state.phase = 'building'
+      assert.equal((await read()).step, 2)
+      state.phase = 'starting'
+      assert.equal((await read()).step, 3)
+      // A failure is none of the three steps, so the bar reports no step.
+      state.phase = 'failed'
+      assert.equal((await read()).step, 0)
+      assert.equal((await read()).phase, 'failed')
+    })
+  })
+
+  test('reads the status path with a query string too', async () => {
+    await withServer(createStartingHandler(newState()), async (base) => {
+      const res = await request(`${base}/__status?t=1`)
+      assert.equal(JSON.parse(res.body).phase, 'waiting')
+    })
+  })
+
+  test('carries the words for every phase, and asks for nothing over the network', () => {
+    const html = PAGE.toString()
+    for (const words of [
+      'Waiting for the content',
+      'Building the site',
+      'Almost there',
+      'Something went wrong',
+      'This is taking longer than usual',
+    ]) {
+      assert.ok(html.includes(words), words)
+    }
+    assert.equal(/<(?:script|link|img)[^>]+(?:src|href)=/.test(html), false)
   })
 })
