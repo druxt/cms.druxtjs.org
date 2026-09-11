@@ -35,8 +35,8 @@ const druxtVersion = JSON.parse(
 const DRUXT_BASE_URL = process.env.DRUXT_BASE_URL || 'http://127.0.0.1:8899'
 
 export default {
-  // Pages render live from Drupal. Generating them, with live rendering as
-  // the fallback, comes with the Lagoon deployment.
+  // Pages render live from Drupal. In production, server/start.js serves
+  // pre-rendered copies first and falls back to live rendering.
   target: 'server',
 
   publicRuntimeConfig: {
