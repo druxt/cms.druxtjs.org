@@ -1,12 +1,12 @@
 {
-    "_hash": "296a697e31de4a4d6804328826a1b708a142593b532efe1b49f33ef21bd78332",
+    "_hash": "de4f7c66907b8b386b72079ec97aa968f9f2c896659c0e39b99eace23db5ff14",
     "patches": {
         "drupal/decoupled_settings": [
             {
                 "package": "drupal/decoupled_settings",
                 "description": "Expose the theme's regions, and let a consumer select its theme",
                 "url": "https://github.com/Decipher/decoupled_settings/pull/15.diff",
-                "sha256": "22cb93e19c573ac7cc9dc7726dcacfa02fb89c52e68b295c4a8167a42cc289d0",
+                "sha256": "8d0086ba8c96616acb34f5da681a8aac0a1f643be64db95354ecce1fca97213c",
                 "depth": 1,
                 "extra": {
                     "provenance": "root"
