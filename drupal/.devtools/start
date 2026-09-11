@@ -36,6 +36,15 @@ $webserver_wait_timeout = (int) getenv_default('WEBSERVER_WAIT_TIMEOUT', '20');
 $xdebug_enabled = getenv_default('XDEBUG', '') !== '';
 $xdebug_flags = $xdebug_enabled ? ' -d xdebug.mode=debug -d xdebug.start_with_request=yes' : '';
 
+// OPcache and output buffering, as production PHP has them. The CLI server
+// only uses OPcache when it is loaded and enabled for the CLI, and it
+// revalidates on every request so an edit shows at once.
+$opcache_flags = '';
+if (extension_loaded('Zend OPcache') || str_contains((string) @shell_exec('php -d zend_extension=opcache -m 2>/dev/null'), 'Zend OPcache')) {
+  $opcache_flags = (extension_loaded('Zend OPcache') ? '' : ' -d zend_extension=opcache') . ' -d opcache.enable=1 -d opcache.enable_cli=1 -d opcache.revalidate_freq=0';
+}
+$performance_flags = ' -d output_buffering=4096' . $opcache_flags;
+
 // -----------------------------------------------------------------------------
 
 echo '===============================' . PHP_EOL;
@@ -96,10 +105,10 @@ $cwd = (string) getcwd();
 passthru(sprintf(
   '(cd %s/web && exec nohup php%s -S %s:%s -t . .ht.router.php </dev/null >/tmp/cms-druxtjs-org-php-server.log 2>&1) & echo $! > %s',
   escapeshellarg($cwd),
-  $xdebug_flags,
+  $xdebug_flags . $performance_flags,
   escapeshellarg($webserver_host),
   escapeshellarg($webserver_port),
-  escapeshellarg(server_pid_file())
+  escapeshellarg(server_pid_file($webserver_port))
 ));
 
 $ready = FALSE;
@@ -114,7 +123,7 @@ for ($i = 0; $i < $webserver_wait_timeout; $i++) {
   // immediately, and without this the loop would wait out the full timeout
   // before reporting a failure the OS already explained in the log.
   if ($pid === 0) {
-    $pid = (int) trim((string) @file_get_contents(server_pid_file()));
+    $pid = (int) trim((string) @file_get_contents(server_pid_file($webserver_port)));
   }
   if ($pid > 0 && !@posix_kill($pid, 0)) {
     echo PHP_EOL;

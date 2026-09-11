@@ -55,9 +55,11 @@ if ($unknown !== []) {
  */
 const MIGRATIONS = [
   'docs_user',
+  'docs_consumer',
   'docs_section',
   'docs_file',
   'docs_media',
+  'docs_paragraph_layout',
   'docs_paragraph_text',
   'docs_paragraph_code',
   'docs_paragraph_diagram',
@@ -65,6 +67,9 @@ const MIGRATIONS = [
   'docs_paragraph_image',
   'docs_page',
   'docs_alias',
+  'docs_menu_section',
+  'docs_menu_page',
+  'docs_menu_footer',
 ];
 $repo_root = dirname(getcwd());
 $pin_file = $repo_root . '/docs-source.json';
@@ -178,6 +183,24 @@ else {
 
 if (!is_file('vendor/bin/drush')) {
   FAIL('vendor/bin/drush is missing. Run .devtools/assemble and .devtools/provision first.');
+}
+
+// Block previews style code with a copy of the frontend's stylesheet, so a
+// copy that has drifted from the pinned frontend stops the run.
+TASK('Checking the preview stylesheet against the frontend at %s.', $checkout);
+$frontend_css = $checkout . '/docs/nuxt/assets/css/code.css';
+$preview_css = 'web/modules/custom/druxt_docs/css/code.css';
+if (!is_file($frontend_css)) {
+  NOTE('The checkout has no docs/nuxt/assets/css/code.css, so there is nothing to compare.');
+}
+elseif (file_get_contents($frontend_css) === file_get_contents($preview_css)) {
+  PASS('Identical.');
+}
+elseif ($from_pin) {
+  FAIL('%s differs from the frontend at the pinned commit. Copy it over: cp %s %s', $preview_css, $frontend_css, $preview_css);
+}
+else {
+  NOTE('%s differs from the frontend in DOCS_CHECKOUT, which may be ahead of the pin.', $preview_css);
 }
 
 // The database is the source of truth, so seeding is not a thing to do
@@ -325,7 +348,10 @@ function fetch_pinned(string $dir, string $repository, string $ref): void {
   if (is_dir($dir . '/.git')) {
     $head = git_output($dir, 'rev-parse HEAD', FALSE);
     $dirty = git_output($dir, 'status --porcelain', FALSE);
-    if ($head === $ref && $dirty === '') {
+    // A checkout fetched before page dates came from history is shallow,
+    // and reusing it would stop the build at the full-history check.
+    $shallow = git_output($dir, 'rev-parse --is-shallow-repository', FALSE);
+    if ($head === $ref && $dirty === '' && $shallow !== 'true') {
       NOTE('Already checked out.');
       return;
     }
@@ -335,7 +361,9 @@ function fetch_pinned(string $dir, string $repository, string $ref): void {
     FAIL('Unable to create %s.', $dir);
   }
   git_run($dir, 'init -q');
-  git_run($dir, sprintf('fetch -q --depth 1 %s %s', escapeshellarg($repository), $ref), sprintf('Could not fetch %s from %s. If the commit lives on a mirror, set DOCS_REPOSITORY to the mirror URL.', $ref, $repository));
+  // The whole history, not --depth 1: page dates come from it, and a shallow
+  // fetch dates every page to the fetch itself.
+  git_run($dir, sprintf('fetch -q %s %s', escapeshellarg($repository), $ref), sprintf('Could not fetch %s from %s. If the commit lives on a mirror, set DOCS_REPOSITORY to the mirror URL.', $ref, $repository));
   git_run($dir, 'checkout -q FETCH_HEAD');
 }
 

@@ -9,6 +9,7 @@ dependencies:
     - paragraphs.paragraphs_type.docs_code
     - paragraphs.paragraphs_type.docs_diagram
     - paragraphs.paragraphs_type.docs_image
+    - paragraphs.paragraphs_type.docs_layout_section
     - paragraphs.paragraphs_type.docs_rich_text
     - paragraphs.paragraphs_type.docs_text
   module:
@@ -33,6 +34,7 @@ settings:
       docs_callout: docs_callout
       docs_image: docs_image
       docs_rich_text: docs_rich_text
+      docs_layout_section: docs_layout_section
     target_bundles_drag_drop:
       docs_callout:
         weight: 4
@@ -45,6 +47,9 @@ settings:
         enabled: true
       docs_image:
         weight: 3
+        enabled: true
+      docs_layout_section:
+        weight: 8
         enabled: true
       docs_rich_text:
         weight: 6

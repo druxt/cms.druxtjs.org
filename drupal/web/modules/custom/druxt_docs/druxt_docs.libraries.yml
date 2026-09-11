@@ -1,0 +1,5 @@
+preview:
+  css:
+    theme:
+      css/code.css: {}
+      css/preview.css: {}

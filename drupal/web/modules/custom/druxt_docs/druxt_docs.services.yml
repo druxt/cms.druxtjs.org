@@ -1,12 +1,11 @@
 services:
-  druxt_docs.tome_sync_suppressor:
-    class: Drupal\druxt_docs\EventSubscriber\TomeSyncSuppressor
-    arguments:
-      - '@?tome_sync.importer'
+  druxt_docs.frontend_redirect:
+    class: Drupal\druxt_docs\EventSubscriber\FrontendRedirectSubscriber
+    arguments: ['@current_user', '@path_alias.manager']
     tags:
       - { name: event_subscriber }
-  # Above tome_sync's path normalizer, which sits at 8.
-  serializer.normalizer.druxt_docs_path:
-    class: Drupal\druxt_docs\Normalizer\PathItemNormalizer
+  druxt_docs.login_theme:
+    class: Drupal\druxt_docs\Theme\LoginThemeNegotiator
+    arguments: ['@config.factory']
     tags:
-      - { name: normalizer, priority: 20 }
+      - { name: theme_negotiator, priority: 10 }

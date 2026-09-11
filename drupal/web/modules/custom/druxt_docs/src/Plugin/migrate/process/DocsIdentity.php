@@ -48,9 +48,36 @@ final class DocsIdentity extends ProcessPluginBase {
       'file' => Identity::file($value),
       'section' => Identity::section($value),
       'user' => Identity::user($value),
+      'consumer' => Identity::consumer($value),
+      'menu_link' => $this->menuLink($value),
       'paragraph' => $this->paragraph($value),
+      'section_paragraph' => $this->sectionParagraph($value),
       default => throw new MigrateException(sprintf('docs_identity: "%s" is not a kind of identifier this site derives.', $kind)),
     };
+  }
+
+  /**
+   * A menu link's identifier, whose source is its menu and a key.
+   */
+  private function menuLink(string $value): string {
+    [$menu, $key] = explode(':', $value, 2) + ['', ''];
+    if ($menu === '' || $key === '') {
+      throw new MigrateException(sprintf('docs_identity: a menu link identifier needs a menu and a key, not "%s".', $value));
+    }
+    return Identity::menuLink($menu, $key);
+  }
+
+  /**
+   * A section's identifier, whose source is a page path and its position.
+   */
+  private function sectionParagraph(string $value): string {
+    $parts = explode(':', $value);
+    $position = array_pop($parts);
+    $page = implode(':', $parts);
+    if ($page === '' || !ctype_digit((string) $position)) {
+      throw new MigrateException(sprintf('docs_identity: a section identifier needs a page and a position, not "%s".', $value));
+    }
+    return Identity::sectionParagraph($page, (int) $position);
   }
 
   /**
