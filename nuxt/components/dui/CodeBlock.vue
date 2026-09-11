@@ -1,5 +1,8 @@
 <template>
-  <pre :class="`language-${language}`"><code :class="`language-${language}`" v-html="highlighted" /></pre>
+  <!-- AppProse adds the copy button inside this wrapper, so Vue keeps owning the root. -->
+  <div class="docs-code">
+    <pre :class="`language-${language}`"><code :class="`language-${language}`" v-html="highlighted" /></pre>
+  </div>
 </template>
 
 <script>

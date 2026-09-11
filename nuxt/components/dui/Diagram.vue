@@ -1,6 +1,6 @@
 <template>
-  <!-- plugins/mermaid.client.js replaces this with the rendered figure. -->
-  <pre><code class="language-mermaid">{{ source }}</code></pre>
+  <!-- plugins/mermaid.client.js replaces the pre with the rendered figure, inside this wrapper. -->
+  <div style="display: contents"><pre><code class="language-mermaid">{{ source }}</code></pre></div>
 </template>
 
 <script>

@@ -18,7 +18,7 @@ export default {
 .docs-diagram-row > div {
   display: flex;
 }
-.docs-diagram-row > div > .docs-diagram {
+.docs-diagram-row > div .docs-diagram {
   flex: 1;
 }
 </style>

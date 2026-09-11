@@ -192,11 +192,16 @@ export default {
 
         // The button anchors to a wrapper, not the pre: the pre scrolls, and
         // an absolutely positioned child of a scroll container scrolls with
-        // the code.
-        const wrapper = document.createElement('div')
-        wrapper.className = 'docs-code'
-        pre.parentNode.insertBefore(wrapper, pre)
-        wrapper.appendChild(pre)
+        // the code. A component that renders its own wrapper keeps it, so Vue
+        // still owns the element it later replaces.
+        let wrapper = pre.parentElement
+        if (!wrapper.classList.contains('docs-code')) {
+          wrapper = document.createElement('div')
+          wrapper.className = 'docs-code'
+          pre.parentNode.insertBefore(wrapper, pre)
+          wrapper.appendChild(pre)
+        }
+        if (wrapper.querySelector('.docs-copy')) return
 
         const button = document.createElement('button')
         button.type = 'button'
