@@ -8,6 +8,8 @@
 <script>
 /** A documentation page's body. The page component renders its title and description. */
 export default {
+  // DruxtEntity's other props (fields, schema, value) are not HTML attributes.
+  inheritAttrs: false,
   props: {
     entity: { type: Object, default: undefined },
   },
