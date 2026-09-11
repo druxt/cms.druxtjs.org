@@ -107,4 +107,30 @@ final class Layout {
     throw new \OutOfBoundsException(sprintf('No block at position %d.', $index));
   }
 
+  /**
+   * The behavior settings layout_paragraphs stores on a section.
+   *
+   * Its layout, and no parent. layout_paragraphs reads a page's structure
+   * from these rather than from the field, so this is the module's own
+   * shape exactly.
+   *
+   * @return array{layout_paragraphs: array{layout: string, config: array, parent_uuid: string, region: string}}
+   *   The settings.
+   */
+  public static function sectionBehavior(string $layout): array {
+    return ['layout_paragraphs' => ['layout' => $layout, 'config' => ['label' => ''], 'parent_uuid' => '', 'region' => '']];
+  }
+
+  /**
+   * The behavior settings layout_paragraphs stores on a block.
+   *
+   * The UUID of the section it sits in, and the region within it.
+   *
+   * @return array{layout_paragraphs: array{layout: string, config: array, parent_uuid: string, region: string}}
+   *   The settings.
+   */
+  public static function blockBehavior(string $section_uuid, string $region): array {
+    return ['layout_paragraphs' => ['layout' => '', 'config' => [], 'parent_uuid' => $section_uuid, 'region' => $region]];
+  }
+
 }
