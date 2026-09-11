@@ -1,0 +1,253 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * @file
+ * Import the authored documentation from its pinned source.
+ *
+ * `../docs-source.json` names the documentation repository and the commit
+ * the committed content is built from. This fetches that commit, runs the
+ * IR builder in ../scripts over it, imports the result into the provisioned
+ * site and exports it back through Tome. Whatever git then reports under
+ * content/ is the difference between the committed content and what the
+ * pinned source produces today.
+ *
+ * With --check that difference fails the run, which is what CI wants.
+ * Without it, the difference is the change to commit after bumping the
+ * pin, which is what a developer wants.
+ *
+ * DOCS_CHECKOUT points this at a local clone instead of the pinned commit,
+ * for iterating on the documentation and the importer together. It is
+ * never honoured under --check, because a check that can be pointed at an
+ * uncommitted working tree is not checking the pin.
+ *
+ * DOCS_REPOSITORY replaces the clone URL alone, for a mirror that already
+ * holds the pinned commit. The commit stays the pinned one.
+ */
+
+declare(strict_types=1);
+
+namespace DocsDevTools;
+
+require_once __DIR__ . '/helpers.php';
+
+// -----------------------------------------------------------------------------
+// Variables.
+// -----------------------------------------------------------------------------
+
+$check = in_array('--check', array_slice($argv, 1), TRUE);
+$repo_root = dirname(getcwd());
+$pin_file = $repo_root . '/docs-source.json';
+$source_dir = $repo_root . '/.docs-source';
+$ir_dir = $repo_root . '/.docs-ir';
+
+// -----------------------------------------------------------------------------
+
+echo '===============================' . PHP_EOL;
+echo '          📥 IMPORT            ' . PHP_EOL;
+echo '===============================' . PHP_EOL;
+echo PHP_EOL;
+
+// -----------------------------------------------------------------------------
+// The pin.
+// -----------------------------------------------------------------------------
+
+TASK('Reading the documentation source pin at %s.', $pin_file);
+$pin = read_pin($pin_file);
+PASS('Pinned to %s at %s.', $pin['repository'], $pin['ref']);
+
+// -----------------------------------------------------------------------------
+// The checkout.
+// -----------------------------------------------------------------------------
+
+$checkout = resolve_env_value('DOCS_CHECKOUT', '')[0];
+if ($checkout !== '' && $check) {
+  FAIL('DOCS_CHECKOUT is set, and --check only ever builds from the pinned commit. Unset it to check the pin, or drop --check to build from the working tree.');
+}
+
+if ($checkout !== '') {
+  TASK('Using the documentation checkout at %s.', $checkout);
+  if (!is_dir($checkout . '/.git') && !is_file($checkout . '/.git')) {
+    FAIL('DOCS_CHECKOUT %s is not a git checkout. The IR builder lists the corpus with git, so it needs one.', $checkout);
+  }
+  $head = git_output($checkout, 'rev-parse HEAD');
+  if ($head === $pin['ref']) {
+    PASS('The checkout is at the pinned commit.');
+  }
+  else {
+    NOTE('The checkout is at %s, not the pinned %s. The content this produces belongs to the working tree, not the pin.', substr($head, 0, 12), substr($pin['ref'], 0, 12));
+  }
+}
+else {
+  $repository = resolve_env_value('DOCS_REPOSITORY', $pin['repository'])[0];
+  command_must_exist('git');
+  TASK('Fetching the pinned commit into %s.', $source_dir);
+  fetch_pinned($source_dir, $repository, $pin['ref']);
+  $checkout = $source_dir;
+  PASS('Checked out %s.', $pin['ref']);
+}
+
+// -----------------------------------------------------------------------------
+// The intermediate representation.
+// -----------------------------------------------------------------------------
+
+$builder = $repo_root . '/scripts/build-ir.mjs';
+TASK('Building the intermediate representation with %s.', $builder);
+if (!is_file($builder)) {
+  FAIL('The IR builder is missing: %s.', $builder);
+}
+command_must_exist('node');
+// Checked here because the builder's own failure would name a module, not
+// the step that installs it.
+$node_modules = $repo_root . '/node_modules';
+if (!is_dir($node_modules . '/github-slugger')) {
+  FAIL('github-slugger is not installed under %s. Run `npm ci` in %s first.', $node_modules, $repo_root);
+}
+if (is_dir($ir_dir)) {
+  remove_directory($ir_dir);
+}
+passthru_or_fail(
+  sprintf('node %s --source %s --out %s', escapeshellarg($builder), escapeshellarg($checkout), escapeshellarg($ir_dir)),
+  'The IR builder failed. Nothing was imported.',
+);
+$documents = glob($ir_dir . '/*.json') ?: [];
+if ($documents === []) {
+  FAIL('The IR builder exited 0 but wrote no documents to %s.', $ir_dir);
+}
+PASS('%d documents written to %s.', count($documents), $ir_dir);
+
+// -----------------------------------------------------------------------------
+// The import.
+// -----------------------------------------------------------------------------
+
+TASK('Importing into the provisioned site.');
+if (!is_file('vendor/bin/drush')) {
+  FAIL('vendor/bin/drush is missing. Run .devtools/assemble and .devtools/provision first.');
+}
+drush('druxt-docs:import %s', [$ir_dir]);
+PASS('Imported.');
+
+// -----------------------------------------------------------------------------
+// The export, and the drift.
+// -----------------------------------------------------------------------------
+
+TASK('Exporting content through Tome.');
+// Tome runs its export in child drush processes it builds from the parent's
+// own command line, and it reads everything before the command name as the
+// executable. Global options placed there break every child, so this runs
+// drush from the project directory with the options after the command.
+putenv('PHPRC=' . __DIR__ . '/etc/php.ini');
+passthru_or_fail(
+  'vendor/bin/drush tome:export --process-count=1 -y',
+  'Tome export failed. The content directory may be half written; restore it with git before trying again.',
+);
+PASS('Exported.');
+
+TASK('Comparing the export against the committed content.');
+$drift = git_output(getcwd(), 'status --porcelain -- content files');
+if ($drift === '') {
+  PASS('The committed content matches what the pinned source produces.');
+}
+elseif ($check) {
+  FAIL_NO_EXIT('The committed content does not match what the pinned source produces:');
+  echo $drift . PHP_EOL;
+  echo git_output(getcwd(), 'diff --stat -- content files') . PHP_EOL;
+  quit(1);
+}
+else {
+  NOTE('The export differs from the committed content:');
+  echo $drift . PHP_EOL;
+  NOTE('Review the difference and commit it alongside the pin.');
+}
+
+echo PHP_EOL;
+echo '===============================' . PHP_EOL;
+echo '     📥 IMPORT COMPLETE  ✅   ' . PHP_EOL;
+echo '===============================' . PHP_EOL;
+echo PHP_EOL;
+echo 'Source:    ' . $checkout . PHP_EOL;
+echo 'Documents: ' . count($documents) . PHP_EOL;
+echo 'Content:   ' . ($drift === '' ? 'unchanged' : 'changed, see git status') . PHP_EOL;
+echo PHP_EOL;
+
+// -----------------------------------------------------------------------------
+// Helpers local to this script.
+// -----------------------------------------------------------------------------
+
+/**
+ * Read and validate the pin file.
+ *
+ * @return array{repository: string, ref: string}
+ *   The pin.
+ */
+function read_pin(string $file): array {
+  if (!is_file($file)) {
+    FAIL('No pin file at %s. It names the documentation repository and commit this content is built from.', $file);
+  }
+  $raw = (string) file_get_contents($file);
+  $pin = json_decode($raw, TRUE);
+  if (!is_array($pin)) {
+    FAIL('%s is not a JSON object.', $file);
+  }
+  foreach (['repository', 'ref'] as $key) {
+    if (!isset($pin[$key]) || !is_string($pin[$key]) || $pin[$key] === '') {
+      FAIL('%s is missing "%s".', $file, $key);
+    }
+  }
+  if (!preg_match('/^[0-9a-f]{40}$/', $pin['ref'])) {
+    FAIL('%s pins "%s", which is not a full commit sha. Branch names and tags move; the pin has to name exactly one commit.', $file, $pin['ref']);
+  }
+  return $pin;
+}
+
+/**
+ * Check out exactly one commit of a repository, reusing it when present.
+ */
+function fetch_pinned(string $dir, string $repository, string $ref): void {
+  if (is_dir($dir . '/.git')) {
+    $head = git_output($dir, 'rev-parse HEAD', FALSE);
+    $dirty = git_output($dir, 'status --porcelain', FALSE);
+    if ($head === $ref && $dirty === '') {
+      NOTE('Already checked out.');
+      return;
+    }
+    remove_directory($dir);
+  }
+  if (!mkdir($dir, 0777, TRUE) && !is_dir($dir)) {
+    FAIL('Unable to create %s.', $dir);
+  }
+  git_run($dir, 'init -q');
+  git_run($dir, sprintf('fetch -q --depth 1 %s %s', escapeshellarg($repository), $ref), sprintf('Could not fetch %s from %s. If the commit lives on a mirror, set DOCS_REPOSITORY to the mirror URL.', $ref, $repository));
+  git_run($dir, 'checkout -q FETCH_HEAD');
+}
+
+/**
+ * Run a git command in a directory, failing on error.
+ */
+function git_run(string $dir, string $arguments, string $failure = ''): void {
+  passthru(sprintf('git -C %s %s', escapeshellarg($dir), $arguments), $exit_code);
+  if ($exit_code !== 0) {
+    FAIL($failure !== '' ? $failure : sprintf('git %s failed in %s.', $arguments, $dir));
+  }
+}
+
+/**
+ * Capture a git command's trimmed output.
+ */
+function git_output(string $dir, string $arguments, bool $must_succeed = TRUE): string {
+  exec(sprintf('git -C %s %s 2>/dev/null', escapeshellarg($dir), $arguments), $output, $exit_code);
+  if ($exit_code !== 0 && $must_succeed) {
+    FAIL('git %s failed in %s.', $arguments, $dir);
+  }
+  return trim(implode(PHP_EOL, $output));
+}
+
+/**
+ * Delete a directory this script created.
+ */
+function remove_directory(string $dir): void {
+  passthru(sprintf('rm -rf %s', escapeshellarg($dir)), $exit_code);
+  if ($exit_code !== 0) {
+    FAIL('Unable to remove %s.', $dir);
+  }
+}
