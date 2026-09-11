@@ -12,6 +12,8 @@
         "drupal/core-recommended": "^11",
         "drupal/druxt": "1.2.x-dev",
         "drupal/markdown_easy": "^2.0",
+        "drupal/migrate_plus": "^6.0",
+        "drupal/migrate_tools": "^6.1",
         "drupal/paragraphs": "^1.23",
         "drupal/pathauto": "^1.15",
         "drupal/redirect": "^1.13",
