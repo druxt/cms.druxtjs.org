@@ -3,3 +3,14 @@ preview:
     theme:
       css/code.css: {}
       css/preview.css: {}
+
+node_preview:
+  css:
+    component:
+      css/node-preview.css: {}
+  js:
+    js/node-preview.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupal.displace
+    - core/once
