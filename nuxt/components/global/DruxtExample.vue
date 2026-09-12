@@ -153,9 +153,15 @@
 
         <!-- Markup: always open, the site's own code block, one line. -->
         <div class="border-t border-base-300 pt-3 mt-1" data-testid="markup">
-          <!-- The site's code styling keys on .prose, which a playground page lacks. The docs' copy button is added on mount. -->
+          <!-- The site's code styling keys on .prose, which a playground page lacks. The docs' copy button, from the template: this card re-renders, so nothing may move its nodes. -->
           <div class="prose max-w-none druxt-markup">
-            <DuiCodeBlock :code="snippet" language="vue" class="text-xs whitespace-pre-wrap break-all" />
+            <div class="docs-code">
+              <DuiCodeBlock :code="snippet" language="vue" class="text-xs whitespace-pre-wrap break-all" tabindex="0" />
+              <button type="button" class="docs-copy" aria-label="Copy code to clipboard" :data-state="copyState || null" @click="copy">
+                <span>{{ copyState ? copyStates[copyState].label : 'Copy' }}</span>
+              </button>
+              <span class="sr-only" role="status" aria-live="polite">{{ copyState ? copyStates[copyState].announce : '' }}</span>
+            </div>
           </div>
         </div>
 
@@ -219,7 +225,7 @@ import {
   pageFor,
   pickOption,
 } from '~/utils/live-examples'
-import { addCopyButton } from '~/utils/copy-button'
+import { COPY_STATES, copyText } from '~/utils/copy-button'
 import { createRuntime } from '~/utils/druxt-runtime'
 import mutations from '~/store/mutations'
 
@@ -264,6 +270,7 @@ export default {
       loading: {},
       wrapper: true,
       openResolution: false,
+      copyState: null,
       error: null,
       requests: [],
       resolution: { is: '', options: [] },
@@ -276,6 +283,7 @@ export default {
 
   computed: {
     backends: () => BACKENDS,
+    copyStates: () => COPY_STATES,
     fixed: ({ component }) => !!component,
     live: ({ name }) => !!COMPONENTS[name],
     contextOnly: ({ name }) => CONTEXT_ONLY[name] || null,
@@ -393,16 +401,11 @@ export default {
   },
 
   mounted() {
-    this.enhanceMarkup()
     if (this.placement === 'playground') this.readUrl()
     if (this.name) {
       this.reset()
       this.track('example_component')
     }
-  },
-
-  updated() {
-    this.enhanceMarkup()
   },
 
   beforeDestroy() {
@@ -431,9 +434,12 @@ export default {
       if (JSON.stringify(query) !== JSON.stringify(this.$route.query)) this.$router.replace({ query }).catch(() => {})
     },
 
-    /** The docs' copy button on the markup line, once its code block exists. */
-    enhanceMarkup() {
-      addCopyButton(this.$el.querySelector('[data-testid="markup"] pre'), { onCopy: () => this.track('example_copy') })
+    /** The markup line to the clipboard, the way the docs' button does it. */
+    async copy() {
+      clearTimeout(this.copyTimer)
+      this.copyState = await copyText(this.snippet)
+      if (this.copyState === 'copied') this.track('example_copy')
+      this.copyTimer = setTimeout(() => { this.copyState = null }, 2000)
     },
 
     /** Whether a backend can serve the component; the reason it cannot is the descriptor's. */

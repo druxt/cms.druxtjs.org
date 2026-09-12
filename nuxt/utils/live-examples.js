@@ -184,7 +184,8 @@ export const COMPONENTS = {
       description: 'Each one narrows the next.',
       steps: [
         { name: 'theme', source: 'themes', required: true, prefer: siteTheme },
-        { name: 'name', source: 'regions', needs: ['theme'], prefer: perBackend('header', 'banner_top') },
+        // The header on both: a banner region's blocks show only on their own pages.
+        { name: 'name', source: 'regions', needs: ['theme'], prefer: 'header' },
       ],
     },
     props: [],
@@ -197,9 +198,9 @@ export const COMPONENTS = {
       label: 'type, uuid, mode',
       description: 'Each one narrows the next.',
       steps: [
-        { name: 'entityType', source: 'entityTypes', required: true, internal: true, prefer: 'node' },
-        { name: 'bundle', source: 'bundles', needs: ['entityType'], required: true, internal: true, prefer: perBackend('doc_page', 'recipe') },
-        { name: 'uuid', source: 'entities', needs: ['entityType', 'bundle'], prefer: perBackend(/Getting started/, /Deep mediterranean quiche/) },
+        { name: 'entityType', source: 'entityTypes', required: true, internal: true, prefer: perBackend('paragraph', 'node') },
+        { name: 'bundle', source: 'bundles', needs: ['entityType'], required: true, internal: true, prefer: perBackend('docs_diagram', 'recipe') },
+        { name: 'uuid', source: 'entities', needs: ['entityType', 'bundle'], prefer: perBackend(undefined, /Deep mediterranean quiche/) },
         { name: 'mode', source: 'modes', needs: ['entityType', 'bundle', 'schemaType'], prefer: 'full' },
       ],
       // `type` is built from the two internal steps.
