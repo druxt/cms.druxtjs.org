@@ -79,7 +79,8 @@ describe('COMPONENTS', () => {
 
   test('selects prefer content: nodes, the site menu, the frontend theme of each backend', () => {
     const step = (name, key) => name.chain.steps.find((s) => s.name === key)
-    assert.equal(step(m.COMPONENTS.DruxtEntity, 'entityType').prefer, 'node')
+    assert.equal(step(m.COMPONENTS.DruxtEntity, 'entityType').prefer({ backend: 'site' }), 'paragraph')
+    assert.equal(step(m.COMPONENTS.DruxtEntity, 'entityType').prefer({ backend: 'umami' }), 'node')
     assert.equal(step(m.COMPONENTS.DruxtEntity, 'mode').prefer, 'full')
     const menu = m.COMPONENTS.DruxtMenu.props.find((p) => p.name === 'name')
     assert.equal(menu.prefer({ backend: 'site' }), 'docs')
@@ -118,7 +119,7 @@ describe('demo defaults', () => {
     const block = m.COMPONENTS.DruxtBlock.props.find((p) => p.name === 'uuid')
     assert.equal(m.pickOption([{ value: '1', label: 'umami_branding' }, { value: '2', label: 'umami_banner_recipes' }], block.prefer({ backend: 'umami' })), '2')
     assert.equal(m.pickOption([{ value: '1', label: 'druxtjs_branding' }, { value: '2', label: 'druxtjs_docs_menu' }], block.prefer({ backend: 'site' })), '1')
-    assert.equal(step(m.COMPONENTS.DruxtBlockRegion, 'name').prefer({ backend: 'umami' }), 'banner_top')
+    assert.equal(step(m.COMPONENTS.DruxtBlockRegion, 'name').prefer, 'header')
     assert.equal(step(m.COMPONENTS.DruxtEntity, 'bundle').prefer({ backend: 'umami' }), 'recipe')
     assert.equal(m.pickOption([{ value: 'x', label: 'Borscht (x)' }, { value: 'y', label: 'Deep mediterranean quiche (y)' }], step(m.COMPONENTS.DruxtEntity, 'uuid').prefer({ backend: 'umami' })), 'y')
     const path = m.COMPONENTS.DruxtRouter.props.find((p) => p.name === 'path')
