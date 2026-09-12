@@ -21,6 +21,7 @@
 
 <script>
 import { seoHead } from '~/utils/seo'
+import { apiSourceUrl } from '~/utils/api-source'
 import { documentDescription } from '~/utils/content'
 import { isPackageRoot } from '~/components/app/icon/module'
 export default {
@@ -64,9 +65,7 @@ export default {
      */
     inModuleHeader: ({ $route }) => isPackageRoot($route.path),
 
-    source: ({ document }) => (document.dir
-      ? 'https://github.com/druxt/druxt.js/tree/develop' + document.dir.replace('/api/packages', '/packages')
-      : null),
+    source: ({ document }) => apiSourceUrl(document.dir, document.slug),
 
   },
 }
