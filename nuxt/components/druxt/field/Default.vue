@@ -1,7 +1,8 @@
 <script>
 /**
  * Every field without a more specific wrapper: its label when shown above,
- * then each item, rendered by DruxtField's own item slots.
+ * or a form widget's label, then each item, rendered by DruxtField's own
+ * item slots.
  */
 export default {
   props: {
@@ -15,7 +16,8 @@ export default {
     const items = Object.keys(slots)
       .filter((name) => /^field-\d+$/.test(name))
       .sort((a, b) => a.split('-')[1] - b.split('-')[1])
-    const label = slots['label-above'] ? [slots['label-above']()] : []
+    const form = ((this.schema || {}).config || {}).schemaType === 'form'
+    const label = slots['label-above'] ? [slots['label-above']()] : form && slots.label ? [slots.label()] : []
     return h('div', [...label, ...items.map((name) => slots[name]())])
   },
 }
