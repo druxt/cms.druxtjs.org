@@ -114,14 +114,13 @@ export const SOURCES = {
   },
 
   // The backend's languages, for the langcode prop. A monolingual site without
-  // the language module exposes none, and offers none.
+  // the language module has no such resource, which its index says, so it is
+  // not asked for one it would answer with a 404.
   languages: async (api) => {
-    try {
-      const { data } = await get(api, '/configurable_language/configurable_language?fields%5Bconfigurable_language--configurable_language%5D=drupal_internal__id,label,locked')
-      return data.filter((o) => !o.attributes.locked).map((o) => ({ value: o.attributes.drupal_internal__id, label: `${o.attributes.label} (${o.attributes.drupal_internal__id})` }))
-    } catch (e) {
-      return []
-    }
+    const { links = {} } = await get(api, '')
+    if (!links['configurable_language--configurable_language']) return []
+    const { data } = await get(api, '/configurable_language/configurable_language?fields%5Bconfigurable_language--configurable_language%5D=drupal_internal__id,label,locked')
+    return data.filter((o) => !o.attributes.locked).map((o) => ({ value: o.attributes.drupal_internal__id, label: `${o.attributes.label} (${o.attributes.drupal_internal__id})` }))
   },
 
   // Paths the router can resolve: this backend's content, by title.
