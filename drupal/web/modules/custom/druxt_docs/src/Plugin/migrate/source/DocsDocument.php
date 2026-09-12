@@ -32,7 +32,6 @@ final class DocsDocument extends DocsSourceBase {
       'description' => 'Page description',
       'weight' => 'Order within the section',
       'isLanding' => 'Whether the page is its section landing page',
-      'toc' => 'Table of contents, computed at build time',
       'items' => 'Sections and blocks, in the order the page reads',
       'created' => 'When the page was written, from git',
       'changed' => 'When the page last changed, from git',
@@ -97,7 +96,6 @@ final class DocsDocument extends DocsSourceBase {
       // cannot carry a boolean map key and a static_map over true and
       // false is unwritable.
       $document['isLanding'] = (int) !empty($document['isLanding']);
-      $document['toc'] = json_encode($document['toc'] ?? [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
       $rows[] = $document;
     }
     return new \ArrayIterator($rows);
