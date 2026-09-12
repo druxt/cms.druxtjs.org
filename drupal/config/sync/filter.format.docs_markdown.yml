@@ -1,0 +1,23 @@
+uuid: 99d09e12-ad58-49ac-a2cc-cbd4629f715d
+langcode: en
+status: true
+dependencies:
+  module:
+    - markdown_easy
+name: 'Documentation markdown'
+format: docs_markdown
+weight: 0
+filters:
+  filter_html_image_secure:
+    id: filter_html_image_secure
+    provider: filter
+    status: true
+    weight: 10
+    settings: {  }
+  markdown_easy:
+    id: markdown_easy
+    provider: markdown_easy
+    status: true
+    weight: 0
+    settings:
+      flavor: github

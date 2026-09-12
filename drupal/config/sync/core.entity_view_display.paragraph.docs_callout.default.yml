@@ -1,0 +1,16 @@
+uuid: 0f094f4e-95a1-4701-ac5e-d943de9fc3d9
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.docs_callout.field_callout
+    - field.field.paragraph.docs_callout.field_callout_type
+    - paragraphs.paragraphs_type.docs_callout
+id: paragraph.docs_callout.default
+targetEntityType: paragraph
+bundle: docs_callout
+mode: default
+content: {  }
+hidden:
+  field_callout: true
+  field_callout_type: true

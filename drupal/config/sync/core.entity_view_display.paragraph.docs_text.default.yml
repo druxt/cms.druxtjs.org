@@ -1,0 +1,14 @@
+uuid: 8ecb8f74-6670-4fe2-8432-8cb753a1c6af
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.docs_text.field_text
+    - paragraphs.paragraphs_type.docs_text
+id: paragraph.docs_text.default
+targetEntityType: paragraph
+bundle: docs_text
+mode: default
+content: {  }
+hidden:
+  field_text: true
