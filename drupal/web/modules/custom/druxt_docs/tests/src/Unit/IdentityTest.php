@@ -52,6 +52,29 @@ final class IdentityTest extends UnitTestCase {
   }
 
   /**
+   * An earlier version's paragraphs are its own, stable, and apart.
+   *
+   * A second import of the same history has to land on the same entities,
+   * and no earlier version may take a UUID the current page already holds.
+   */
+  public function testRevisionParagraphsAreStableAndApart(): void {
+    $source = 'docs/nuxt/content/how-to/proxy.md';
+    $first = str_repeat('a', 40);
+    $second = str_repeat('b', 40);
+    $this->assertSame(Identity::revisionParagraph($source, $first, 0), Identity::revisionParagraph($source, $first, 0));
+    $uuids = [
+      Identity::revisionParagraph($source, $first, 0),
+      Identity::revisionParagraph($source, $first, 1),
+      Identity::revisionParagraph($source, $second, 0),
+      Identity::revisionSectionParagraph($source, $first, 0),
+      Identity::revisionSectionParagraph($source, $second, 0),
+      Identity::paragraph($source, 0),
+      Identity::sectionParagraph($source, 0),
+    ];
+    $this->assertCount(count($uuids), array_unique($uuids));
+  }
+
+  /**
    * An author's UUID is stable, and no other kind of entity can take it.
    *
    * A reseed has to find the same account, or every page would be
