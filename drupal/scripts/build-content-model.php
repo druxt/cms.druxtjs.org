@@ -16,6 +16,7 @@
 
 declare(strict_types=1);
 
+use Drupal\druxt_docs\Identity;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\media\Entity\MediaType;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -24,40 +25,6 @@ use Drupal\node\Entity\NodeType;
 use Drupal\paragraphs\Entity\ParagraphsType;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
-
-/**
- * The project's UUID namespace.
- *
- * Fixed, and never regenerated: every deterministic identifier in this
- * project derives from it, so changing it orphans everything already
- * created.
- */
-const DOCS_UUID_NAMESPACE = '6f0d2b1e-9c3a-5d47-9a58-3b7f1c0e4a26';
-
-/**
- * A UUIDv5, derived from the project namespace and a name.
- *
- * Identity is a function of the source rather than of when the script
- * happened to run, so a rebuild from an empty database produces the same
- * identifiers and does not orphan content that already references them.
- */
-function docs_uuid(string $name): string {
-  $namespace = str_replace('-', '', DOCS_UUID_NAMESPACE);
-  $bytes = '';
-  for ($i = 0; $i < 32; $i += 2) {
-    $bytes .= chr((int) hexdec(substr($namespace, $i, 2)));
-  }
-  $hash = sha1($bytes . $name);
-
-  return sprintf(
-    '%08s-%04s-%04x-%04x-%12s',
-    substr($hash, 0, 8),
-    substr($hash, 8, 4),
-    (hexdec(substr($hash, 12, 4)) & 0x0fff) | 0x5000,
-    (hexdec(substr($hash, 16, 4)) & 0x3fff) | 0x8000,
-    substr($hash, 20, 12),
-  );
-}
 
 /**
  * Creates an entity only when it is absent, so the script can be re-run.
@@ -167,7 +134,7 @@ $sections = [
   'modules' => ['Modules', -7],
 ];
 foreach ($sections as $machine => [$name, $weight]) {
-  $uuid = docs_uuid("taxonomy_term:documentation_section:$machine");
+  $uuid = Identity::section($machine);
   $existing = \Drupal::entityTypeManager()->getStorage('taxonomy_term')
     ->loadByProperties(['uuid' => $uuid]);
   if ($existing === []) {

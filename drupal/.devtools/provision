@@ -9,18 +9,26 @@
  * this project is built in stages and each stage has to be provisionable:
  *
  *   config only        drush site:install --existing-config
- *   config + content   drush tome:install
  *   neither            drush site:install minimal
  *
  * Reading the checkout rather than assuming the finished shape is what
  * keeps `provision` working on the commit that adds the content model and
  * on every commit before it.
  *
+ * Content is never installed here. It lives in the site's database rather
+ * than in the repository, so a provisioned site starts empty and
+ * `.devtools/import` seeds it. That is also what lets the import job assert
+ * something: from an empty site, an importer that writes nothing leaves a
+ * page count of zero instead of hiding behind content the install loaded.
+ *
  * The SQLite override lives in `web/sites/default/settings.local.php`
  * (gitignored), not `settings.php`. Only `default.settings.php` is
- * committed, so this copies it once and enables its already-present but
- * commented-out `settings.local.php` include; every later run then only
- * ever touches the gitignored file.
+ * committed, so this rewrites `settings.php` from it on every run and
+ * enables its already-present but commented-out `settings.local.php`
+ * include. The installer leaves `settings.php` alone as long as the
+ * included file also carries a hash salt: without one it appends its own
+ * database block after the include, and that block would win over every
+ * later `DB_FILE`.
  */
 
 declare(strict_types=1);
@@ -45,20 +53,18 @@ echo PHP_EOL;
 
 TASK('Preparing web/sites/default/settings.php.');
 $settings_php = 'web/sites/default/settings.php';
-if (!file_exists($settings_php)) {
-  if (!copy('web/sites/default/default.settings.php', $settings_php)) {
-    FAIL('Unable to create %s from default.settings.php.', $settings_php);
-  }
+// The installer makes both read-only once it has run.
+chmod('web/sites/default', 0755);
+if (file_exists($settings_php)) {
+  chmod($settings_php, 0644);
 }
-$settings_contents = (string) file_get_contents($settings_php);
+$settings_contents = (string) file_get_contents('web/sites/default/default.settings.php');
 $commented_include = "#\n# if (file_exists(\$app_root . '/' . \$site_path . '/settings.local.php')) {\n#   include \$app_root . '/' . \$site_path . '/settings.local.php';\n# }\n";
 $active_include = "\nif (file_exists(\$app_root . '/' . \$site_path . '/settings.local.php')) {\n  include \$app_root . '/' . \$site_path . '/settings.local.php';\n}\n";
-if (str_contains($settings_contents, $commented_include)) {
-  file_put_contents($settings_php, str_replace($commented_include, $active_include, $settings_contents));
+if (!str_contains($settings_contents, $commented_include)) {
+  FAIL('Could not find the expected settings.local.php include block in default.settings.php. The file may have changed shape - update this script\'s anchor rather than skipping the patch.');
 }
-elseif (!str_contains($settings_contents, $active_include)) {
-  FAIL('Could not find the expected settings.local.php include block (commented or active) in %s. The file may have changed shape - update this script\'s anchor rather than skipping the patch.', $settings_php);
-}
+file_put_contents($settings_php, str_replace($commented_include, $active_include, $settings_contents));
 PASS('settings.php includes settings.local.php.');
 
 TASK('Configuring the SQLite database at %s.', $db_file);
@@ -67,9 +73,12 @@ if (file_exists($db_file)) {
 }
 // var_export() so a path containing quotes stays valid PHP.
 $db_file_php = var_export($db_file, TRUE);
+// A throwaway site needs no secret salt, only a present one.
+$hash_salt_php = var_export(hash('sha256', $db_file), TRUE);
 file_put_contents('web/sites/default/settings.local.php', sprintf(
-  "<?php\n\n/**\n * @file\n * Provision-only override, written fresh each run by .devtools/provision.\n * Gitignored - never committed.\n */\n\n\$databases['default']['default'] = [\n  'driver' => 'sqlite',\n  'database' => %s,\n];\n\n\$settings['config_sync_directory'] = '../config/sync';\n",
-  $db_file_php
+  "<?php\n\n/**\n * @file\n * Provision-only override, written fresh each run by .devtools/provision.\n * Gitignored - never committed.\n */\n\n\$databases['default']['default'] = [\n  'driver' => 'sqlite',\n  'database' => %s,\n];\n\n\$settings['hash_salt'] = %s;\n\$settings['config_sync_directory'] = '../config/sync';\n",
+  $db_file_php,
+  $hash_salt_php
 ));
 PASS('SQLite database configured.');
 
@@ -78,13 +87,6 @@ PASS('SQLite database configured.');
 // -----------------------------------------------------------------------------
 
 $has_config = file_exists('config/sync/core.extension.yml');
-// Any committed content entity, not just nodes: the section taxonomy is
-// content too, and checking only for nodes silently skipped importing it.
-$content_files = array_filter(
-  glob('content/*.json') ?: [],
-  static fn(string $file): bool => !str_starts_with(basename($file), 'meta.'),
-);
-$has_content = $has_config && $content_files !== [];
 
 // The committed config is authored against whatever database the editorial
 // environment uses, and Drupal refuses to uninstall the module providing the
@@ -116,12 +118,7 @@ register_shutdown_function(static function () use ($extension_patched, $extensio
   file_put_contents($extension_yml, preg_replace('/^  sqlite: \d+\n/m', '', $current, 1));
 });
 
-if ($has_content) {
-  TASK('Running drush tome:install (config and content).');
-  drush('tome:install');
-  PASS('Site installed from committed config and content.');
-}
-elseif ($has_config) {
+if ($has_config) {
   TASK('Running drush site:install --existing-config.');
   drush('site:install --existing-config');
   PASS('Site installed from committed config.');
@@ -143,7 +140,7 @@ echo '===============================' . PHP_EOL;
 echo PHP_EOL;
 echo 'Database: ' . $db_file . PHP_EOL;
 echo 'Config:   ' . ($has_config ? 'imported' : 'none committed yet') . PHP_EOL;
-echo 'Content:  ' . ($has_content ? 'imported via Tome' : 'none committed yet') . PHP_EOL;
+echo 'Content:  ' . 'none, run .devtools/import to seed it' . PHP_EOL;
 echo PHP_EOL;
 echo '> Next steps:' . PHP_EOL;
 echo '  .devtools/start    # Start the webserver' . PHP_EOL;
