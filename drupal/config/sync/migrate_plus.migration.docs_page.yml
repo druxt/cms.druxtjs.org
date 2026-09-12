@@ -37,6 +37,7 @@ process:
     source: changed
     from_format: 'Y-m-d\TH:i:sP'
     to_format: U
+  revision_log: revision_log
   langcode:
     plugin: default_value
     default_value: en
@@ -48,6 +49,7 @@ process:
     migration: docs_user
     source: constants/author
     no_stub: true
+  revision_uid: '@uid'
   field_description: description
   field_weight: weight
   field_source_path: source
@@ -68,12 +70,14 @@ process:
       - docs_paragraph_callout
       - docs_paragraph_image
 destination:
-  plugin: 'entity:node'
+  plugin: docs_page
   default_bundle: doc_page
+  media_migration: docs_media
 idMap: {  }
 migration_dependencies:
   required:
     - docs_user
+    - docs_media
     - docs_paragraph_layout
     - docs_section
     - docs_paragraph_text
