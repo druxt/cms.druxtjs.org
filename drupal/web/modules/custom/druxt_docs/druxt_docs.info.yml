@@ -1,0 +1,11 @@
+name: DruxtJS documentation
+type: module
+description: 'Imports the authored druxtjs.org documentation into Drupal content.'
+package: DruxtJS
+core_version_requirement: ^11
+dependencies:
+  - drupal:node
+  - drupal:media
+  - drupal:path
+  - drupal:taxonomy
+  - paragraphs:paragraphs
