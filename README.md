@@ -5,21 +5,21 @@ documentation site.
 
 The documentation is authored as markdown in the
 [druxt.js](https://github.com/druxt/druxt.js) monorepo. This project holds the
-Drupal content model it is migrated into, the importer that does the
-migrating, and the resulting content committed as
-[Tome](https://www.drupal.org/project/tome) JSON. The frontend reads it back
-over JSON:API with Druxt, which makes druxtjs.org a site built with the
-framework it documents.
+Drupal content model it is migrated into and the importer that does the
+migrating. The content itself lives in the site's database, the way it does
+on any other Drupal site. The frontend reads it back over JSON:API with
+Druxt, which makes druxtjs.org a site built with the framework it
+documents.
 
 ## Layout
 
 | Path | Purpose |
 | ---- | ------- |
-| `drupal/` | The Drupal codebase, configuration, content and importer |
+| `drupal/` | The Drupal codebase, configuration and importer |
 | `drupal/.devtools/` | Provisioning scripts: PHP and SQLite, no Docker |
 | `drupal/config/sync/` | Exported site configuration |
-| `drupal/content/` | Content, committed as Tome JSON |
-| `docs-source.json` | The documentation repository and commit the content is built from |
+| `drupal/content/` | A Tome export of the content, kept as a backup. Not what the site installs from |
+| `docs-source.json` | The documentation repository and commit the content is seeded from |
 | `scripts/` | The IR builder, the corpus survey and its baseline, content validation |
 | `tests/` | Unit tests for the corpus reader, guardrail tests for the scripts |
 
@@ -35,18 +35,41 @@ cd drupal
 ```
 
 `.devtools/info` reports what is configured, and `.devtools/stop` shuts the
-server down. Provisioning reads the checkout to decide how to install: with
-committed content it runs `drush tome:install`, with configuration only it
-installs from that configuration, and with neither it falls back to a bare
-site so that the scripts work on every commit.
+server down. Provisioning installs from the committed configuration, and
+falls back to a bare site when there is none, so that the scripts work on
+every commit. It gives you an empty site; run the importer to put the
+documentation in it.
+
+### Check `git status` after touching a local site
+
+`tome_sync` is installed, and it exports every entity to `drupal/content/`
+as the entity is saved. The importer suppresses that around its own run, so
+importing leaves the directory alone. Nothing suppresses it for anything
+else.
+
+So saving or deleting a node, a term or a media item by any other route,
+through the admin UI, through `drush`, through a test, rewrites the
+committed export underneath you. There is no warning and nothing fails.
+Deleting one node, for example, silently removes that node and its path
+alias from `drupal/content/` and rewrites `content/meta/index.json`.
+
+Nothing is lost, because it is all in git:
+
+```sh
+git status -- drupal/content drupal/files
+git checkout -- drupal/content drupal/files
+```
+
+Make that check a habit before committing anything from a working tree
+where you have run the site.
 
 ## The documentation source
 
 `docs-source.json` pins the documentation repository and the exact commit
-the committed content is built from. Nothing here reads a branch: the
-content under `drupal/content/` is a function of that commit, the importer
-and the content model, and CI proves it on every pipeline by building from
-the pin and failing when the result differs from what is committed.
+the content is seeded from. Nothing here reads a branch: the content is a
+function of that commit, the importer and the content model, and CI proves
+the importer still produces it on every pipeline by building from the pin
+into a throwaway site.
 
 Everything that reads the documentation lives here. `scripts/build-ir.mjs`
 turns the pinned checkout into the intermediate representation the importer
@@ -54,25 +77,34 @@ consumes, and `scripts/survey-content.mjs` measures the same checkout into
 `scripts/content-baseline.json`, the counts validation asserts against.
 
 To move the pin, edit the `ref` in `docs-source.json` to the new commit and
-rebuild the content from it:
+rebuild against it:
 
 ```sh
 npm ci                                   # the IR builder's one dependency
 cd drupal
 .devtools/assemble
-.devtools/provision
-.devtools/import                         # fetch, build, import, export
+.devtools/provision                      # an empty site
+.devtools/import                         # fetch, build, import
 cd ..
 npm run survey:content                   # re-measure the baseline
 ```
 
-Commit the content change together with the pin and the baseline. The merge
-request diff is the review: every page the new commit added, removed or
-changed shows up as Tome JSON, and nothing else does.
+Commit the pin together with the baseline.
 
-`.devtools/import --check` is what CI runs. It refuses to build from anything
-but the pinned commit, so a green pipeline means the committed content and
-the pin agree.
+`.devtools/import --check` is what CI runs. It refuses to build from
+anything but the pinned commit, and it fails unless the site ends up holding
+a page for every document the source produced, so a green pipeline means the
+importer still turns the pinned commit into the whole corpus.
+
+That page count alone would not be enough. It is compared against the
+document count from the same build, so a builder that quietly produced fewer
+documents would agree with itself. Before importing anything, the run also
+checks the documents against the pinned checkout's tracked files and against
+the committed baseline, which are two sources the builder does not control.
+A page that leaves the corpus fails there, by name.
+
+The importer seeds a site; it is not a synchronisation loop. Running it
+against a database an editor has worked in would overwrite them.
 
 ## Status
 
