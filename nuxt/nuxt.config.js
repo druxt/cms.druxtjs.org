@@ -142,6 +142,11 @@ export default {
     'druxt-layout-paragraphs',
     'druxt-menu',
     'druxt-blocks',
+    'druxt-views',
+    'druxt-breadcrumb',
+    // Every core module, so the playground can render every component. Its
+    // layout is only added to a site without one.
+    'druxt-site',
     // The consumer's decoupled settings and theme manifest, baked in at build.
     // A copy of the unreleased @druxt-contrib/decoupled-settings module.
     '~/modules/decoupled-settings',
@@ -180,10 +185,10 @@ export default {
     // The Umami demo backend, for the live component examples. Proxied so the
     // browser stays on this origin and Umami's CORS allowlist never applies.
     [
-      '/umami-jsonapi',
+      '/umami',
       {
         target: 'https://demo-api.druxtjs.org',
-        pathRewrite: { '^/umami-jsonapi': '/jsonapi' },
+        pathRewrite: { '^/umami': '' },
         changeOrigin: true,
       },
     ],

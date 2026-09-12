@@ -14,20 +14,19 @@
       <label v-else class="flex items-center gap-2 text-sm">
         <span class="sr-only sm:not-sr-only text-base-content/70">Component</span>
         <!-- Capped: the disabled options' reasons would otherwise set the width. -->
-        <select v-model="name" data-testid="component" class="select select-sm select-bordered h-[30px] min-h-0 rounded-md w-[15rem] max-w-full">
-          <option value="">Pick one</option>
-          <optgroup v-for="group in picker" :key="group.label" :label="group.label">
-            <option v-for="o in group.options" :key="o.name" :value="o.name" :disabled="!group.enabled">{{ o.label }}</option>
-          </optgroup>
+        <select v-model="name" data-testid="component" class="select select-sm select-bordered h-[30px] min-h-0 rounded-md w-[15rem] max-w-full text-base sm:text-sm">
+          <option value="" disabled>Pick one</option>
+          <option v-for="n in picker" :key="n" :value="n">{{ n }}</option>
         </select>
       </label>
 
       <!-- Right on a wide band; left under the picker when the band wraps. -->
       <label v-if="live" class="sm:ml-auto flex items-center gap-2 text-sm">
         <span class="text-base-content/70">Backend</span>
-        <select v-model="backend" data-testid="backend" class="select select-sm select-bordered h-[30px] min-h-0 rounded-md">
-          <option v-for="(b, key) in backends" :key="key" :value="key" :disabled="!supports(key)">
-            {{ b.label }}{{ supports(key) ? '' : ' (not for this component yet)' }}
+        <select v-model="backend" data-testid="backend" class="select select-sm select-bordered h-[30px] min-h-0 rounded-md text-base sm:text-sm">
+          <!-- Short, so the reason never widens the select on a phone; it is the option's title. -->
+          <option v-for="(b, key) in backends" :key="key" :value="key" :disabled="!available(key)" :title="available(key) ? null : schema.backends[key]">
+            {{ b.label }}{{ available(key) ? '' : ' (n/a)' }}
           </option>
         </select>
       </label>
@@ -48,37 +47,14 @@
     </div>
 
     <template v-if="live">
-      <!-- Examples as presets. -->
-      <div class="flex items-center gap-1.5 px-3.5 pb-2.5 overflow-x-auto" style="scrollbar-width: none">
-        <span class="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-base-content/70 mr-1 flex-shrink-0">Examples</span>
-        <button
-          v-for="chip in chips"
-          :key="chip.label"
-          type="button"
-          class="h-[26px] px-3 rounded-full text-[12.5px] border whitespace-nowrap flex-shrink-0"
-          :class="[
-            chip.selected ? 'bg-base-100 border-base-content font-semibold' : 'border-base-300 text-base-content/70',
-            chip.edited ? 'italic' : '',
-          ]"
-          :disabled="chip.edited"
-          @click="applyExample(chip)"
-        >
-          {{ chip.label }}
-        </button>
-      </div>
-
-      <!-- Wrapper bar. -->
-      <div class="flex items-center justify-between gap-3 px-3.5 py-2 bg-base-100 border-t border-base-300">
+      <!-- Which wrapper Druxt chose; the `wrapper` prop row below turns it off. -->
+      <div class="flex items-center gap-3 px-3.5 py-2 bg-base-100 border-t border-base-300">
         <span data-testid="matched" class="text-[11px] font-mono text-base-content/70 truncate">
           <template v-if="!wrapper">No wrapper: {{ name }} renders the data only</template>
           <template v-else-if="resolution.is && resolution.is !== 'DruxtWrapper'">{{ resolution.is }} matched</template>
           <template v-else-if="resolution.is">No component matched; Druxt used its own wrapper</template>
           <template v-else>resolving</template>
         </span>
-        <div class="flex h-[22px] rounded-md bg-base-200 p-0.5 text-[12px] flex-shrink-0" role="group" aria-label="Wrapper">
-          <button type="button" class="px-2.5 rounded" :class="wrapper ? 'bg-base-100 font-semibold shadow-sm' : 'text-base-content/70'" @click="setWrapper(true)">Wrapped</button>
-          <button type="button" class="px-2.5 rounded" :class="!wrapper ? 'bg-base-100 font-semibold shadow-sm' : 'text-base-content/70'" @click="setWrapper(false)">Raw</button>
-        </div>
       </div>
 
       <!-- The instance: the only band on base-100. Capped and scrolling, so nothing lies over the output. -->
@@ -101,11 +77,12 @@
             <a href="/explanation/component-resolution" class="text-primary-focus text-[12.5px]">How wrapper resolution works</a>
           </div>
 
-          <!-- The real instance, wrapped or raw. Raw is Druxt's own output, only styled. -->
+          <!-- The real instance, wrapped or raw, mounted under a runtime for the chosen backend. Raw is Druxt's own output, only styled. -->
           <client-only>
-            <div ref="stage" :class="wrapper ? '' : 'druxt-raw'">
-              <component :is="name" v-if="ready && primed" :key="renderKey" ref="instance" v-bind="renderProps" :wrapper="wrapper ? undefined : false" />
-              <p v-else class="text-sm text-base-content/70">loading</p>
+            <div ref="stage" :class="wrapper ? '' : 'druxt-raw'" @click.capture="inert">
+              <p v-if="!primed" class="text-sm text-base-content/70">loading</p>
+              <!-- The runtime's root goes in here; nothing else does, so Vue leaves it alone. -->
+              <div ref="mount" />
             </div>
           </client-only>
         </template>
@@ -125,16 +102,16 @@
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <template v-for="(step, i) in schema.chain.steps">
-              <span v-if="i" :key="step.name + ':sep'" class="text-base-content/50">›</span>
+              <span v-if="i" :key="step.name + ':sep'" class="text-base-content/50 hidden sm:inline">›</span>
               <select
                 :key="step.name"
                 :data-testid="'step-' + step.name"
-                class="select select-sm select-bordered h-[30px] min-h-0 rounded-md font-mono text-[12.5px] max-w-full"
+                class="select select-sm select-bordered h-[30px] min-h-0 rounded-md font-mono text-base sm:text-[12.5px] w-full sm:w-auto sm:max-w-full"
                 :value="values[step.name] || ''"
                 :disabled="!stepEnabled(step)"
                 @change="setStep(i, $event.target.value)"
               >
-                <option value="">{{ loadingOf(step) ? 'loading' : step.name }}</option>
+                <option v-if="!values[step.name]" value="" disabled>{{ loadingOf(step) ? 'loading' : 'choose' }}</option>
                 <option v-for="o in optionsOf(step)" :key="o.value" :value="o.value">{{ o.label }}</option>
               </select>
             </template>
@@ -154,8 +131,9 @@
                 {{ o.charAt(0).toUpperCase() + o.slice(1) }}
               </button>
             </div>
-            <select v-else-if="prop.control === 'select'" :data-testid="'prop-' + prop.name" class="select select-sm select-bordered h-[30px] min-h-0 rounded-md w-[200px] max-w-full font-mono text-[12.5px]" :value="values[prop.name] || ''" @change="setValue(prop.name, $event.target.value)">
-              <option value="">{{ loading[prop.source] ? 'loading' : prop.name }}</option>
+            <span v-else-if="prop.control === 'select' && !loading[prop.source] && !ungrouped(prop).length" class="text-[12.5px] text-base-content/70 italic">{{ prop.name === 'langcode' ? 'one language on this backend' : 'nothing to choose on this backend' }}</span>
+            <select v-else-if="prop.control === 'select'" :data-testid="'prop-' + prop.name" class="select select-sm select-bordered h-[30px] min-h-0 rounded-md w-full sm:w-[200px] font-mono text-base sm:text-[12.5px]" :value="values[prop.name] || ''" @change="setValue(prop.name, $event.target.value)">
+              <option v-if="!values[prop.name]" value="" disabled>{{ loading[prop.source] ? 'loading' : 'choose' }}</option>
               <template v-if="grouped(prop).length">
                 <optgroup v-for="g in grouped(prop)" :key="g.group" :label="g.group">
                   <option v-for="o in g.items" :key="o.value" :value="o.value">{{ o.label }}<template v-if="o.suffix"> {{ o.suffix }}</template></option>
@@ -167,19 +145,18 @@
               <input type="checkbox" class="toggle toggle-sm toggle-primary" :checked="toggleValue(prop)" @change="setValue(prop.name, $event.target.checked)" />
               <span class="text-[12px]">{{ toggleValue(prop) ? 'on' : 'off' }}</span>
             </label>
-            <input v-else-if="prop.control === 'number'" type="number" class="input input-sm input-bordered h-[30px] min-h-0 rounded-md w-[72px] font-mono text-[12.5px]" :placeholder="prop.default == null ? '' : String(prop.default)" :value="values[prop.name] == null ? '' : values[prop.name]" @change="setValue(prop.name, $event.target.value === '' ? undefined : Number($event.target.value))" />
-            <input v-else type="text" class="input input-sm input-bordered h-[30px] min-h-0 rounded-md w-full font-mono text-[12.5px]" :placeholder="prop.default == null ? '' : String(prop.default)" :value="values[prop.name] || ''" @change="setValue(prop.name, $event.target.value || undefined)" />
+            <input v-else-if="prop.control === 'number'" type="number" class="input input-sm input-bordered h-[30px] min-h-0 rounded-md w-[72px] font-mono text-base sm:text-[12.5px]" :placeholder="prop.default == null ? '' : String(prop.default)" :value="values[prop.name] == null ? '' : values[prop.name]" @change="setValue(prop.name, $event.target.value === '' ? undefined : Number($event.target.value))" />
+            <input v-else type="text" class="input input-sm input-bordered h-[30px] min-h-0 rounded-md w-full font-mono text-base sm:text-[12.5px]" :placeholder="prop.default == null ? '' : String(prop.default)" :value="values[prop.name] || ''" @change="setValue(prop.name, $event.target.value || undefined)" />
             <span v-if="prop.note" class="text-[12px] text-base-content/70">{{ prop.note }}</span>
           </div>
         </div>
 
         <!-- Markup: always open, the site's own code block, one line. -->
-        <div class="border-t border-base-300 pt-3 mt-1 relative" data-testid="markup">
-          <!-- The site's code styling keys on .prose, which a playground page lacks. -->
+        <div class="border-t border-base-300 pt-3 mt-1" data-testid="markup">
+          <!-- The site's code styling keys on .prose, which a playground page lacks. The docs' copy button is added on mount. -->
           <div class="prose max-w-none druxt-markup">
             <DuiCodeBlock :code="snippet" language="vue" class="text-xs whitespace-pre-wrap break-all" />
           </div>
-          <button type="button" class="absolute top-5 right-3 text-[12.5px] font-medium" style="color: rgba(229, 236, 241, 0.82)" @click="copy">{{ copied ? 'Copied' : 'Copy' }}</button>
         </div>
 
         <!-- Resolution: closed, its answer; open, the list. -->
@@ -192,7 +169,11 @@
             <ol class="font-mono space-y-0.5 list-none pl-0">
               <li v-for="(n, i) in resolution.options" :key="n" :class="n === resolution.is ? 'font-semibold' : 'text-base-content/70'">{{ i + 1 }}. {{ n }}</li>
             </ol>
-            <p v-if="source" class="text-base-content/70">Data came from <code>{{ source }}</code></p>
+            <!-- Every request the instance made, as it made it. -->
+            <p class="text-base-content/70">{{ requests.length ? 'Requests' : 'No requests: the data was already in the store.' }}</p>
+            <ul v-if="requests.length" class="font-mono space-y-0.5 list-none pl-0 break-all" data-testid="requests">
+              <li v-for="r in requests" :key="r" class="text-base-content/70">{{ r }}</li>
+            </ul>
           </div>
         </div>
 
@@ -224,23 +205,26 @@
  * `fields` parameter is stored as complete and handed back untouched, so the
  * component never asks this site's Drupal for it.
  */
+import Vue from 'vue'
 import {
   BACKENDS,
   COMPONENTS,
+  COMPONENT_NAMES,
   CONTEXT_ONLY,
-  PICKER,
   SHIPPED_WRAPPERS,
   SOURCES,
-  UMAMI_COMPONENTS,
+  WRAPPER_PROP,
   liveComponentsOf,
   packageOf,
   pageFor,
 } from '~/utils/live-examples'
+import { addCopyButton } from '~/utils/copy-button'
+import { createRuntime } from '~/utils/druxt-runtime'
 
 // The props every module component shares. `value` and `settings` are
 // objects, so they are set in code rather than from a control.
 const SHARED_PROPS = [
-  { name: 'langcode', type: 'string', control: 'text', description: 'The resource language code.' },
+  { name: 'langcode', type: 'string', control: 'select', source: 'languages', description: 'The resource language code.' },
   { name: 'value', type: 'object', control: 'code', description: 'The v-model binding; supplies the data and skips the fetch.' },
 ]
 const SETTINGS_PROP = { name: 'settings', type: 'object', control: 'code', description: 'Module settings overriding the site defaults.' }
@@ -277,15 +261,12 @@ export default {
       options: {},
       loading: {},
       wrapper: true,
-      example: 'Default',
       openResolution: false,
-      copied: false,
       error: null,
-      source: '',
+      requests: [],
       resolution: { is: '', options: [] },
       renderKey: 0,
-      // The instance mounts only after its resource is primed, or the first
-      // fetch goes to this site's Drupal whatever the backend select says.
+      // Whether an instance is mounted under its runtime.
       primed: false,
       rawEmpty: false,
     }
@@ -302,28 +283,15 @@ export default {
     /** Where the card sits, for analytics. */
     placement: ({ component, pkg }) => (component ? 'api' : pkg ? 'module' : 'playground'),
 
-    picker: ({ pkg }) =>
-      PICKER.map((group) => ({
-        ...group,
-        options: group.names
-          .filter((n) => !pkg || packageOf(n) === pkg)
-          .map((n) => {
-            const why = CONTEXT_ONLY[n] ? (CONTEXT_ONLY[n].parent ? `rendered by ${CONTEXT_ONLY[n].parent}` : CONTEXT_ONLY[n].reason) : SHIPPED_WRAPPERS[n] ? `shown by ${SHIPPED_WRAPPERS[n].by}` : ''
-            return { name: n, label: why ? `${n} (${why})` : n }
-          }),
-      })).filter((group) => group.options.length),
+    /** Only components that render on their own; the others have their own pages. */
+    picker: ({ pkg }) => COMPONENT_NAMES.filter((n) => !pkg || packageOf(n) === pkg),
 
     rows: ({ schema, name }) => [
       ...(schema.props || []),
       ...SHARED_PROPS,
       ...(DECLARES_SETTINGS.includes(name) ? [SETTINGS_PROP] : []),
+      WRAPPER_PROP,
     ],
-
-    chips: ({ schema, example }) => {
-      const list = (schema.examples || []).map((e) => ({ ...e, selected: e.label === example }))
-      if (example === 'Edited') list.push({ label: 'Edited', props: {}, edited: true, selected: true })
-      return list
-    },
 
     /** Props handed to the component: chain values composed, internal steps dropped, unset left out. */
     renderProps: ({ schema, values, fixedValues }) => {
@@ -363,14 +331,40 @@ export default {
 
     dirtyChain: ({ schema, values }) => ((schema.chain || {}).steps || []).some((s) => values[s.name]),
 
-    storybook: ({ backend, schema, renderProps }) => {
-      const b = BACKENDS[backend]
-      if (!b.storybook || !schema.story) return null
-      const carried = Object.entries(renderProps).filter(([k]) => (schema.args || []).includes(k))
-      const args = carried.map(([k, v]) => `${k}:${typeof v === 'boolean' ? '!' + v : v}`).join(';')
-      return {
-        href: `${b.storybook}?path=/story/${schema.story}${args ? '&args=' + encodeURIComponent(args) : ''}`,
-        label: carried.length ? `Open in ${b.storybookLabel} Storybook` : `Open this component in ${b.storybookLabel} Storybook`,
+    /**
+     * The Umami Storybook link, to the story of the very instance shown: the
+     * Druxt modules write one story per entity display, block, region, menu
+     * and view, titled from their names.
+     */
+    storybook() {
+      const b = BACKENDS[this.backend]
+      if (!b.storybook || !this.name) return null
+      const slug = (...parts) => parts.filter(Boolean).join('/').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+      const option = (value) => Object.values(this.options).flat().find((o) => o.value === value) || {}
+      const v = this.values
+      const label = (value) => (option(value).label || '').replace(/ \([^)]*\)$/, '')
+      const link = (id, args) => ({
+        href: `${b.storybook}?path=/story/${id}${args ? '&args=' + encodeURIComponent(args) : ''}`,
+        label: `Open this ${this.name} in ${b.storybookLabel} Storybook`,
+      })
+      switch (this.name) {
+        case 'DruxtBlock': {
+          const o = option(v.uuid)
+          return o.value ? link(`${slug('druxt', 'blocks', o.group, o.suffix, o.label)}--default`) : null
+        }
+        case 'DruxtBlockRegion':
+          return v.theme && v.name ? link(`${slug('druxt', 'blocks', v.theme, v.name)}--default`) : null
+        case 'DruxtEntity':
+        case 'DruxtEntityForm': {
+          const type = this.name === 'DruxtEntityForm' ? 'form' : this.fixedValues.schemaType || v.schemaType || 'view'
+          return v.entityType && v.bundle && v.mode ? link(`${slug('druxt', 'entity', v.entityType, v.bundle, `${type} displays`)}--${slug(v.mode)}`, v.uuid ? `uuid:${v.uuid}` : '') : null
+        }
+        case 'DruxtMenu':
+          return v.name ? link(`${slug('druxt', 'menu', label(v.name))}--default`) : null
+        case 'DruxtView':
+          return v.viewId && v.displayId ? link(`${slug('druxt', 'views', label(v.viewId))}--${slug(v.displayId)}`) : null
+        default:
+          return this.schema.story ? link(this.schema.story) : null
       }
     },
   },
@@ -389,23 +383,44 @@ export default {
     },
   },
 
+  created() {
+    // A Vue instance, kept off the reactive data.
+    this.sandbox = null
+  },
+
   mounted() {
+    this.enhanceMarkup()
     if (this.name) {
       this.reset()
       this.track('example_component')
     }
   },
 
+  updated() {
+    this.enhanceMarkup()
+  },
+
+  beforeDestroy() {
+    this.unmount()
+  },
+
   methods: {
     pageFor,
+
+    /** The docs' copy button on the markup line, once its code block exists. */
+    enhanceMarkup() {
+      addCopyButton(this.$el.querySelector('[data-testid="markup"] pre'), { onCopy: () => this.track('example_copy') })
+    },
+
+    /** Whether a backend can serve the component; the reason it cannot is the descriptor's. */
+    available(backend) {
+      const only = this.schema.backends
+      return !only || only[backend] === true
+    },
 
     /** One GA4 event per interaction. gtag() exists only on production, so this is a no-op elsewhere. */
     track(event, params = {}) {
       window.gtag?.('event', event, { component: this.name, backend: this.backend, placement: this.placement, ...params })
-    },
-
-    supports(backend) {
-      return backend === 'site' || !this.name || UMAMI_COMPONENTS.includes(this.name)
     },
 
     /**
@@ -419,7 +434,7 @@ export default {
       let tries = 0
       const look = () => {
         if (key !== this.renderKey) return
-        const c = (this.$refs.instance || {}).component
+        const c = (((this.sandbox || {}).$children || [])[0] || {}).component
         if (c && (c.options || []).length) {
           this.resolution = { is: c.is, options: [...c.options] }
           const stage = this.$refs.stage
@@ -446,11 +461,11 @@ export default {
       return list
     },
 
-    /** Back to the component as documented: defaults, first example, wrapper on. */
+    /** Back to the component as documented: defaults, wrapper on. */
     async reset() {
-      if (!this.supports(this.backend)) {
+      if (!this.available(this.backend)) {
         // The watcher brings us back here.
-        this.backend = 'site'
+        this.backend = Object.keys(BACKENDS).find((key) => this.available(key)) || 'site'
         return
       }
       this.error = null
@@ -458,10 +473,10 @@ export default {
       this.rawEmpty = false
       this.values = {}
       this.wrapper = true
-      this.example = 'Default'
       if (!this.live) return
       try {
-        for (const prop of this.schema.props || []) if (prop.source) await this.loadOptions(prop.source, {})
+        // Every select in the panel, the shared rows included.
+        for (const prop of this.rows) if (prop.source) await this.loadOptions(prop.source, {})
         await this.autoFill()
       } catch (e) {
         this.error = e.message
@@ -476,7 +491,7 @@ export default {
       const key = this.optionsKey(source, deps)
       this.$set(this.loading, source, true)
       try {
-        const list = await cached(`${this.backend}:${key}`, () => SOURCES[source](BACKENDS[this.backend].api, deps))
+        const list = await cached(`${this.backend}:${key}`, () => SOURCES[source](BACKENDS[this.backend].api, deps, BACKENDS[this.backend]))
         this.$set(this.options, key, list)
         return list
       } finally {
@@ -505,9 +520,16 @@ export default {
       return this.loadOptions(step.source, this.depsOf(step))
     },
 
-    /** The value a step should take on its own: its default if offered, else the first option. */
+    /** What a select prefers on its own: `prefer` (a value, or a function of the card), else its documented default. */
+    preferred(prop) {
+      const want = prop.prefer !== undefined ? prop.prefer : prop.default
+      return typeof want === 'function' ? want(this) : want
+    },
+
+    /** The value a step should take on its own: what it prefers if offered, else the first option. */
     pickFor(step, list) {
-      if (step.default && list.find((o) => o.value === step.default)) return step.default
+      const want = this.preferred(step)
+      if (want && list.find((o) => o.value === want)) return want
       return (list[0] || {}).value
     },
 
@@ -516,7 +538,6 @@ export default {
       const steps = this.schema.chain.steps
       this.$set(this.values, steps[i].name, value || undefined)
       for (let j = i + 1; j < steps.length; j++) this.$set(this.values, steps[j].name, undefined)
-      this.markEdited()
       this.track('example_prop', { prop: steps[i].name })
       await this.fillFrom(i + 1)
       this.rerender()
@@ -538,17 +559,17 @@ export default {
       for (const prop of this.schema.props || []) {
         if (prop.source && !this.values[prop.name]) {
           const list = this.options[this.optionsKey(prop.source, {})] || []
-          const preferred = list.find((o) => /branding|main/.test(o.label)) || list[0]
+          const want = this.preferred(prop)
+          const preferred = (want && list.find((o) => o.value === want)) || list.find((o) => /branding/.test(o.label)) || list[0]
           if (preferred) this.$set(this.values, prop.name, preferred.value)
         }
       }
-      this.example = 'Default'
       this.rerender()
     },
 
     async setValue(prop, value) {
       this.$set(this.values, prop, value)
-      this.markEdited()
+      if (prop === 'wrapper') this.wrapper = value !== false
       this.track('example_prop', { prop })
       // Form swaps mode for form modes.
       if (prop === 'schemaType' && this.schema.chain) {
@@ -558,14 +579,6 @@ export default {
           await this.fillFrom(i)
         }
       }
-      this.rerender()
-    },
-
-    setWrapper(on) {
-      this.wrapper = on
-      this.$set(this.values, 'wrapper', on ? undefined : false)
-      this.markEdited()
-      this.track('example_wrapper', { wrapper: on ? 'wrapped' : 'raw' })
       this.rerender()
     },
 
@@ -579,29 +592,6 @@ export default {
       return v !== undefined && v !== prop.default
     },
 
-    /** Select the preset the values match, or Edited. Which instance renders is a choice, not an edit. */
-    markEdited() {
-      const match = (this.schema.examples || []).find((chip) => {
-        const plain = (this.schema.props || []).filter((p) => !p.source).every((p) => this.values[p.name] === chip.props[p.name] || (this.values[p.name] === undefined && chip.props[p.name] === undefined))
-        return plain && this.wrapper === (chip.props.wrapper !== false)
-      })
-      this.example = match ? match.label : 'Edited'
-    },
-
-    /** Load a preset: plain props back to the example's values; the chain and instance pickers stay as chosen. */
-    applyExample(chip) {
-      if (chip.edited) return
-      this.example = chip.label
-      this.track('example_preset', { preset: chip.label })
-      for (const p of this.schema.props || []) {
-        if (p.source && chip.props[p.name] === undefined) continue
-        this.$set(this.values, p.name, chip.props[p.name])
-      }
-      this.wrapper = chip.props.wrapper !== false
-      this.$set(this.values, 'wrapper', this.wrapper ? undefined : false)
-      this.rerender()
-    },
-
     grouped(prop) {
       const list = this.options[this.optionsKey(prop.source, {})] || []
       if (!list.some((o) => o.group)) return []
@@ -611,52 +601,87 @@ export default {
       return this.options[this.optionsKey(prop.source, {})] || []
     },
 
-    /** Prime a by-uuid resource from the chosen backend, then re-key the instance. */
+    /**
+     * Mount the component under a runtime of its own for the chosen backend.
+     *
+     * A fresh client and store every time, so what the disclosure lists is
+     * every request a cold render makes. Nuxt resolves the injected `$`
+     * options through the root, so a second root with its own carries the
+     * whole subtree to that backend.
+     */
     async rerender() {
       this.error = null
       this.primed = false
       this.rawEmpty = false
       this.resolution = { is: '', options: [] }
+      this.unmount()
       if (!this.ready) return
+      this.requests = []
       const b = BACKENDS[this.backend]
-      const uuid = this.renderProps.uuid
-      const type = this.name === 'DruxtBlock' ? 'block--block' : this.renderProps.type
+      const key = ++this.renderKey
       try {
-        if (uuid && type) {
-          const [entity, bundle] = type.split('--')
-          const href = `${b.api}/${entity}/${bundle}/${uuid}`
-          const res = await fetch(href, { headers: { Accept: 'application/vnd.api+json' } })
-          if (!res.ok) throw new Error(`${res.status} from ${href}`)
-          const body = await res.json()
-          this.$store.commit('druxt/addResource', { prefix: undefined, resource: { data: body.data, links: { self: { href } } } })
-          this.source = href
-        } else {
-          this.source = b.api
-        }
+        const settings = (this.$druxt || {}).settings || {}
+        // This site's own state, minus the Druxt modules the runtime brings of its own.
+        const own = new Set(['druxt', 'druxtRouter', 'druxtSchema', 'druxtMenu', 'druxtViews'])
+        const state = Object.fromEntries(Object.entries(this.$store.state).filter(([k]) => !own.has(k)))
+        const runtime = createRuntime({ baseUrl: b.baseUrl || settings.baseUrl || window.location.origin, proxyRoot: b.proxyRoot, settings, state })
+        runtime.axios.interceptors.request.use((config) => {
+          const url = /^https?:/.test(config.url || '') ? config.url : [config.baseURL || '', config.url || ''].map((part, i) => (i ? part.replace(/^\/+/, '') : part.replace(/\/+$/, ''))).filter(Boolean).join('/')
+          this.requests.push(`${(config.method || 'get').toUpperCase()} ${url.replace(/^https?:\/\/[^/]+/, '')}`)
+          return config
+        })
         this.primed = true
-        this.renderKey++
-        this.readResolution(this.renderKey)
+        await this.$nextTick()
+        if (key !== this.renderKey || !this.$refs.mount) return
+        const el = document.createElement('div')
+        this.$refs.mount.appendChild(el)
+        // Everything this site injects, except $nuxt: left out, the prototype getter falls back to the real one.
+        const injected = Object.fromEntries(Object.entries(this.$root.$options).filter(([k]) => k.startsWith('$') && k !== '$nuxt'))
+        const name = this.name
+        const props = { ...this.renderProps, ...(this.wrapper ? {} : { wrapper: false }) }
+        const card = this
+        this.sandbox = new Vue({
+          ...injected,
+          $druxt: runtime.client,
+          $druxtMenu: runtime.menu,
+          $druxtRouter: runtime.router,
+          store: runtime.store,
+          router: this.$router,
+          // A failure inside the instance is the card's to show, not the page's.
+          errorCaptured(err) {
+            if (key === card.renderKey) card.error = err.message
+            return false
+          },
+          render: (h) => h(name, { props }),
+        })
+        this.sandbox.$mount(el)
+        this.readResolution(key)
       } catch (e) {
         this.error = e.message
       }
+    },
+
+    /** Links and form buttons inside the preview do nothing: the page stays here, and nothing posts to a backend. */
+    inert(event) {
+      if (event.target.closest('a, button#submit, button#reset, input[type="submit"]')) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+    },
+
+    /** Take the mounted instance down with its runtime. */
+    unmount() {
+      if (!this.sandbox) return
+      const el = this.sandbox.$el
+      this.sandbox.$destroy()
+      if (el && el.parentNode) el.parentNode.removeChild(el)
+      this.sandbox = null
     },
 
     retry() {
       this.reset()
     },
 
-    async copy() {
-      try {
-        await navigator.clipboard.writeText(this.snippet)
-        this.copied = true
-        this.track('example_copy')
-        setTimeout(() => {
-          this.copied = false
-        }, 1500)
-      } catch (e) {
-        // No clipboard here; the text is on screen to select.
-      }
-    },
   },
 }
 </script>
