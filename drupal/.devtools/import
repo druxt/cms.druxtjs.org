@@ -19,11 +19,6 @@
  * what CI wants. Without it, DOCS_CHECKOUT can point the run at a working
  * tree, which is what a developer iterating on the importer wants.
  *
- * --migrate writes the entities through the Migrate API instead of the
- * drush command. Everything before the write is identical, so the two
- * paths are comparable on the same inputs, which is what makes the
- * migration acceptable as a replacement rather than merely working.
- *
  * --force seeds a site that already holds documentation this run did not
  * create. It overwrites, so it is never what CI wants and rarely what a
  * person wants.
@@ -49,9 +44,8 @@ require_once __DIR__ . '/helpers.php';
 
 $arguments = array_slice($argv, 1);
 $check = in_array('--check', $arguments, TRUE);
-$migrate = in_array('--migrate', $arguments, TRUE);
 $force = in_array('--force', $arguments, TRUE);
-$unknown = array_diff($arguments, ['--check', '--migrate', '--force']);
+$unknown = array_diff($arguments, ['--check', '--force']);
 if ($unknown !== []) {
   FAIL('Unknown argument: %s.', implode(', ', $unknown));
 }
@@ -60,6 +54,7 @@ if ($unknown !== []) {
  * The migrations, in the order their dependencies require.
  */
 const MIGRATIONS = [
+  'docs_user',
   'docs_section',
   'docs_file',
   'docs_media',
@@ -216,30 +211,23 @@ else {
   PASS('Nothing to overwrite.');
 }
 
-if ($migrate) {
-  TASK('Pointing the migrations at %s.', $ir_dir);
-  drush('state:set %s %s', ['druxt_docs.ir_directory', $ir_dir]);
-  PASS('Set.');
+TASK('Pointing the migrations at %s.', $ir_dir);
+drush('state:set %s %s', ['druxt_docs.ir_directory', $ir_dir]);
+PASS('Set.');
 
-  foreach (MIGRATIONS as $migration) {
-    TASK('Running %s.', $migration);
-    $output = drush('migrate:import %s', [$migration], $exit_code);
-    if ($exit_code !== 0 || preg_match('/\b([1-9]\d*) failed\b/', $output)) {
-      // Migrate reports a failed row and still exits zero, so the count is
-      // read as well as the status. A run that imports nothing also exits
-      // zero, which the page count below is what catches.
-      FAIL_NO_EXIT('%s did not import cleanly:', $migration);
-      echo trim($output) . PHP_EOL;
-      echo trim(drush('migrate:messages %s', [$migration], $ignored)) . PHP_EOL;
-      quit(1);
-    }
-    PASS('Done.');
+foreach (MIGRATIONS as $migration) {
+  TASK('Running %s.', $migration);
+  $output = drush('migrate:import %s', [$migration], $exit_code);
+  if ($exit_code !== 0 || preg_match('/\b([1-9]\d*) failed\b/', $output)) {
+    // Migrate reports a failed row and still exits zero, so the count is
+    // read as well as the status. A run that imports nothing also exits
+    // zero, which the page count below is what catches.
+    FAIL_NO_EXIT('%s did not import cleanly:', $migration);
+    echo trim($output) . PHP_EOL;
+    echo trim(drush('migrate:messages %s', [$migration], $ignored)) . PHP_EOL;
+    quit(1);
   }
-}
-else {
-  TASK('Importing into the provisioned site.');
-  drush('druxt-docs:import %s', [$ir_dir]);
-  PASS('Imported.');
+  PASS('Done.');
 }
 
 // -----------------------------------------------------------------------------
@@ -252,31 +240,29 @@ else {
 // repository was authoritative and is wrong now, because it would also
 // delete a page an editor wrote. So this reports rather than deletes, and
 // removing a page from the corpus becomes a deliberate act.
-if ($migrate) {
-  TASK('Checking for pages the corpus no longer has.');
-  $sources = array_map(
-    static fn(string $file): string => (string) (json_decode((string) file_get_contents($file), TRUE)['source'] ?? ''),
-    $documents,
-  );
-  $sources_file = $ir_dir . '/.sources.json';
-  file_put_contents($sources_file, json_encode(array_values(array_filter($sources))));
-  $expression = sprintf(
-    '$k = array_flip(json_decode(file_get_contents(%s), TRUE)); $s = []; foreach (\Drupal::database()->select("migrate_map_docs_page", "m")->fields("m", ["sourceid1"])->isNotNull("m.destid1")->execute()->fetchCol() as $id) { if (!isset($k[$id])) { $s[] = $id; } } echo implode("|", $s);',
-    var_export($sources_file, TRUE),
-  );
-  $stale = trim(drush('php:eval %s', [$expression]));
-  unlink($sources_file);
-  if ($stale !== '') {
-    $names = explode('|', $stale);
-    FAIL_NO_EXIT('The site holds %d page(s) this migration created that the corpus no longer has:', count($names));
-    foreach ($names as $name) {
-      echo '  ' . $name . PHP_EOL;
-    }
-    NOTE('Roll the migrations back and seed again, so the removal is deliberate. Nothing is deleted here, because a page an editor wrote would look the same from a query.');
-    quit(1);
+TASK('Checking for pages the corpus no longer has.');
+$sources = array_map(
+  static fn(string $file): string => (string) (json_decode((string) file_get_contents($file), TRUE)['source'] ?? ''),
+  $documents,
+);
+$sources_file = $ir_dir . '/.sources.json';
+file_put_contents($sources_file, json_encode(array_values(array_filter($sources))));
+$expression = sprintf(
+  '$k = array_flip(json_decode(file_get_contents(%s), TRUE)); $s = []; foreach (\Drupal::database()->select("migrate_map_docs_page", "m")->fields("m", ["sourceid1"])->isNotNull("m.destid1")->execute()->fetchCol() as $id) { if (!isset($k[$id])) { $s[] = $id; } } echo implode("|", $s);',
+  var_export($sources_file, TRUE),
+);
+$stale = trim(drush('php:eval %s', [$expression]));
+unlink($sources_file);
+if ($stale !== '') {
+  $names = explode('|', $stale);
+  FAIL_NO_EXIT('The site holds %d page(s) this migration created that the corpus no longer has:', count($names));
+  foreach ($names as $name) {
+    echo '  ' . $name . PHP_EOL;
   }
-  PASS('None.');
+  NOTE('Roll the migrations back and seed again, so the removal is deliberate. Nothing is deleted here, because a page an editor wrote would look the same from a query.');
+  quit(1);
 }
+PASS('None.');
 
 // A run that imports nothing exits 0 just as happily as one that imports
 // everything, so this counts the result rather than trusting the exit code.
@@ -297,7 +283,6 @@ echo '===============================' . PHP_EOL;
 echo '     📥 IMPORT COMPLETE  ✅   ' . PHP_EOL;
 echo '===============================' . PHP_EOL;
 echo PHP_EOL;
-echo 'Writer:    ' . ($migrate ? 'Migrate API' : 'druxt-docs:import') . PHP_EOL;
 echo 'Source:    ' . $checkout . PHP_EOL;
 echo 'Documents: ' . count($documents) . PHP_EOL;
 echo 'Pages:     ' . $imported . PHP_EOL;
