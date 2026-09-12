@@ -1,0 +1,17 @@
+uuid: eee1ba0a-36db-41f3-9820-aa9a41a62fc4
+langcode: en
+status: true
+dependencies: {  }
+name: 'Basic HTML'
+format: basic_html
+weight: 0
+filters:
+  filter_html:
+    id: filter_html
+    provider: filter
+    status: true
+    weight: -10
+    settings:
+      allowed_html: '<br> <p> <h2> <h3> <h4> <h5> <h6> <strong> <em> <code> <blockquote> <a href> <ul type> <ol type start> <li> <table> <tr> <td rowspan colspan> <th rowspan colspan> <thead> <tbody> <tfoot> <caption>'
+      filter_html_help: false
+      filter_html_nofollow: false

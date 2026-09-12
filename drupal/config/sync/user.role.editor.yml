@@ -1,0 +1,47 @@
+uuid: a6a3965b-0786-4d4d-9e36-59589f7a37e7
+langcode: en
+status: true
+dependencies:
+  config:
+    - filter.format.basic_html
+    - filter.format.docs_markdown
+    - media.type.image
+    - node.type.doc_page
+  module:
+    - file
+    - filter
+    - media
+    - node
+    - paragraphs
+    - system
+    - toolbar
+id: editor
+label: Editor
+weight: 3
+is_admin: false
+permissions:
+  - 'access administration pages'
+  - 'access content'
+  - 'access content overview'
+  - 'access files overview'
+  - 'access media overview'
+  - 'access toolbar'
+  - 'administer node published status'
+  - 'create doc_page content'
+  - 'create image media'
+  - 'delete any doc_page content'
+  - 'delete any image media'
+  - 'delete doc_page revisions'
+  - 'delete own doc_page content'
+  - 'edit any doc_page content'
+  - 'edit any image media'
+  - 'edit own doc_page content'
+  - 'edit own image media'
+  - 'revert doc_page revisions'
+  - 'use text format basic_html'
+  - 'use text format docs_markdown'
+  - 'view doc_page revisions'
+  - 'view media'
+  - 'view own unpublished content'
+  - 'view the administration theme'
+  - 'view unpublished paragraphs'
