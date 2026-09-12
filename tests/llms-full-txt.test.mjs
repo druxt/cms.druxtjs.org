@@ -7,7 +7,9 @@
 import { describe, test } from 'node:test'
 import assert from 'node:assert/strict'
 
-const { buildLlmsFullTxt, toAbsoluteUrls, isChangelog } = await import('../nuxt/lib/llms-full-txt.js')
+const { buildLlmsFullTxt, toAbsoluteUrls, isChangelog } = await import(
+  '../nuxt/lib/llms-full-txt.js'
+)
 
 const doc = (over) => ({
   route: '/how-to/theming',
@@ -36,23 +38,41 @@ describe('buildLlmsFullTxt', () => {
   })
 
   test('cites each document source so a quote can be attributed to a page', () => {
-    assert.ok(buildLlmsFullTxt([doc()], options).includes('Source: https://example.test/how-to/theming'))
+    assert.ok(
+      buildLlmsFullTxt([doc()], options).includes('Source: https://example.test/how-to/theming')
+    )
   })
 
   test('orders by weight, not alphabetically, because weight is the reading order', () => {
-    const out = buildLlmsFullTxt([
-      doc({ route: '/how-to/aaa', title: 'Last', weight: 10, content: 'Last body.' }),
-      doc({ route: '/how-to/zzz', title: 'First', weight: -10, content: 'First body.' }),
-    ], options)
+    const out = buildLlmsFullTxt(
+      [
+        doc({ route: '/how-to/aaa', title: 'Last', weight: 10, content: 'Last body.' }),
+        doc({ route: '/how-to/zzz', title: 'First', weight: -10, content: 'First body.' }),
+      ],
+      options
+    )
 
     assert.ok(out.indexOf('First body.') < out.indexOf('Last body.'))
   })
 
   test('groups documents under their section, in guide order', () => {
-    const out = buildLlmsFullTxt([
-      doc({ route: '/explanation/architecture', title: 'Architecture', section: 'explanation', content: 'Concept body.' }),
-      doc({ route: '/tutorials/getting-started', title: 'Getting started', section: 'tutorials', content: 'Tutorial body.' }),
-    ], options)
+    const out = buildLlmsFullTxt(
+      [
+        doc({
+          route: '/explanation/architecture',
+          title: 'Architecture',
+          section: 'explanation',
+          content: 'Concept body.',
+        }),
+        doc({
+          route: '/tutorials/getting-started',
+          title: 'Getting started',
+          section: 'tutorials',
+          content: 'Tutorial body.',
+        }),
+      ],
+      options
+    )
 
     assert.ok(out.indexOf('Tutorial body.') < out.indexOf('Concept body.'))
     assert.ok(out.includes('# Tutorials'))
@@ -60,28 +80,52 @@ describe('buildLlmsFullTxt', () => {
   })
 
   test('includes the API reference, which is what a caller asking about props needs', () => {
-    const out = buildLlmsFullTxt([
-      doc(),
-      doc({ route: '/api/packages/blocks', title: 'Blocks API', section: 'api', content: 'Generated signature.' }),
-    ], options)
+    const out = buildLlmsFullTxt(
+      [
+        doc(),
+        doc({
+          route: '/api/packages/blocks',
+          title: 'Blocks API',
+          section: 'api',
+          content: 'Generated signature.',
+        }),
+      ],
+      options
+    )
 
     assert.ok(out.includes('Generated signature.'))
   })
 
   test('puts the reference after the guide, because it is reference', () => {
-    const out = buildLlmsFullTxt([
-      doc({ route: '/api/packages/blocks', section: 'api', content: 'Reference body.' }),
-      doc({ route: '/tutorials/start', section: 'tutorials', content: 'Tutorial body.' }),
-    ], options)
+    const out = buildLlmsFullTxt(
+      [
+        doc({ route: '/api/packages/blocks', section: 'api', content: 'Reference body.' }),
+        doc({ route: '/tutorials/start', section: 'tutorials', content: 'Tutorial body.' }),
+      ],
+      options
+    )
 
     assert.ok(out.indexOf('Tutorial body.') < out.indexOf('Reference body.'))
   })
 
   test('drops per-package changelogs, the largest and least useful pages', () => {
-    const out = buildLlmsFullTxt([
-      doc({ route: '/api/packages/blocks/CHANGELOG', title: 'Changelog', section: 'api', content: 'Release history.' }),
-      doc({ route: '/api/packages/blocks', title: 'Blocks API', section: 'api', content: 'Generated signature.' }),
-    ], options)
+    const out = buildLlmsFullTxt(
+      [
+        doc({
+          route: '/api/packages/blocks/CHANGELOG',
+          title: 'Changelog',
+          section: 'api',
+          content: 'Release history.',
+        }),
+        doc({
+          route: '/api/packages/blocks',
+          title: 'Blocks API',
+          section: 'api',
+          content: 'Generated signature.',
+        }),
+      ],
+      options
+    )
 
     assert.ok(!out.includes('Release history.'))
     assert.ok(out.includes('Generated signature.'))
@@ -96,7 +140,10 @@ describe('buildLlmsFullTxt', () => {
 
 describe('toAbsoluteUrls', () => {
   test('rewrites root-relative links, which resolve to nothing outside the site', () => {
-    assert.equal(toAbsoluteUrls('See [proxy](/how-to/proxy).', 'https://example.test'), 'See [proxy](https://example.test/how-to/proxy).')
+    assert.equal(
+      toAbsoluteUrls('See [proxy](/how-to/proxy).', 'https://example.test'),
+      'See [proxy](https://example.test/how-to/proxy).'
+    )
   })
 
   test('leaves absolute and protocol-relative URLs alone', () => {
@@ -106,7 +153,10 @@ describe('toAbsoluteUrls', () => {
   })
 
   test('rewrites every link in a document, not just the first', () => {
-    assert.equal(toAbsoluteUrls('[a](/one) then [b](/two)', 'https://example.test'), '[a](https://example.test/one) then [b](https://example.test/two)')
+    assert.equal(
+      toAbsoluteUrls('[a](/one) then [b](/two)', 'https://example.test'),
+      '[a](https://example.test/one) then [b](https://example.test/two)'
+    )
   })
 })
 
