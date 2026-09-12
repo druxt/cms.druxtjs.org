@@ -96,6 +96,40 @@ A page that leaves the corpus fails there, by name.
 The importer seeds a site; it is not a synchronisation loop. Running it
 against a database an editor has worked in would overwrite them.
 
+## Page history
+
+Each page is imported with its history. The IR builder reads every commit
+that changed a page, follows the page through moves, and keeps each
+distinct version. A commit that leaves a page as it was, such as a move, is
+not a new version. The importer saves the versions as revisions, oldest
+first, and then the current version as the last revision:
+
+| Revision | Value |
+| -------- | ----- |
+| Date | The commit's author date, as `revision_timestamp` and `changed` |
+| Log message | The commit subject and short sha |
+| Revision author | The account from the `docs_user` migration |
+| Content | Title, description and new paragraphs, parsed from that commit |
+
+History is only written when a page is created. `--update` changes the
+current revision in place and never writes history again, so a re-run
+cannot duplicate it. To rebuild the history after moving the pin, roll the
+migrations back and import again. Rolling back deletes each page's earlier
+revisions and the paragraphs only they used.
+
+An earlier version cannot be edited, so it never fails the build:
+
+- A fence in a language the model does not accept stays in the prose
+  around it.
+- An image stays an image only when the current pages use the same file
+  with the same alt text. Any other image stays in the prose as markdown,
+  and no media is created for it.
+- Links are not checked.
+
+The one check that does apply is the round-trip: an earlier version whose
+blocks do not rebuild it stops the build, because its revision would not
+say what the page said.
+
 ## Status
 
 Early. The content model and importer are being built; see the `druxtjs-docs-drupal-migration` change for the plan.
