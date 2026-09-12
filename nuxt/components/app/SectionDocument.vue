@@ -26,13 +26,15 @@ const GENERATED = ['/how-to/contributing']
  */
 export default {
   name: 'AppSectionDocument',
-  async asyncData({ $config, $content, error, params, store, route }) {
+  async asyncData({ $config, $content, error, params, redirect, store, route }) {
     const section = sectionOf(route.path)
     const path = route.path.replace(/\/$/, '') || '/'
 
     if ($config.docsSource !== 'markdown' && !GENERATED.includes(path)) {
       const document = await fetchDrupalPage(store, path)
       if (!document) return error({ statusCode: 404, message: 'Document not found' })
+      // Drupal matches aliases in any case; one spelling is the page.
+      if (document.redirect) return redirect(301, document.redirect, route.query)
       // Siblings in the docs menu's order, the section landing first.
       const top = store.state.menu.find((item) => (item.props || {}).to === `/${section}`)
       // Drupal's menu also lists the landing among its own children; keep it once.

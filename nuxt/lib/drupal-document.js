@@ -19,7 +19,7 @@ const INCLUDE = ['field_content', 'field_content.field_media', 'field_content.fi
  * @returns {Promise<object|null>} The page, or null when no page has the path.
  */
 export const fetchDrupalPage = async (store, path) => {
-  const { route } = (await store.dispatch('druxtRouter/get', path)) || {}
+  const { route, redirect } = (await store.dispatch('druxtRouter/get', path)) || {}
   const entity = route && !route.error && route.entity
   if (!entity || entity.type !== 'node') return null
 
@@ -31,6 +31,9 @@ export const fetchDrupalPage = async (store, path) => {
 
   return {
     path,
+    // Where the router sends this request instead: Drupal's redirect for it,
+    // or its alias when the path only differs from the alias in case.
+    redirect: redirect || null,
     type,
     uuid: entity.uuid,
     title: data.attributes.title,

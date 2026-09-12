@@ -77,7 +77,8 @@ runs it.
 | A stored page                                     | The stored HTML, with `X-Docs-Cache: HIT`              |
 | A stored page older than `DOCS_CACHE_TTL`         | The stored HTML (`STALE`), while a fresh copy renders  |
 | A page it has not stored                          | Rendered live (`MISS`), then stored if it answered 200 |
-| A page with a query string                        | Rendered live, and never stored                        |
+| A page with `?live=1`                             | Rendered live, and never stored                        |
+| A page with any other query string                | The stored copy for the path                           |
 | A page path with a trailing slash                 | A 301 to the same path without it                      |
 | `/jsonapi`, `/router/translate-path` and `/sites` | Proxied to Drupal                                      |
 

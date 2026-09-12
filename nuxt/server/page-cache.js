@@ -189,7 +189,9 @@ const createHandler =
       res.writeHead(301, { Location: `/${pathname.replace(/^\/+|\/+$/g, '')}${search}` })
       return res.end()
     }
-    if (!cache || search) return live(req, res)
+    // Only `live=1` renders past the store: any other query string, a campaign
+    // tag say, is the same page and gets the stored copy.
+    if (!cache || /(^\?|&)live=1(&|$)/.test(search)) return live(req, res)
 
     const page = await cache.read(pathname, String(req.headers['accept-encoding'] || ''))
     if (!page) {
