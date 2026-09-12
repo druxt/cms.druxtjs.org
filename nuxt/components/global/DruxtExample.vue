@@ -217,6 +217,7 @@ import {
   liveComponentsOf,
   packageOf,
   pageFor,
+  pickOption,
 } from '~/utils/live-examples'
 import { addCopyButton } from '~/utils/copy-button'
 import { createRuntime } from '~/utils/druxt-runtime'
@@ -552,9 +553,7 @@ export default {
 
     /** The value a step should take on its own: what it prefers if offered, else the first option. */
     pickFor(step, list) {
-      const want = this.preferred(step)
-      if (want && list.find((o) => o.value === want)) return want
-      return (list[0] || {}).value
+      return pickOption(list, this.preferred(step))
     },
 
     /** Set one chain step, clear everything after it, and fill those steps in. */
@@ -583,9 +582,8 @@ export default {
       for (const prop of this.schema.props || []) {
         if (prop.source && !this.values[prop.name]) {
           const list = this.options[this.optionsKey(prop.source, {})] || []
-          const want = this.preferred(prop)
-          const preferred = (want && list.find((o) => o.value === want)) || list.find((o) => /branding/.test(o.label)) || list[0]
-          if (preferred) this.$set(this.values, prop.name, preferred.value)
+          const value = pickOption(list, this.preferred(prop))
+          if (value !== undefined) this.$set(this.values, prop.name, value)
         }
       }
       // The rest of a shared URL: plain props, the shared rows, the wrapper.

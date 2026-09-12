@@ -144,10 +144,27 @@ export const SOURCES = {
 /** The frontend theme: this site's own, or the Umami demo's. */
 const siteTheme = (card) => (card.backend === 'umami' ? 'umami' : ((card.$config || {}).decoupledTheme || {}).default)
 
+/** One value per backend: what demos best on each. */
+const perBackend = (site, umami) => (card) => (card.backend === 'umami' ? umami : site)
+
+/**
+ * The option a select takes on its own: the one whose value is `want`, or
+ * whose label matches it when `want` is a pattern, else the first.
+ *
+ * @param {object[]} list - Options, each { value, label }.
+ * @param {string|RegExp} [want] - What the select prefers.
+ * @returns {*} The chosen option's value, or undefined from an empty list.
+ */
+export const pickOption = (list, want) => {
+  const match = want instanceof RegExp ? list.find((o) => want.test(o.label || '')) : want && list.find((o) => o.value === want)
+  return ((match || list[0]) || {}).value
+}
+
 /**
  * One entry per component. `props` are rows in the panel, in order;
- * `chain` groups dependent selects into one row. A select's `prefer` is the
- * value it takes on its own, a string or a function of the card. `backends`
+ * `chain` groups dependent selects into one row. A select's `prefer` is what
+ * it takes on its own: a value, a pattern its label matches, or a function of
+ * the card returning either, so each backend gets what demos best. `backends`
  * limits a component to the backends that can serve it, with the reason.
  */
 export const COMPONENTS = {
@@ -155,7 +172,7 @@ export const COMPONENTS = {
     story: 'druxt-blocks-druxtblock--default',
     args: ['id', 'uuid'],
     props: [
-      { name: 'uuid', type: 'string', control: 'select', source: 'blocks', required: true, description: 'The block entity UUID.' },
+      { name: 'uuid', type: 'string', control: 'select', source: 'blocks', required: true, prefer: perBackend(/branding/, /umami_banner_recipes/), description: 'The block entity UUID.' },
     ],
   },
 
@@ -167,7 +184,7 @@ export const COMPONENTS = {
       description: 'Each one narrows the next.',
       steps: [
         { name: 'theme', source: 'themes', required: true, prefer: siteTheme },
-        { name: 'name', source: 'regions', needs: ['theme'], prefer: 'header' },
+        { name: 'name', source: 'regions', needs: ['theme'], prefer: perBackend('header', 'banner_top') },
       ],
     },
     props: [],
@@ -181,8 +198,8 @@ export const COMPONENTS = {
       description: 'Each one narrows the next.',
       steps: [
         { name: 'entityType', source: 'entityTypes', required: true, internal: true, prefer: 'node' },
-        { name: 'bundle', source: 'bundles', needs: ['entityType'], required: true, internal: true },
-        { name: 'uuid', source: 'entities', needs: ['entityType', 'bundle'] },
+        { name: 'bundle', source: 'bundles', needs: ['entityType'], required: true, internal: true, prefer: perBackend('doc_page', 'recipe') },
+        { name: 'uuid', source: 'entities', needs: ['entityType', 'bundle'], prefer: perBackend(/Getting started/, /Deep mediterranean quiche/) },
         { name: 'mode', source: 'modes', needs: ['entityType', 'bundle', 'schemaType'], prefer: 'full' },
       ],
       // `type` is built from the two internal steps.
@@ -201,8 +218,8 @@ export const COMPONENTS = {
       description: 'Each one narrows the next.',
       steps: [
         { name: 'entityType', source: 'entityTypes', required: true, internal: true, prefer: 'node' },
-        { name: 'bundle', source: 'bundles', needs: ['entityType'], required: true, internal: true },
-        { name: 'uuid', source: 'entities', needs: ['entityType', 'bundle'] },
+        { name: 'bundle', source: 'bundles', needs: ['entityType'], required: true, internal: true, prefer: perBackend('doc_page', 'recipe') },
+        { name: 'uuid', source: 'entities', needs: ['entityType', 'bundle'], prefer: perBackend(/Getting started/, /Deep mediterranean quiche/) },
         { name: 'mode', source: 'modes', needs: ['entityType', 'bundle', 'schemaType'], prefer: 'full' },
       ],
       compose: ({ entityType, bundle }) => (entityType && bundle ? { type: `${entityType}--${bundle}` } : {}),
@@ -244,7 +261,7 @@ export const COMPONENTS = {
     story: 'druxt-breadcrumb-druxtbreadcrumb--default',
     args: [],
     props: [
-      { name: 'path', type: 'string', control: 'select', source: 'paths', required: true, description: 'The path to build the breadcrumb for; the current route when unset.' },
+      { name: 'path', type: 'string', control: 'select', source: 'paths', required: true, prefer: perBackend(/getting-started/, /deep-mediterranean-quiche/), description: 'The path to build the breadcrumb for; the current route when unset.' },
       { name: 'home', type: 'boolean', control: 'toggle', default: true, description: 'Whether to include the home link.' },
     ],
   },
@@ -253,7 +270,7 @@ export const COMPONENTS = {
     story: 'druxt-router-druxtrouter--default',
     args: [],
     props: [
-      { name: 'path', type: 'string', control: 'select', source: 'paths', required: true, description: 'The path to resolve; the current route when unset.' },
+      { name: 'path', type: 'string', control: 'select', source: 'paths', required: true, prefer: perBackend(/getting-started/, /deep-mediterranean-quiche/), description: 'The path to resolve; the current route when unset.' },
     ],
   },
 
