@@ -108,9 +108,10 @@ provision:
       - drupal/web/sites/default/files/
     expire_in: 1 day
 
-# Rebuilds the content from the pinned documentation commit and fails when
-# the result differs from what is committed. The pinned commit is fetched
-# from the documentation project on this GitLab with the job token, so that
+# Rebuilds the content from the pinned documentation commit, imports it into
+# a provisioned site, and fails when the site does not end up holding a page
+# for every document the source produced. The pinned commit is fetched from
+# the documentation project on this GitLab with the job token, so that
 # project has to allow this one in its CI/CD job token allowlist.
 import:
   extends: .drupal
@@ -126,9 +127,6 @@ import:
     - .devtools/assemble
     - .devtools/provision
     - .devtools/import --check
-  # The importer does not write entities yet, so this fails at the import
-  # step on every pipeline. Remove this with the importer.
-  allow_failure: true
   artifacts:
     when: on_failure
     paths:
