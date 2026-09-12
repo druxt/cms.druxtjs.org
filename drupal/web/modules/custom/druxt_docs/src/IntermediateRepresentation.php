@@ -16,8 +16,11 @@ final class IntermediateRepresentation {
 
   /**
    * Every key a document must carry to be worth importing.
+   *
+   * Including its history, even when that is empty: a builder that stopped
+   * writing it would otherwise import every page with no past, plausibly.
    */
-  private const REQUIRED_KEYS = ['source', 'url', 'section', 'title', 'blocks'];
+  private const REQUIRED_KEYS = ['source', 'url', 'section', 'title', 'blocks', 'commit', 'revisions'];
 
   /**
    * Loads and validates every document in a directory.
