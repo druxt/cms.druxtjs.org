@@ -74,6 +74,13 @@ final class Identity {
   }
 
   /**
+   * An author, by the identifier the user migration gives them.
+   */
+  public static function user(string $id): string {
+    return self::uuid("user:$id");
+  }
+
+  /**
    * The section term for a vocabulary machine name.
    */
   public static function section(string $machine): string {
