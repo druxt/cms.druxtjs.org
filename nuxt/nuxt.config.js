@@ -1,6 +1,7 @@
 // GA4, as a plain gtag.js snippet: the Nuxt analytics modules need either
 // Universal Analytics or Nuxt 3.
 const GA_MEASUREMENT_ID = 'G-Y1ZRHGDGSD'
+const { syncDruxtComponents } = require('./lib/sync-druxt-components')
 
 // The id is interpolated into an inline script, so check its shape first.
 if (!/^G-[A-Z0-9]+$/.test(GA_MEASUREMENT_ID)) {
@@ -80,7 +81,6 @@ export default {
     '~/plugins/mermaid.client.js',
   ],
   components: true,
-
   // Mirrors the SITE_ORIGIN override into the client bundle so hydration
   // recomputes the same absolute URLs the generated HTML carries.
   env: {
@@ -220,6 +220,9 @@ export default {
   },
 
   hooks: {
+    // Druxt's own components load with the page: see lib/sync-druxt-components.js.
+    'components:extend': (components) => syncDruxtComponents(components),
+
     /**
      * Collects routes whose generation failed, so the build can refuse to ship them.
      *
