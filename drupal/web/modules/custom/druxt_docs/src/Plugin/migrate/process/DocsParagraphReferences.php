@@ -29,9 +29,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * run and names itself, because the alternative is a page quietly short a
  * paragraph.
  *
+ * An item written as `['section' => [page, position]]` is a layout section,
+ * looked up only in `section_migration`, so its identifiers are never
+ * compared against a block migration's.
+ *
  * @code
  * field_content:
  *   plugin: docs_paragraph_references
+ *   section_migration: docs_paragraph_layout
  *   migrations:
  *     - docs_paragraph_text
  *     - docs_paragraph_code
@@ -90,12 +95,32 @@ final class DocsParagraphReferences extends ProcessPluginBase implements Contain
       $maps[$name] = $migration->getIdMap();
     }
 
+    $section_map = NULL;
+    $section_name = $this->configuration['section_migration'] ?? NULL;
+    if ($section_name !== NULL) {
+      $section_migration = $this->migrationManager->createInstance($section_name);
+      if ($section_migration === NULL) {
+        throw new MigrateException(sprintf('docs_paragraph_references: there is no "%s" migration.', $section_name));
+      }
+      $section_map = $section_migration->getIdMap();
+    }
+
     $references = [];
     foreach ($value as $position => $ids) {
+      $searched = $maps;
+      $kind = 'block';
+      if (is_array($ids) && array_key_exists('section', $ids)) {
+        $kind = 'section';
+        if ($section_map === NULL) {
+          throw new MigrateException('docs_paragraph_references: a section item arrived, and no "section_migration" is configured.');
+        }
+        $searched = [$section_name => $section_map];
+        $ids = $ids['section'];
+      }
       $ids = is_array($ids) ? array_values($ids) : [$ids];
       $label = implode(':', array_map('strval', $ids));
       $found = NULL;
-      foreach ($maps as $name => $map) {
+      foreach ($searched as $name => $map) {
         $destination = $map->lookupDestinationIds($ids);
         if ($destination === []) {
           continue;
@@ -110,7 +135,7 @@ final class DocsParagraphReferences extends ProcessPluginBase implements Contain
         $found = $first;
       }
       if ($found === NULL) {
-        throw new MigrateException(sprintf('docs_paragraph_references: block %s has no paragraph in any of %s. Run them first, and do not let them skip rows.', $label, implode(', ', array_keys($maps))));
+        throw new MigrateException(sprintf('docs_paragraph_references: %s %s has no paragraph in any of %s. Run them first, and do not let them skip rows.', $kind, $label, implode(', ', array_keys($searched))));
       }
       $references[$position] = [
         'target_id' => $found[0],

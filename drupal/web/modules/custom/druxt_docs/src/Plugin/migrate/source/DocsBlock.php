@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\druxt_docs\Plugin\migrate\source;
 
+use Drupal\druxt_docs\Layout;
 use Drupal\migrate\Attribute\MigrateSource;
 use Drupal\migrate\MigrateException;
 
@@ -49,6 +50,8 @@ final class DocsBlock extends DocsSourceBase {
       'group' => 'Group a diagram belongs to, where the page groups them',
       'callout' => 'Callout type',
       'src' => 'Image path, for image blocks',
+      'layout_section' => 'Position of the section the block sits in',
+      'layout_region' => 'Region of that section the block sits in',
     ];
   }
 
@@ -88,6 +91,17 @@ final class DocsBlock extends DocsSourceBase {
 
     $rows = [];
     foreach ($this->documents() as $page => $document) {
+      try {
+        $placements = [];
+        foreach (Layout::sections($document['blocks']) as $position => $section) {
+          foreach ($section['blocks'] as $member => $region) {
+            $placements[$member] = [$position, $region];
+          }
+        }
+      }
+      catch (\InvalidArgumentException $exception) {
+        throw new MigrateException(sprintf('%s: %s', $page, $exception->getMessage()));
+      }
       foreach ($document['blocks'] as $index => $block) {
         $type = $block['type'] ?? '';
         if (!isset(self::BUNDLES[$type])) {
@@ -116,6 +130,8 @@ final class DocsBlock extends DocsSourceBase {
           'group' => $block['group'] ?? NULL,
           'callout' => $block['callout'] ?? NULL,
           'src' => $block['src'] ?? NULL,
+          'layout_section' => $placements[$index][0],
+          'layout_region' => $placements[$index][1],
         ];
       }
     }

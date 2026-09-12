@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\druxt_docs\Plugin\migrate\source;
 
+use Drupal\druxt_docs\Layout;
+use Drupal\druxt_docs\Sections;
 use Drupal\migrate\Attribute\MigrateSource;
+use Drupal\migrate\MigrateException;
 
 /**
  * One row per page, carrying its block keys in reading order.
@@ -30,7 +33,12 @@ final class DocsDocument extends DocsSourceBase {
       'weight' => 'Order within the section',
       'isLanding' => 'Whether the page is its section landing page',
       'toc' => 'Table of contents, computed at build time',
-      'blocks' => 'Block identifiers, in reading order',
+      'items' => 'Sections and blocks, in the order the page reads',
+      'created' => 'When the page was written, from git',
+      'changed' => 'When the page last changed, from git',
+      'menu_title' => 'The page\'s title in the documentation menu',
+      'menu_weight' => 'The page\'s order in that menu',
+      'menu_parent' => 'The page its menu link sits under, if any',
     ];
   }
 
@@ -45,13 +53,46 @@ final class DocsDocument extends DocsSourceBase {
    * {@inheritdoc}
    */
   protected function initializeIterator(): \Iterator {
-    $rows = [];
-    foreach ($this->documents() as $page => $document) {
-      $keys = [];
-      foreach (array_keys($document['blocks']) as $index) {
-        $keys[] = [$page, $index];
+    $documents = $this->documents();
+    // Each section's landing page, which its other pages sit under.
+    $landings = [];
+    foreach ($documents as $page => $document) {
+      if (!empty($document['isLanding'])) {
+        $landings[$document['section']] = $page;
       }
-      $document['blocks'] = $keys;
+    }
+
+    $landing = $this->configuration['landing'] ?? NULL;
+    $rows = [];
+    foreach ($documents as $page => $document) {
+      if ($landing !== NULL && (bool) $landing !== !empty($document['isLanding'])) {
+        continue;
+      }
+      // A section, then the blocks in it, then the next section. That is
+      // the order layout_paragraphs reads a page's field in.
+      try {
+        $sections = Layout::sections($document['blocks']);
+      }
+      catch (\InvalidArgumentException $exception) {
+        throw new MigrateException(sprintf('%s: %s', $page, $exception->getMessage()));
+      }
+      $items = [];
+      foreach ($sections as $position => $section) {
+        $items[] = ['section' => [$page, $position]];
+        foreach (array_keys($section['blocks']) as $index) {
+          $items[] = [$page, $index];
+        }
+      }
+      $document['items'] = $items;
+      unset($document['blocks']);
+
+      // In the menu, a landing page stands for its section, under the
+      // section's own name and in the section's order.
+      $is_landing = !empty($document['isLanding']);
+      $definition = Sections::ALL[$document['section']] ?? NULL;
+      $document['menu_title'] = $is_landing && $definition ? $definition['name'] : $document['title'];
+      $document['menu_weight'] = $is_landing && $definition ? $definition['weight'] : (int) ($document['weight'] ?? 0);
+      $document['menu_parent'] = $is_landing ? NULL : ($landings[$document['section']] ?? NULL);
       // Normalised here rather than in a process pipeline, because YAML
       // cannot carry a boolean map key and a static_map over true and
       // false is unwritable.

@@ -1,0 +1,17 @@
+name: DruxtJS
+type: theme
+description: 'The druxtjs.org regions, which Druxt renders blocks into on the frontend, and a plain layout for pages Drupal renders itself.'
+package: Custom
+core_version_requirement: ^11
+base theme: false
+libraries:
+  - druxtjs/global
+regions:
+  header: Header
+  sidebar: Sidebar
+  breadcrumb: Breadcrumb
+  content: Content
+  toc: 'On this page'
+  footer: Footer
+  page_top: 'Page top'
+  page_bottom: 'Page bottom'
