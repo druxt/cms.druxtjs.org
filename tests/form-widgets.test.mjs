@@ -38,6 +38,14 @@ describe('references', () => {
     assert.equal(w.referenceId('bare'), 'bare')
     assert.equal(w.referenceId(null), '')
   })
+  test('lists every reference a value holds', () => {
+    assert.deepEqual(w.referenceItems({ data: [{ type: 'taxonomy_term--tags', id: 't1' }, { type: 'taxonomy_term--tags', id: 't2' }] }).map((o) => o.id), ['t1', 't2'])
+    assert.deepEqual(w.referenceItems({ data: { type: 'user--user', id: 'u1' } }).map((o) => o.id), ['u1'])
+    assert.deepEqual(w.referenceItems([{ id: 'x', type: 'node--page' }]).map((o) => o.id), ['x'])
+    assert.deepEqual(w.referenceItems(null), [])
+    assert.deepEqual(w.referenceItems('bare'), [])
+  })
+
   test('labels entities by name, title or label, and carries their type back', () => {
     assert.deepEqual(w.entityOptions([{ id: '1', type: 'taxonomy_term--tags', attributes: { name: 'Baked' } }, { id: '2', type: 'node--page', attributes: { title: 'About' } }]), [
       { value: '1', label: 'Baked', type: 'taxonomy_term--tags' },
