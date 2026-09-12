@@ -66,10 +66,6 @@
         }
     ],
     "path": [
-        {
-            "alias": null,
-            "pid": null,
-            "langcode": "en"
-        }
+        []
     ]
 }
