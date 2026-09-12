@@ -254,7 +254,7 @@ function find_free_port(int $start = 8888, int $max_attempts = 100): int {
  * and the port may hold an unrelated service.
  */
 function stop_webserver(string $port): void {
-  $pid_file = server_pid_file();
+  $pid_file = server_pid_file($port);
   $candidates = [];
 
   if (is_file($pid_file)) {
@@ -297,14 +297,15 @@ function stop_webserver(string $port): void {
 }
 
 /**
- * Path of the pidfile tracking the dev webserver process.
+ * Path of the pidfile tracking the dev webserver on a port.
  */
-function server_pid_file(): string {
-  // Unique per checkout: a fixed name is shared by every clone of this
-  // repo on the machine, letting one checkout's `stop` kill another
-  // checkout's server (the pidfile written last wins). cwd is stable
-  // here - every .devtools script runs from drupal/.
-  return sprintf('/tmp/cms-druxtjs-org-php-server-%s.pid', hash('sha256', (string) getcwd()));
+function server_pid_file(string $port): string {
+  // Unique per checkout and port: a fixed name is shared by every clone of
+  // this repo on the machine, letting one checkout's `stop` kill another
+  // checkout's server, and one name per checkout lets a start on one port
+  // stop the server on another. cwd is stable here - every .devtools
+  // script runs from drupal/.
+  return sprintf('/tmp/cms-druxtjs-org-php-server-%s-%s.pid', hash('sha256', (string) getcwd()), $port);
 }
 
 /**
