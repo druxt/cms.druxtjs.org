@@ -64,6 +64,7 @@
             "php": "8.3.0"
         },
         "preferred-install": {
+            "drupal/decoupled_settings": "source",
             "drupal/jsonapi_node_preview": "source",
             "*": "dist"
         }
@@ -139,6 +140,9 @@
             ]
         },
         "patches": {
+            "drupal/decoupled_settings": {
+                "Expose the theme's regions, and let a consumer select its theme": "https://github.com/Decipher/decoupled_settings/pull/15.diff"
+            },
             "drupal/jsonapi_node_preview": {
                 "Issue #3367724: resolve includes from the previewed entity": "https://git.drupalcode.org/project/jsonapi_node_preview/-/merge_requests/4.diff"
             }
