@@ -7,6 +7,7 @@
  * renders behind it. A page that is not stored yet renders live, and is
  * stored once it has answered 200.
  */
+const { redirectFor } = require('./redirects')
 const fs = require('fs')
 const path = require('path')
 const zlib = require('zlib')
@@ -182,6 +183,12 @@ const createHandler =
       return res.end('Bad Request')
     }
     const { pathname, search } = url
+    // An old URL, or a package subdomain: sent on before anything is served.
+    const elsewhere = redirectFor(req.headers.host, pathname, search)
+    if (elsewhere) {
+      res.writeHead(301, { Location: elsewhere })
+      return res.end()
+    }
     if (!isPage(req.method, pathname)) return live(req, res)
 
     // Canonical page URLs carry no trailing slash.

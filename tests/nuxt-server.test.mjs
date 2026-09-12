@@ -363,6 +363,18 @@ describe('createHandler', () => {
     }
   })
 
+  test('sends an old path on, before the store or a render is consulted', async () => {
+    await withServer(createHandler({ cache: null, live: live() }), async (base) => {
+      const res = await request(`${base}/guide/proxy/?utm_source=old`)
+      assert.equal(res.status, 301)
+      assert.equal(res.headers.location, '/how-to/proxy?utm_source=old')
+      assert.equal(
+        (await request(`${base}/api/components/DruxtEntity.html`)).headers.location,
+        '/api/packages/entity/components/DruxtEntity'
+      )
+    })
+  })
+
   test('asks search engines to stay away only when told to', async () => {
     await withServer(createHandler({ cache: null, live: live(), noindex: true }), async (base) => {
       assert.equal((await request(`${base}/`)).headers['x-robots-tag'], 'noindex, nofollow')
