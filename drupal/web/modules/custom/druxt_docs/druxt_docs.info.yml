@@ -9,3 +9,6 @@ dependencies:
   - drupal:path
   - drupal:taxonomy
   - paragraphs:paragraphs
+  - drupal:migrate
+  - migrate_plus:migrate_plus
+  - migrate_tools:migrate_tools

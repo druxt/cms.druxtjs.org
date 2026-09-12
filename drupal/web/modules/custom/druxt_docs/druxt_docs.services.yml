@@ -6,6 +6,12 @@ services:
       - '@file_system'
       - '@database'
       - '@?tome_sync.importer'
+  druxt_docs.tome_sync_suppressor:
+    class: Drupal\druxt_docs\EventSubscriber\TomeSyncSuppressor
+    arguments:
+      - '@?tome_sync.importer'
+    tags:
+      - { name: event_subscriber }
   # Above tome_sync's path normalizer, which sits at 8.
   serializer.normalizer.druxt_docs_path:
     class: Drupal\druxt_docs\Normalizer\PathItemNormalizer
