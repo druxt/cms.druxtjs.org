@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\druxt_docs\Plugin\migrate\source;
 
+use Drupal\druxt_docs\History;
 use Drupal\druxt_docs\Layout;
 use Drupal\druxt_docs\Sections;
 use Drupal\migrate\Attribute\MigrateSource;
@@ -16,6 +17,9 @@ use Drupal\migrate\MigrateException;
  * the node migration can look each one up and keep the order the page
  * reads in. Order is the property most easily lost here, so it is carried
  * explicitly rather than reconstructed from a query.
+ *
+ * `revisions` passes the page's earlier versions through as the IR holds
+ * them, for the docs_page destination to save as revisions.
  */
 #[MigrateSource(id: 'docs_document')]
 final class DocsDocument extends DocsSourceBase {
@@ -35,6 +39,9 @@ final class DocsDocument extends DocsSourceBase {
       'items' => 'Sections and blocks, in the order the page reads',
       'created' => 'When the page was written, from git',
       'changed' => 'When the page last changed, from git',
+      'commit' => 'The commit that last changed the page: its sha and subject',
+      'revision_log' => 'The current version\'s log: that commit\'s subject and short sha',
+      'revisions' => 'The page\'s earlier versions, oldest first',
       'menu_title' => 'The page\'s title in the documentation menu',
       'menu_weight' => 'The page\'s order in that menu',
       'menu_parent' => 'The page its menu link sits under, if any',
@@ -96,6 +103,16 @@ final class DocsDocument extends DocsSourceBase {
       // cannot carry a boolean map key and a static_map over true and
       // false is unwritable.
       $document['isLanding'] = (int) !empty($document['isLanding']);
+
+      // The current version is dated to the commit that last changed the
+      // page, and logged with it, as each earlier version is with its own.
+      $commit = is_array($document['commit'] ?? NULL) ? $document['commit'] : [];
+      try {
+        $document['revision_log'] = History::log((string) ($commit['subject'] ?? ''), (string) ($commit['sha'] ?? ''));
+      }
+      catch (\InvalidArgumentException $exception) {
+        throw new MigrateException(sprintf('%s: no commit to log the current version with. %s', $page, $exception->getMessage()));
+      }
       $rows[] = $document;
     }
     return new \ArrayIterator($rows);

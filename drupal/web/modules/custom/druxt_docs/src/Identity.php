@@ -83,6 +83,24 @@ final class Identity {
   }
 
   /**
+   * A block's paragraph in an earlier version of a page.
+   *
+   * Keyed on the commit the version comes from as well as the position, so
+   * each revision's paragraphs are its own. Named apart from the current
+   * version's, whose names start with the page path, so none can collide.
+   */
+  public static function revisionParagraph(string $source, string $sha, int $index): string {
+    return self::uuid("paragraph:revision:$sha:$source:$index");
+  }
+
+  /**
+   * A layout section in an earlier version of a page.
+   */
+  public static function revisionSectionParagraph(string $source, string $sha, int $position): string {
+    return self::uuid("paragraph:revision:section:$sha:$source:$position");
+  }
+
+  /**
    * A menu link, by its menu and a key unique within that menu.
    */
   public static function menuLink(string $menu, string $key): string {

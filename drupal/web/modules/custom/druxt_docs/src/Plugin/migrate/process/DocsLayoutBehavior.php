@@ -19,7 +19,8 @@ use Drupal\migrate\Row;
  * settings, not in the field: a section records its layout, and a block
  * records the UUID of the section it sits in and the region within it.
  * This writes exactly the shape the module writes, serialized, because the
- * field is a serialized string.
+ * field is a serialized string. The shape is Layout's, which the docs_page
+ * destination also writes an earlier version's paragraphs with.
  *
  * @code
  * behavior_settings:
@@ -38,12 +39,11 @@ final class DocsLayoutBehavior extends ProcessPluginBase {
    * {@inheritdoc}
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property): string {
-    $settings = match ($this->configuration['role'] ?? '') {
+    return serialize(match ($this->configuration['role'] ?? '') {
       'section' => $this->section($value),
       'block' => $this->block($value),
       default => throw new MigrateException('docs_layout_behavior: "role" must be "section" or "block".'),
-    };
-    return serialize(['layout_paragraphs' => $settings]);
+    });
   }
 
   /**
@@ -53,7 +53,7 @@ final class DocsLayoutBehavior extends ProcessPluginBase {
     if (!is_string($layout) || !in_array($layout, Layout::layouts(), TRUE)) {
       throw new MigrateException(sprintf('docs_layout_behavior: "%s" is not a layout a section may use.', is_scalar($layout) ? $layout : gettype($layout)));
     }
-    return ['layout' => $layout, 'config' => ['label' => ''], 'parent_uuid' => '', 'region' => ''];
+    return Layout::sectionBehavior($layout);
   }
 
   /**
@@ -64,7 +64,7 @@ final class DocsLayoutBehavior extends ProcessPluginBase {
     if (!is_string($page) || $page === '' || !is_numeric($position) || !is_string($region) || $region === '') {
       throw new MigrateException('docs_layout_behavior: a block needs its page, its section position and its region.');
     }
-    return ['layout' => '', 'config' => [], 'parent_uuid' => Identity::sectionParagraph($page, (int) $position), 'region' => $region];
+    return Layout::blockBehavior(Identity::sectionParagraph($page, (int) $position), $region);
   }
 
 }
