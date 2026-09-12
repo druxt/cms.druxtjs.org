@@ -98,6 +98,15 @@ describe('SOURCES', () => {
   })
 })
 
+describe('the playground page', () => {
+  test('site search knows it by every component it renders', async () => {
+    const { PAGES } = (await import('../nuxt/lib/site.js')).default
+    const page = PAGES.find((p) => p.route === '/playground')
+    for (const name of m.COMPONENT_NAMES)
+      assert.ok(page.keywords.includes(name), `${name} is not a keyword`)
+  })
+})
+
 describe('BACKENDS', () => {
   test('each backend names where its options come from and where its runtime sends requests', () => {
     assert.equal(m.BACKENDS.site.api, '/jsonapi')

@@ -23,8 +23,10 @@ import { seoHead } from '~/utils/seo'
 export default {
   name: 'PlaygroundPage',
   head() {
+    // The tab names the component a shared link opens on; the share card stays the page's.
+    const component = this.$route.query.component
     return seoHead({
-      title: 'Live component playground',
+      title: component ? `${component} in the playground` : 'Live component playground',
       description: PLAYGROUND_DESCRIPTION,
       // The query string carries a card's state; the page is one page.
       path: '/playground',
