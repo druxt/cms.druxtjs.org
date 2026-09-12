@@ -200,7 +200,7 @@ describe('demo defaults', () => {
       ),
       '1'
     )
-    assert.equal(step(m.COMPONENTS.DruxtBlockRegion, 'name').prefer, 'header')
+    assert.equal(step(m.COMPONENTS.DruxtBlockRegion, 'name').prefer, 'content')
     assert.equal(step(m.COMPONENTS.DruxtEntity, 'bundle').prefer({ backend: 'umami' }), 'recipe')
     assert.equal(
       m.pickOption(
