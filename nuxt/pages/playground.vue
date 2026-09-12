@@ -2,8 +2,8 @@
   <div>
     <h1 class="text-3xl font-semibold tracking-tight mb-2">Live component playground</h1>
     <p class="text-base-content/70 mb-8 max-w-content">
-      Pick a Druxt component and render it against a live Drupal. Its props are the controls;
-      its examples are presets.
+      Pick a Druxt component and render it against a live Drupal: this site's, the Umami demo, or
+      your own. Its props are the controls; its examples are presets.
     </p>
 
     <DruxtExample />

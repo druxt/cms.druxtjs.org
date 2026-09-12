@@ -25,14 +25,24 @@
       <!-- Right on a wide band; left under the picker when the band wraps. -->
       <label v-if="live" class="sm:ml-auto flex items-center gap-2 text-sm">
         <span class="text-base-content/70">Backend</span>
-        <select v-model="backend" data-testid="backend" class="select select-sm select-bordered h-[30px] min-h-0 rounded-md text-base lg:text-sm">
-          <!-- Short, so the reason never widens the select on a phone; it is the option's title. -->
-          <option v-for="(b, key) in backends" :key="key" :value="key" :disabled="!available(key)" :title="available(key) ? null : schema.backends[key]">
+        <select data-testid="backend" class="select select-sm select-bordered h-[30px] min-h-0 rounded-md text-base lg:text-sm" :value="customOpen ? 'other' : backend" @change="pickBackend($event.target.value)">
+          <!-- Short, so the reason never widens the select on a phone; the reason is said below. -->
+          <option v-for="(b, key) in backends" :key="key" :value="key" :disabled="!available(key)">
             {{ b.label }}{{ available(key) ? '' : ' (n/a)' }}
           </option>
+          <option value="other">Your own Drupal</option>
         </select>
       </label>
     </div>
+
+    <!-- A reader's Drupal: its origin, checked for what it offers before it is used. -->
+    <form v-if="live && customOpen" class="flex flex-wrap items-center gap-2 px-3.5 pb-2.5 text-sm" data-testid="custom-backend" @submit.prevent="useCustom">
+      <input v-model="customInput" type="url" aria-label="The origin of your Drupal" placeholder="https://drupal.example" class="input input-sm input-bordered h-[30px] min-h-0 rounded-md w-full sm:w-[260px] font-mono text-base lg:text-[12.5px]" :disabled="customBusy" />
+      <button type="submit" class="btn btn-sm btn-outline h-[30px] min-h-0" :disabled="customBusy || !customInput">{{ customBusy ? 'Checking' : 'Use it' }}</button>
+      <p class="basis-full text-[11.5px]" :class="customError ? 'text-error' : 'text-base-content/70'" role="status">
+        {{ customError || 'The browser talks to it directly, so it has to allow this origin (CORS in its services.yml). What it lacks greys out the components that need it.' }}
+      </p>
+    </form>
     <!-- Why a backend is greyed out: the option's title, said in text. -->
     <p v-if="live && unavailable" class="px-3.5 pb-2 -mt-1 text-[11.5px] text-base-content/70">{{ unavailable }}</p>
 
@@ -65,7 +75,7 @@
       <div data-testid="preview" class="druxt-preview bg-base-100 border-t border-base-300 px-[18px] py-5 max-h-[380px] overflow-y-auto">
         <div v-if="error" class="text-sm">
           <p class="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-error">Backend not responding</p>
-          <p class="mt-1 text-base-content/70">The {{ backends[backend].label }} did not answer. The controls keep their values, so nothing is lost.</p>
+          <p class="mt-1 text-base-content/70">{{ backends[backend].label }} did not answer. The controls keep their values, so nothing is lost.</p>
           <p class="mt-2 font-mono text-[12px] text-base-content/70">{{ error }}</p>
           <button type="button" class="btn btn-sm btn-outline mt-3" @click="retry">Try again</button>
         </div>
@@ -234,7 +244,9 @@ import {
   liveComponentsOf,
   packageOf,
   pageFor,
+  parseOrigin,
   pickOption,
+  probeBackend,
 } from '~/utils/live-examples'
 import { COPY_STATES, copyText } from '~/utils/copy-button'
 import { createRuntime } from '~/utils/druxt-runtime'
@@ -276,6 +288,12 @@ export default {
     return {
       name: this.component || liveComponentsOf(this.pkg)[0] || '',
       backend: 'site',
+      // A reader's own Drupal, once probed; and the form that asks for it.
+      custom: null,
+      customOpen: false,
+      customInput: '',
+      customBusy: false,
+      customError: '',
       values: {},
       options: {},
       loading: {},
@@ -293,7 +311,9 @@ export default {
   },
 
   computed: {
-    backends: () => BACKENDS,
+    backends: ({ custom }) => (custom ? { ...BACKENDS, custom } : BACKENDS),
+    /** The backend in a URL: its key, or a reader's origin. */
+    backendId: ({ backend, custom }) => (backend === 'custom' && custom ? custom.baseUrl : backend),
     copyStates: () => COPY_STATES,
     fixed: ({ component }) => !!component,
     live: ({ name }) => !!COMPONENTS[name],
@@ -315,17 +335,18 @@ export default {
     },
 
     /** The card's state as a playground URL query, for sharing and for the link below. */
-    shareQuery: ({ name, backend, values, wrapper }) => {
-      const query = { component: name, backend }
+    shareQuery: ({ name, backendId, values, wrapper }) => {
+      const query = { component: name, backend: backendId }
       for (const [key, value] of Object.entries(values)) if (value !== undefined && value !== '' && key !== 'wrapper') query[key] = String(value)
       if (!wrapper) query.wrapper = 'false'
       return query
     },
 
-    /** Each backend that cannot serve the component, with the descriptor's reason. */
-    unavailable: ({ backends, schema }) => Object.keys(backends)
-      .filter((key) => schema.backends && schema.backends[key] !== true)
-      .map((key) => `${backends[key].label}: ${schema.backends[key]}.`)
+    /** Each backend that cannot serve the component, with its reason: the descriptor's, or the probe's. */
+    unavailable: ({ backends, schema, name }) => Object.keys(backends)
+      .map((key) => [key, key === 'custom' ? (backends.custom.reasons || {})[name] : schema.backends && schema.backends[key] !== true && schema.backends[key]])
+      .filter(([, reason]) => reason)
+      .map(([key, reason]) => `${backends[key].label}: ${reason}.`)
       .join(' '),
 
     rows: ({ schema, name }) => [
@@ -379,7 +400,7 @@ export default {
      * and view, titled from their names.
      */
     storybook() {
-      const b = BACKENDS[this.backend]
+      const b = this.backends[this.backend]
       if (!b.storybook || !this.name) return null
       const slug = (...parts) => parts.filter(Boolean).join('/').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
       const option = (value) => Object.values(this.options).flat().find((o) => o.value === value) || {}
@@ -432,8 +453,13 @@ export default {
     this.initial = {}
   },
 
-  mounted() {
+  async mounted() {
     if (this.placement === 'playground') this.readUrl()
+    if (this.customInput) {
+      this.customOpen = true
+      await this.useCustom()
+      if (this.backend === 'custom') return
+    }
     if (this.name) {
       this.reset()
       this.track('example_component')
@@ -455,7 +481,43 @@ export default {
       const { component, backend, wrapper, ...rest } = this.$route.query || {}
       if (component && COMPONENTS[component]) this.name = component
       if (backend && BACKENDS[backend]) this.backend = backend
+      // A reader's Drupal in a shared link: probed once the card is up.
+      if (backend && /^https?:\/\//.test(backend)) this.customInput = backend
       this.initial = { ...rest, ...(wrapper === 'false' ? { wrapper: false } : {}) }
+    },
+
+    /** The backend select: a known one, or the form for a reader's own. */
+    pickBackend(value) {
+      if (value === 'other') {
+        this.customOpen = true
+        return
+      }
+      this.customOpen = false
+      this.backend = value
+    },
+
+    /** Check the typed origin, and render against it if it answers. */
+    async useCustom() {
+      const { origin, error } = parseOrigin(this.customInput, window.location.protocol)
+      if (error) {
+        this.customError = error
+        return
+      }
+      this.customBusy = true
+      this.customError = ''
+      try {
+        const { backend } = await probeBackend(origin)
+        this.custom = backend
+        this.customOpen = false
+        this.track('example_custom_backend')
+        // The watcher renders; a change of origin on the same key must too.
+        if (this.backend === 'custom') this.reset()
+        else this.backend = 'custom'
+      } catch (e) {
+        this.customError = e.message
+      } finally {
+        this.customBusy = false
+      }
     },
 
     writeUrl() {
@@ -474,6 +536,7 @@ export default {
 
     /** Whether a backend can serve the component; the reason it cannot is the descriptor's. */
     available(backend) {
+      if (backend === 'custom') return !!this.custom && !(this.custom.reasons || {})[this.name]
       const only = this.schema.backends
       return !only || only[backend] === true
     },
@@ -525,7 +588,7 @@ export default {
     async reset() {
       if (!this.available(this.backend)) {
         // The watcher brings us back here.
-        this.backend = Object.keys(BACKENDS).find((key) => this.available(key)) || 'site'
+        this.backend = Object.keys(this.backends).find((key) => this.available(key)) || 'site'
         return
       }
       this.error = null
@@ -551,7 +614,8 @@ export default {
       const key = this.optionsKey(source, deps)
       this.$set(this.loading, source, true)
       try {
-        const list = await cached(`${this.backend}:${key}`, () => SOURCES[source](BACKENDS[this.backend].api, deps, BACKENDS[this.backend]))
+        const b = this.backends[this.backend]
+        const list = await cached(`${this.backendId}:${key}`, () => SOURCES[source](b.api, deps, b))
         this.$set(this.options, key, list)
         return list
       } finally {
@@ -681,7 +745,7 @@ export default {
       this.unmount()
       if (!this.ready) return
       this.requests = []
-      const b = BACKENDS[this.backend]
+      const b = this.backends[this.backend]
       const key = ++this.renderKey
       try {
         const settings = (this.$druxt || {}).settings || {}

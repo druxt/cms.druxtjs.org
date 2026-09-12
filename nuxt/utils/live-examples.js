@@ -31,6 +31,76 @@ const get = async (api, path) => {
   return response.json()
 }
 
+/**
+ * A reader's own Drupal as a backend. The browser talks to it directly, so
+ * it must allow this origin (CORS); nothing here is proxied.
+ *
+ * @param {string} origin - The Drupal's origin, `https://example.com`.
+ * @returns {object} A backend like those in BACKENDS.
+ */
+export const customBackend = (origin) => ({
+  label: new URL(origin).host,
+  api: `${origin}/jsonapi`,
+  baseUrl: origin,
+  proxyRoot: origin,
+  custom: true,
+})
+
+/**
+ * The origin a reader typed, as one this card can use, or the reason it cannot.
+ *
+ * @param {string} input - What was typed.
+ * @param {string} [pageProtocol] - This page's protocol: an https page cannot fetch http.
+ * @returns {{ origin?: string, error?: string }} The origin, or the problem.
+ */
+export const parseOrigin = (input, pageProtocol = 'https:') => {
+  let url
+  try {
+    url = new URL(/^https?:\/\//.test(input.trim()) ? input.trim() : `https://${input.trim()}`)
+  } catch (e) {
+    return { error: 'That is not a URL.' }
+  }
+  if (pageProtocol === 'https:' && url.protocol !== 'https:') return { error: 'It must be https: this page is, and a browser will not mix the two.' }
+  return { origin: url.origin }
+}
+
+/**
+ * What a Drupal offers, by asking it. Each check names the component it
+ * unlocks; a failed one becomes that component's reason in the backend list.
+ *
+ * @param {string} origin - The Drupal's origin.
+ * @returns {Promise<{ backend: object, links: object }>} The backend, its per-component reasons filled in.
+ */
+export const probeBackend = async (origin) => {
+  const backend = customBackend(origin)
+  let index
+  try {
+    index = await get(backend.api, '')
+  } catch (e) {
+    throw new Error(e instanceof TypeError
+      ? `The browser could not reach ${backend.api}. If it is up, that Drupal has to allow this origin: enable CORS in its services.yml.`
+      : `No JSON:API answered at ${backend.api} (${e.message}).`)
+  }
+  const links = index.links || {}
+  const reasons = {}
+  // Anything but a 404 is the module answering: a 400 or 403 is still there.
+  const answers = (url) => fetch(url, { headers: { Accept: 'application/vnd.api+json' } }).then((r) => r.status !== 404, () => false)
+  // The first of a collection, for a request that needs a real name.
+  const first = async (path) => (((await get(backend.api, path).catch(() => ({}))).data || [])[0] || {}).attributes || {}
+  // The router: one path resolved, whatever it answers with.
+  if (!(await answers(`${origin}/router/translate-path?path=/`))) reasons.DruxtRouter = reasons.DruxtBreadcrumb = reasons.DruxtSite = 'needs Decoupled Router on that Drupal'
+  // Menu items and views add nothing to the index; ask for one of each.
+  const menu = links['menu--menu'] ? (await first('/menu/menu?page%5Blimit%5D=1&fields%5Bmenu--menu%5D=drupal_internal__id')).drupal_internal__id : null
+  if (!menu || !(await answers(`${backend.api}/menu_items/${menu}`))) reasons.DruxtMenu = 'needs JSON:API Menu Items on that Drupal'
+  const view = links['view--view'] ? await first('/view/view?page%5Blimit%5D=1&fields%5Bview--view%5D=drupal_internal__id,display') : {}
+  const display = Object.keys(view.display || {})[0]
+  if (!display || !(await answers(`${backend.api}/views/${view.drupal_internal__id}/${display}`))) reasons.DruxtView = 'needs JSON:API Views on that Drupal'
+  if (!links['block--block']) reasons.DruxtBlock = reasons.DruxtBlockRegion = 'exposes no blocks over JSON:API'
+  // The content type the router examples list: the first node type it has.
+  const node = Object.keys(links).map((k) => k.match(/^node--(.+)$/)).find(Boolean)
+  return { backend: { ...backend, nodeBundle: node ? node[1] : undefined, reasons }, links }
+}
+
 const label = (o) => {
   const a = o.attributes || {}
   return a.title || a.name || a.info || a.label || a.drupal_internal__id || o.id
