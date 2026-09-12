@@ -24,9 +24,11 @@
 //             directory and never the checkout.
 //   --check   round-trip every page and report, writing nothing.
 
+import { execFileSync } from 'node:child_process'
 import { copyFileSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { createRequire } from 'node:module'
+import { assertFullHistory, history } from './lib/history.mjs'
 import {
   CODE_LANGUAGES,
   CONTENT_DIR,
@@ -310,6 +312,7 @@ export function normalise(markdown) {
  * @returns {{documents: object[], defects: Defects}} The result.
  */
 export function build(root) {
+  assertFullHistory(root)
   const defects = new Defects()
   const files = trackedContentFiles(root)
   const routes = new Set(files.map(routeFor))
@@ -349,6 +352,7 @@ export function build(root) {
       description: doc.frontmatter.description ?? null,
       weight: doc.frontmatter.weight ?? null,
       toc: buildToc(doc),
+      ...history(root, file),
       links: extractLinks(doc.body).map((link) => ({
         ...link,
         resolves: link.kind !== 'internal'
