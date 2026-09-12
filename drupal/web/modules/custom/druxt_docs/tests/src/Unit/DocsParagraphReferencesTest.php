@@ -149,4 +149,75 @@ final class DocsParagraphReferencesTest extends UnitTestCase {
     return new Row(['source' => 'p'], ['source' => ['type' => 'string']]);
   }
 
+  /**
+   * A section comes before the blocks in it, in the page's order.
+   */
+  public function testSectionsInterleaveWithTheirBlocks(): void {
+    $plugin = $this->pluginWithSections(
+      ['text' => ['p:0' => [9, 90], 'p:1' => [8, 80]], 'code' => ['p:2' => [7, 70]]],
+      ['p:0' => [30, 300], 'p:1' => [20, 200]],
+    );
+    $result = $plugin->transform([['section' => ['p', 0]], ['p', 0], ['p', 1], ['section' => ['p', 1]], ['p', 2]], $this->executable(), $this->row(), 'field_content');
+    self::assertSame([30, 9, 8, 20, 7], array_column($result, 'target_id'));
+  }
+
+  /**
+   * A section is looked up only among sections.
+   *
+   * The block migration holds the same identifiers, so a lookup that
+   * searched everything would find two paragraphs, or the wrong one.
+   */
+  public function testASectionIsNeverLookedUpAmongBlocks(): void {
+    $plugin = $this->pluginWithSections(['text' => ['p:0' => [9, 90]]], ['p:0' => [30, 300]]);
+    $result = $plugin->transform([['section' => ['p', 0]], ['p', 0]], $this->executable(), $this->row(), 'field_content');
+    self::assertSame([30, 9], array_column($result, 'target_id'));
+  }
+
+  /**
+   * A section with nowhere to look it up stops the run.
+   */
+  public function testASectionWithoutASectionMigrationFails(): void {
+    $plugin = $this->pluginWithSections(['text' => ['p:0' => [9, 90]]], [], FALSE);
+    $this->expectException(MigrateException::class);
+    $this->expectExceptionMessageMatches('/no "section_migration"/');
+    $plugin->transform([['section' => ['p', 0]]], $this->executable(), $this->row(), 'field_content');
+  }
+
+  /**
+   * A section with no paragraph stops the run and names itself.
+   */
+  public function testAMissingSectionFails(): void {
+    $plugin = $this->pluginWithSections(['text' => []], ['p:0' => [30, 300]]);
+    $this->expectException(MigrateException::class);
+    $this->expectExceptionMessageMatches('/p:1 has no paragraph in any of sections/');
+    $plugin->transform([['section' => ['p', 1]]], $this->executable(), $this->row(), 'field_content');
+  }
+
+  /**
+   * Builds the plugin over block maps and a section map.
+   */
+  private function pluginWithSections(array $maps, array $sections, bool $configure = TRUE): DocsParagraphReferences {
+    $all = $maps + ($configure ? ['sections' => $sections] : []);
+    $instances = [];
+    foreach ($all as $name => $rows) {
+      $idMap = $this->createMock(MigrateIdMapInterface::class);
+      $idMap->method('lookupDestinationIds')->willReturnCallback(
+        static function (array $source) use ($rows): array {
+          $key = implode(':', array_map('strval', $source));
+          return isset($rows[$key]) ? [$rows[$key]] : [];
+        }
+      );
+      $migration = $this->createMock(MigrationInterface::class);
+      $migration->method('getIdMap')->willReturn($idMap);
+      $instances[$name] = $migration;
+    }
+    $manager = $this->createMock(MigrationPluginManagerInterface::class);
+    $manager->method('createInstance')->willReturnCallback(static fn(string $name) => $instances[$name] ?? NULL);
+    $configuration = ['migrations' => array_keys($maps)];
+    if ($configure) {
+      $configuration['section_migration'] = 'sections';
+    }
+    return new DocsParagraphReferences($configuration, 'docs_paragraph_references', [], $manager);
+  }
+
 }
