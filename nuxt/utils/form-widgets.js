@@ -40,3 +40,9 @@ export function referenceId(value) {
   if (item && typeof item === 'object') return (item.data && single(item.data) ? single(item.data).id : item.id) || ''
   return item || ''
 }
+
+/** Every reference a value holds, as { type, id }, whether relationship data, a list, or one item. */
+export function referenceItems(value) {
+  const data = value && typeof value === 'object' && !Array.isArray(value) && 'data' in value ? value.data : value
+  return [].concat(data || []).filter((o) => o && typeof o === 'object' && o.id)
+}
