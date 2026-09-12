@@ -129,9 +129,6 @@ the driver fails to install on that database.
 - The app builds each time the `nuxt` container starts, which takes a few
   minutes behind the starting page. A deployment shows it for that long, and
   so does a development environment waking from idle.
-- The share cards are only written by `nuxt generate`, so this server does
-  not have them yet. It writes `sitemap.xml` and `llms.txt` into `static/`
-  as it starts.
 - The redirects for the package subdomains are still served from the
   druxt.js repository.
 - `docker-compose.yml` is written for Lagoon, and has not been run with
