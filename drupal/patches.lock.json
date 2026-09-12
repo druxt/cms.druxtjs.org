@@ -1,0 +1,17 @@
+{
+    "_hash": "1f58edd0ae9487cae3bf5eb801eff4c2c4fb6228286320459b155a75482343a7",
+    "patches": {
+        "drupal/jsonapi_node_preview": [
+            {
+                "package": "drupal/jsonapi_node_preview",
+                "description": "Issue #3367724: resolve includes from the previewed entity",
+                "url": "https://git.drupalcode.org/project/jsonapi_node_preview/-/merge_requests/4.diff",
+                "sha256": "cb4051a1c809d67a58024e35805b9b5bd7dcc9c8d5e23ec9686f729dbc1fa665",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ]
+    }
+}
