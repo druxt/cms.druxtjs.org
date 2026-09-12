@@ -10,6 +10,8 @@
 </template>
 
 <script>
+import { allowedOptions, entityOptions, referenceId, referenceTypes } from '~/utils/form-widgets'
+
 export default {
   props: {
     relationship: { type: Boolean, default: false },
@@ -19,24 +21,13 @@ export default {
   data: () => ({ entities: [] }),
   async fetch() {
     // A reference lists what it can point at: each target bundle's entities.
-    const s = (this.schema || {}).settings || {}
-    const type = (s.storage || {}).target_type
-    const bundles = Object.keys(((s.config || {}).handler_settings || {}).target_bundles || {})
-    if (!type || !bundles.length) return
-    const collections = await Promise.all(bundles.map((bundle) => this.$store.dispatch('druxt/getCollection', { type: `${type}--${bundle}` })))
+    const collections = await Promise.all(referenceTypes(this.schema).map((type) => this.$store.dispatch('druxt/getCollection', { type })))
     this.entities = collections.flatMap((c) => (c || {}).data || [])
   },
   computed: {
     label: ({ schema }) => ((schema || {}).label || {}).text || '',
-    item: ({ value }) => (Array.isArray(value) ? value[0] : value),
-    current: ({ item }) => (item && typeof item === 'object' ? item.id : item) || '',
-    options: ({ schema, entities }) => {
-      if (entities.length) return entities.map((o) => ({ value: o.id, label: (o.attributes || {}).name || (o.attributes || {}).title || o.id, type: o.type }))
-      // allowed_values arrives as a list of { value, label } or a map of value to label.
-      const s = (schema || {}).settings || {}
-      const allowed = (s.storage || {}).allowed_values || (s.config || {}).allowed_values || []
-      return Array.isArray(allowed) ? allowed : Object.entries(allowed).map(([value, label]) => ({ value, label }))
-    },
+    current: ({ value }) => referenceId(value),
+    options: ({ schema, entities }) => (entities.length ? entityOptions(entities) : allowedOptions(schema)),
   },
   methods: {
     pick(value) {

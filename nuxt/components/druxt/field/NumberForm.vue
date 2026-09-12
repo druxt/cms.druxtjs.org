@@ -9,6 +9,8 @@
 </template>
 
 <script>
+import { numberRange, single } from '~/utils/form-widgets'
+
 export default {
   props: {
     schema: { type: Object, default: () => ({}) },
@@ -16,13 +18,8 @@ export default {
   },
   computed: {
     label: ({ schema }) => ((schema || {}).label || {}).text || '',
-    current: ({ value }) => Number(Array.isArray(value) ? value[0] : value) || 0,
-    range: ({ schema, current }) => {
-      const s = (schema || {}).settings || {}
-      const min = Math.min(Number(((s.config || {}).min ?? -10)), current)
-      const max = Math.max(Number(((s.config || {}).max ?? 10)), current)
-      return Array.from({ length: max - min + 1 }, (_, i) => min + i)
-    },
+    current: ({ value }) => Number(single(value)) || 0,
+    range: ({ schema, value }) => numberRange(schema, value),
   },
 }
 </script>
