@@ -10,7 +10,7 @@
 
     <!-- The module's own components, live, on its root page. -->
     <section v-if="pkg && inModuleHeader && liveComponents.length" class="mt-12">
-      <h2 class="text-xl font-semibold">Try it</h2>
+      <h2 id="try-it" class="text-xl font-semibold">Try it</h2>
       <DruxtExample :pkg="pkg" />
     </section>
 
@@ -55,7 +55,15 @@ export default {
     const { hero, body } = extractHero(document)
 
     store.commit('addRecent', { text: document.title, to: route.path })
-    store.commit('setToc', document.toc || [])
+    // The document's own headings, then the sections this page adds under them.
+    const [, , pkg] = route.path.split('/')
+    const added = pkg && isPackageRoot(route.path)
+      ? [
+          ...(liveComponentsOf(pkg).length ? [{ id: 'try-it', depth: 2, text: 'Try it' }] : []),
+          { id: 'api-reference', depth: 2, text: 'API reference' },
+        ]
+      : []
+    store.commit('setToc', [...(document.toc || []), ...added])
 
     return { document: { ...document, body }, hero, slug }
   },
