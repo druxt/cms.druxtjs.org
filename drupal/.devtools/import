@@ -19,6 +19,15 @@
  * what CI wants. Without it, DOCS_CHECKOUT can point the run at a working
  * tree, which is what a developer iterating on the importer wants.
  *
+ * --migrate writes the entities through the Migrate API instead of the
+ * drush command. Everything before the write is identical, so the two
+ * paths are comparable on the same inputs, which is what makes the
+ * migration acceptable as a replacement rather than merely working.
+ *
+ * --force seeds a site that already holds documentation this run did not
+ * create. It overwrites, so it is never what CI wants and rarely what a
+ * person wants.
+ *
  * DOCS_CHECKOUT points this at a local clone instead of the pinned commit,
  * for iterating on the documentation and the importer together. It is
  * never honoured under --check, because a check that can be pointed at an
@@ -38,7 +47,30 @@ require_once __DIR__ . '/helpers.php';
 // Variables.
 // -----------------------------------------------------------------------------
 
-$check = in_array('--check', array_slice($argv, 1), TRUE);
+$arguments = array_slice($argv, 1);
+$check = in_array('--check', $arguments, TRUE);
+$migrate = in_array('--migrate', $arguments, TRUE);
+$force = in_array('--force', $arguments, TRUE);
+$unknown = array_diff($arguments, ['--check', '--migrate', '--force']);
+if ($unknown !== []) {
+  FAIL('Unknown argument: %s.', implode(', ', $unknown));
+}
+
+/**
+ * The migrations, in the order their dependencies require.
+ */
+const MIGRATIONS = [
+  'docs_section',
+  'docs_file',
+  'docs_media',
+  'docs_paragraph_text',
+  'docs_paragraph_code',
+  'docs_paragraph_diagram',
+  'docs_paragraph_callout',
+  'docs_paragraph_image',
+  'docs_page',
+  'docs_alias',
+];
 $repo_root = dirname(getcwd());
 $pin_file = $repo_root . '/docs-source.json';
 $source_dir = $repo_root . '/.docs-source';
@@ -149,16 +181,102 @@ else {
 // The import.
 // -----------------------------------------------------------------------------
 
-TASK('Importing into the provisioned site.');
 if (!is_file('vendor/bin/drush')) {
   FAIL('vendor/bin/drush is missing. Run .devtools/assemble and .devtools/provision first.');
 }
-drush('druxt-docs:import %s', [$ir_dir]);
-PASS('Imported.');
+
+// The database is the source of truth, so seeding is not a thing to do
+// twice by accident. Migrate skips rows already in its map, so a plain
+// re-run leaves alone anything an editor has changed since. What it cannot
+// see is documentation the site got some other way, and writing over that
+// would be silent. Counted rather than assumed, and refused rather than
+// warned about.
+TASK('Checking the site holds no documentation this run did not create.');
+$expression = <<<'PHP'
+$db = \Drupal::database();
+$pages = (int) $db->select('node_field_data', 'n')->condition('n.type', 'doc_page')->countQuery()->execute()->fetchField();
+$seeded = 0;
+if ($db->schema()->tableExists('migrate_map_docs_page')) {
+  $seeded = (int) $db->select('migrate_map_docs_page', 'm')->isNotNull('m.destid1')->countQuery()->execute()->fetchField();
+}
+echo $pages - $seeded;
+PHP;
+$unaccounted = trim(drush('php:eval %s', [$expression]));
+if (!preg_match('/(-?\d+)\s*$/', $unaccounted, $matches)) {
+  FAIL('Could not count the documentation already on the site. Drush answered: %s', $unaccounted);
+}
+$unaccounted = (int) $matches[1];
+if ($unaccounted > 0 && !$force) {
+  FAIL('The site holds %d documentation page(s) this run did not create. Seeding over them would overwrite whoever wrote them. Roll the migrations back, or pass --force to overwrite deliberately.', $unaccounted);
+}
+if ($unaccounted > 0) {
+  NOTE('Overwriting %d documentation page(s) this run did not create, because --force was given.', $unaccounted);
+}
+else {
+  PASS('Nothing to overwrite.');
+}
+
+if ($migrate) {
+  TASK('Pointing the migrations at %s.', $ir_dir);
+  drush('state:set %s %s', ['druxt_docs.ir_directory', $ir_dir]);
+  PASS('Set.');
+
+  foreach (MIGRATIONS as $migration) {
+    TASK('Running %s.', $migration);
+    $output = drush('migrate:import %s', [$migration], $exit_code);
+    if ($exit_code !== 0 || preg_match('/\b([1-9]\d*) failed\b/', $output)) {
+      // Migrate reports a failed row and still exits zero, so the count is
+      // read as well as the status. A run that imports nothing also exits
+      // zero, which the page count below is what catches.
+      FAIL_NO_EXIT('%s did not import cleanly:', $migration);
+      echo trim($output) . PHP_EOL;
+      echo trim(drush('migrate:messages %s', [$migration], $ignored)) . PHP_EOL;
+      quit(1);
+    }
+    PASS('Done.');
+  }
+}
+else {
+  TASK('Importing into the provisioned site.');
+  drush('druxt-docs:import %s', [$ir_dir]);
+  PASS('Imported.');
+}
 
 // -----------------------------------------------------------------------------
 // What the site ends up holding.
 // -----------------------------------------------------------------------------
+
+// Migrate has no notion of a source row that disappears: it imports what
+// it finds and leaves behind what it made earlier. The importer's own
+// prune deleted any page not in the corpus, which was right when the
+// repository was authoritative and is wrong now, because it would also
+// delete a page an editor wrote. So this reports rather than deletes, and
+// removing a page from the corpus becomes a deliberate act.
+if ($migrate) {
+  TASK('Checking for pages the corpus no longer has.');
+  $sources = array_map(
+    static fn(string $file): string => (string) (json_decode((string) file_get_contents($file), TRUE)['source'] ?? ''),
+    $documents,
+  );
+  $sources_file = $ir_dir . '/.sources.json';
+  file_put_contents($sources_file, json_encode(array_values(array_filter($sources))));
+  $expression = sprintf(
+    '$k = array_flip(json_decode(file_get_contents(%s), TRUE)); $s = []; foreach (\Drupal::database()->select("migrate_map_docs_page", "m")->fields("m", ["sourceid1"])->isNotNull("m.destid1")->execute()->fetchCol() as $id) { if (!isset($k[$id])) { $s[] = $id; } } echo implode("|", $s);',
+    var_export($sources_file, TRUE),
+  );
+  $stale = trim(drush('php:eval %s', [$expression]));
+  unlink($sources_file);
+  if ($stale !== '') {
+    $names = explode('|', $stale);
+    FAIL_NO_EXIT('The site holds %d page(s) this migration created that the corpus no longer has:', count($names));
+    foreach ($names as $name) {
+      echo '  ' . $name . PHP_EOL;
+    }
+    NOTE('Roll the migrations back and seed again, so the removal is deliberate. Nothing is deleted here, because a page an editor wrote would look the same from a query.');
+    quit(1);
+  }
+  PASS('None.');
+}
 
 // A run that imports nothing exits 0 just as happily as one that imports
 // everything, so this counts the result rather than trusting the exit code.
@@ -179,6 +297,7 @@ echo '===============================' . PHP_EOL;
 echo '     📥 IMPORT COMPLETE  ✅   ' . PHP_EOL;
 echo '===============================' . PHP_EOL;
 echo PHP_EOL;
+echo 'Writer:    ' . ($migrate ? 'Migrate API' : 'druxt-docs:import') . PHP_EOL;
 echo 'Source:    ' . $checkout . PHP_EOL;
 echo 'Documents: ' . count($documents) . PHP_EOL;
 echo 'Pages:     ' . $imported . PHP_EOL;
