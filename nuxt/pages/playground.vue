@@ -17,8 +17,19 @@
 </template>
 
 <script>
+import { PLAYGROUND_DESCRIPTION } from '~/lib/site'
+import { seoHead } from '~/utils/seo'
+
 export default {
   name: 'PlaygroundPage',
-  head: () => ({ title: 'Live component playground' }),
+  head() {
+    return seoHead({
+      title: 'Live component playground',
+      description: PLAYGROUND_DESCRIPTION,
+      // The query string carries a card's state; the page is one page.
+      path: '/playground',
+      type: 'website',
+    })
+  },
 }
 </script>

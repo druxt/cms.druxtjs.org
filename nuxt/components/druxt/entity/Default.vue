@@ -14,9 +14,13 @@
  * them. Catches any entity, view or form, with no wrapper of its own.
  */
 export default {
+  // DruxtEntity's other props are not HTML attributes.
+  inheritAttrs: false,
   props: {
     entity: { type: Object, default: () => ({}) },
+    fields: { type: [Object, Boolean], default: () => ({}) },
     schema: { type: Object, default: () => ({}) },
+    value: { type: Object, default: undefined },
   },
   computed: {
     title: ({ entity }) => {
