@@ -60,6 +60,21 @@ for _ in 1 2 3 4 5 6 7 8 9 10; do
   sleep 0.2
 done
 
+# This checkout's server on another port, as a developer would have it
+# running. The pidfile path comes from the helper, not a copy of it.
+other="$(free_port)"
+(cd "$DRUPAL_DIR/web" && exec php -S "127.0.0.1:$other" -t . >/dev/null 2>&1) &
+running=$!
+pid_file="$(cd "$DRUPAL_DIR" && php -r 'require ".devtools/helpers.php"; echo DocsDevTools\server_pid_file($argv[1]);' -- "$other")"
+printf '%s\n' "$running" > "$pid_file"
+trap 'kill "$squatter" "$running" 2>/dev/null; rm -f "$pid_file"' EXIT
+for _ in 1 2 3 4 5 6 7 8 9 10; do
+  if python3 -c "import socket,sys; s=socket.socket(); sys.exit(0 if s.connect_ex(('127.0.0.1', $other)) == 0 else 1)"; then
+    break
+  fi
+  sleep 0.2
+done
+
 output="$(cd "$DRUPAL_DIR" && WEBSERVER_PORT="$port" timeout 60 "$START" 2>&1)"
 status=$?
 
@@ -100,7 +115,16 @@ else
   no "start killed a process it did not start"
 fi
 
-kill "$squatter" 2>/dev/null
+# A start on one port must not stop this checkout's server on another. A
+# pidfile shared by every port once made running this suite do exactly that.
+if kill -0 "$running" 2>/dev/null; then
+  ok "start left this checkout's server on another port running"
+else
+  no "start stopped this checkout's server on another port"
+fi
+
+kill "$squatter" "$running" 2>/dev/null
+rm -f "$pid_file"
 trap - EXIT
 
 # --------------------------------------------------------------------------
