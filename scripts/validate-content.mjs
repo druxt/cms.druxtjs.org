@@ -6,6 +6,14 @@
 //
 //   node scripts/validate-content.mjs [--root <repo>] [--content <dir>]
 //     [--files <dir>] [--ir <dir>] [--source <dir>] [--baseline <file>]
+//     [--corpus]
+//
+// --corpus runs only the three checks that compare the IR against the
+// pinned checkout and the baseline. They read no entity data, so they run
+// straight after the IR is built and before anything is imported. The
+// import asserts its page count against the IR document count, and both
+// sides come from the same build, so an IR that quietly produced fewer
+// documents would agree with itself. These are the checks that notice.
 //
 // Exits 1 when any check fails, naming the check and the page.
 
@@ -15,6 +23,10 @@ import path from 'node:path'
 import process from 'node:process'
 
 const CONTENT_ROOT = 'docs/nuxt/content'
+
+// Arguments that take no value. Declared here rather than beside
+// parseArgs, which runs while this module is still initialising.
+const FLAGS = new Set(['corpus'])
 
 const args = parseArgs(process.argv.slice(2))
 const root = path.resolve(args.root ?? '.')
@@ -39,17 +51,20 @@ main()
 function main () {
   // The files directory only exists once an export has written media, so its
   // absence is reported by the image checks rather than aborting the run.
-  for (const key of ['content', 'ir', 'source']) {
+  const required = args.corpus ? ['ir', 'source'] : ['content', 'ir', 'source']
+  for (const key of required) {
     if (!existsSync(dirs[key])) fail(`The ${key} directory does not exist: ${dirs[key]}`)
   }
   if (!existsSync(baselinePath)) fail(`The baseline does not exist: ${baselinePath}`)
 
   const baseline = readJson(baselinePath)
   const ir = loadIr(dirs.ir)
-  const tome = loadTome(dirs.content)
   const tracked = trackedPages(dirs.source)
 
   checkCorpus(baseline, ir, tracked)
+  if (args.corpus) return report()
+
+  const tome = loadTome(dirs.content)
   checkIndex(tome)
   const pages = checkPages(baseline, tome, tracked)
   checkSections(baseline, tome, pages)
@@ -57,6 +72,10 @@ function main () {
   checkBlocks(baseline, ir, tome, pages)
   checkImages(baseline, ir, tome, pages)
 
+  report()
+}
+
+function report () {
   const failed = results.filter((r) => !r.ok)
   console.log('')
   console.log(`${results.length - failed.length} of ${results.length} checks passed.`)
@@ -260,7 +279,8 @@ function checkImages (baseline, ir, tome, pages) {
       const image = (item.field_media_image ?? [])[0]
       const file = image && tome.byUuid.get(`file.${image.target_uuid}`)
       if (!file) { details.push(`${page.source} image ${i + 1}: file entity missing`); return }
-      const relative = value(file.uri).replace(/^public:\/\//, '')
+      // Tome exports public:// under a public/ directory of the files export.
+      const relative = value(file.uri).replace(/^public:\/\//, 'public/')
       if (!existsSync(path.join(dirs.files, relative))) details.push(`${page.source} image ${i + 1}: ${relative} not in ${dirs.files}`)
       const want = expected[i]
       if (!want) return
@@ -348,7 +368,12 @@ function parseArgs (argv) {
   const out = {}
   for (let i = 0; i < argv.length; i++) {
     const m = /^--([a-z]+)$/.exec(argv[i])
-    if (!m || argv[i + 1] === undefined) fail(`Unexpected argument: ${argv[i]}`)
+    if (!m) fail(`Unexpected argument: ${argv[i]}`)
+    if (FLAGS.has(m[1])) {
+      out[m[1]] = true
+      continue
+    }
+    if (argv[i + 1] === undefined) fail(`${argv[i]} needs a value.`)
     out[m[1]] = argv[++i]
   }
   return out
