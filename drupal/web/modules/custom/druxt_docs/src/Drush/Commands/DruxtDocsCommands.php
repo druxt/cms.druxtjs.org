@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\druxt_docs\Drush\Commands;
 
-use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\druxt_docs\Importer;
+use Drupal\druxt_docs\ImportException;
 use Drupal\druxt_docs\IntermediateRepresentation;
 use Drush\Attributes as CLI;
 use Drush\Commands\DrushCommands;
@@ -21,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 final class DruxtDocsCommands extends DrushCommands {
 
   public function __construct(
-    private readonly EntityTypeManagerInterface $entityTypeManager,
+    private readonly Importer $importer,
   ) {
     parent::__construct();
   }
@@ -31,7 +32,7 @@ final class DruxtDocsCommands extends DrushCommands {
    */
   public static function create(ContainerInterface $container): self {
     return new self(
-      $container->get('entity_type.manager'),
+      $container->get('druxt_docs.importer'),
     );
   }
 
@@ -72,8 +73,8 @@ final class DruxtDocsCommands extends DrushCommands {
   /**
    * Imports an intermediate representation directory into content.
    *
-   * Entity creation lands with the importer itself; this command exists now
-   * so the wiring, the service and the tests around it are in place first.
+   * The run is all or nothing: a document, block or image that cannot be
+   * imported stops it before anything is written.
    */
   #[CLI\Command(name: 'druxt-docs:import')]
   #[CLI\Argument(name: 'directory', description: 'Directory of intermediate representation documents.')]
@@ -85,17 +86,24 @@ final class DruxtDocsCommands extends DrushCommands {
       return self::EXIT_FAILURE;
     }
 
-    if (!$this->entityTypeManager->getDefinition('node', FALSE)) {
-      $this->logger()->error('The node entity type is not available.');
+    try {
+      $counts = $this->importer->import($documents, $directory);
+    }
+    catch (ImportException $exception) {
+      $this->logger()->error($exception->getMessage());
       return self::EXIT_FAILURE;
     }
 
-    $this->logger()->warning(sprintf(
-      'Read %d documents. Entity creation is not implemented yet, so nothing was written.',
+    $this->io()->writeln(sprintf(
+      '%d documents imported: %d entities created, %d updated, %d unchanged, %d deleted.',
       count($documents),
+      $counts['created'],
+      $counts['updated'],
+      $counts['unchanged'],
+      $counts['deleted'],
     ));
 
-    return self::EXIT_FAILURE;
+    return self::EXIT_SUCCESS;
   }
 
 }
