@@ -58,7 +58,7 @@
       </div>
 
       <!-- The instance: the only band on base-100. Capped and scrolling, so nothing lies over the output. -->
-      <div data-testid="preview" class="bg-base-100 border-t border-base-300 px-[18px] py-5 max-h-[380px] overflow-y-auto">
+      <div data-testid="preview" class="druxt-preview bg-base-100 border-t border-base-300 px-[18px] py-5 max-h-[380px] overflow-y-auto">
         <div v-if="error" class="text-sm">
           <p class="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-error">Backend not responding</p>
           <p class="mt-1 text-base-content/70">The {{ backends[backend].label }} did not answer. The controls keep their values, so nothing is lost.</p>

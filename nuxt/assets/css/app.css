@@ -664,3 +664,10 @@ html {
   text-transform: uppercase;
   color: hsl(var(--bc) / 0.55);
 }
+
+/* Live example, preview: a rendered page's code blocks scroll in place, as
+   they do in the prose, instead of past the card. */
+.druxt-preview pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
