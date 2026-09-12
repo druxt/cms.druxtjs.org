@@ -164,10 +164,12 @@ export default {
     proxy: { api: true, files: true },
     // The section pages resolve paths themselves; no catch-all route.
     router: { wildcard: false },
-    menu: { jsonApiMenuItems: true },
+    // Menus ask for the fields a menu needs, not every attribute of a link.
+    menu: { jsonApiMenuItems: true, query: { requiredOnly: true } },
     // No deprecated default field components: fields render through
-    // DruxtField's item slots and this site's own wrappers.
-    entity: { components: { fields: false } },
+    // DruxtField's item slots and this site's own wrappers. Each entity is
+    // asked for the fields its display renders, from the generated schema.
+    entity: { components: { fields: false }, query: { schema: true } },
     // Display schemas, view and form, for what this site renders. Generated
     // from Drupal's display configuration when the app builds.
     schema: {
