@@ -5,8 +5,9 @@ How druxtjs.org runs on [Lagoon](https://docs.lagoon.sh). The
 
 ## Status
 
-Ready for a first deployment to a development environment. The live site
-still runs from the druxt.js repository until the cutover.
+Deployed to a development environment from `feature/lagoon`. The live site
+still runs from the druxt.js repository until the cutover; the checklist at
+the end is what the cutover needs.
 
 ## Services
 
@@ -125,12 +126,31 @@ Lagoon, and `sqlite` for local sites and CI. Drupal refuses to uninstall the
 module that provides the database it runs on, so a configuration without
 the driver fails to install on that database.
 
+## Going to production
+
+What the cutover from the druxt.js build needs, in order.
+
+1. Point the production route at this project's `nuxt` service, with the
+   package subdomains (`blocks.druxtjs.org` and the others) as routes on
+   the same service; the server answers each with a redirect to
+   `druxtjs.org`.
+2. Set `LAGOON_ENVIRONMENT_TYPE=production` on that environment: it turns on
+   the GA4 tag and turns off the `noindex` header previews send.
+3. Confirm the Drupal environment variables the settings file reads, and that
+   the site mail address is one the domain's SPF record allows to send.
+4. After the first deployment, check `sitemap.xml`, `robots.txt`,
+   `llms.txt` and `llms-full.txt`, and that an old path such as
+   `/guide/getting-started` and a legacy reference path such as
+   `/api/components/DruxtEntity.html` redirect.
+5. Watch the first deployment's rollout: every restart serves errors for
+   about a minute, then the starting page, until the app has built.
+
 ## Not done yet
 
 - The app builds each time the `nuxt` container starts, which takes a few
   minutes behind the starting page. A deployment shows it for that long, and
-  so does a development environment waking from idle.
-- The redirects for the package subdomains are still served from the
-  druxt.js repository.
+  so does a development environment waking from idle. A prebuilt image would
+  close it.
+- A 404 is never stored, so a crawl of missing URLs renders each one live.
 - `docker-compose.yml` is written for Lagoon, and has not been run with
   `docker compose` yet.

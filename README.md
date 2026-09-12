@@ -121,6 +121,7 @@ local.
 | Layout                     | druxt-layout-paragraphs renders the page's layout sections.                                                                                                                                                                                                                                                                        |
 | Header, sidebar and footer | druxt-blocks renders the blocks placed in the `druxtjs` theme's regions in Drupal. The theme and the site's name and logo come from the `druxtjs_org` consumer's decoupled settings, read at build by `nuxt/modules/decoupled-settings`.                                                                                           |
 | UI                         | `nuxt/components/dui/` holds presentational components with no Drupal dependency: code blocks, diagrams, rich text and columns. They will move to the shared Druxt UI library.                                                                                                                                                     |
+| Playground                 | `nuxt/components/global/DruxtExample.vue` renders any Druxt component under a runtime of its own for the chosen backend (`nuxt/utils/druxt-runtime.js`), with what it knows about each component in `nuxt/utils/live-examples.js`. The same card sits on the module and component reference pages.                                 |
 
 To change how something looks, find the wrapper name Druxt looked for (the Vue devtools show it), and add a component at the matching path under `nuxt/components/druxt/`. [Component resolution](https://druxtjs.org/explanation/component-resolution) explains the naming.
 
@@ -143,7 +144,7 @@ covers what a deployment does.
 | `npm run docs:generate`  | Build the Modules, API reference and Components pages |
 | `npm run lint`           | Every linter except prose                             |
 | `npm run lint:prose`     | Vale, after `npm run lint:prose:install` once         |
-| `npm test`               | Node tests for the importer's scripts                 |
+| `npm test`               | Node tests for the scripts and the frontend's modules |
 
 ## Contributing
 
