@@ -9,7 +9,7 @@
 const fs = require('fs')
 const http = require('http')
 const path = require('path')
-const { spawn } = require('child_process')
+const { execFileSync, spawn } = require('child_process')
 const { serviceRoute, waitForBackend } = require('./backend')
 const { createHandler, createPageCache, crawl } = require('./page-cache')
 const { createStartingHandler } = require('./starting')
@@ -65,6 +65,24 @@ const main = async () => {
     log(`wrote sitemap.xml and llms.txt for ${docs.length} documents`)
   } catch (error) {
     log(`sitemap.xml and llms.txt not written: ${error.message}`)
+  }
+
+  // The share cards, as `nuxt generate` writes them. A child process, because
+  // satori and resvg crash when required through a patched module loader.
+  try {
+    const cards = execFileSync(
+      process.execPath,
+      [
+        path.join(rootDir, 'scripts', 'og-render.js'),
+        path.join(rootDir, 'content'),
+        path.join(rootDir, 'assets', 'fonts'),
+        path.join(rootDir, 'static', 'og'),
+      ],
+      { encoding: 'utf8' },
+    )
+    log(`rendered ${cards.trim()} share cards`)
+  } catch (error) {
+    log(`share cards not rendered: ${error.message}`)
   }
 
   const started = Date.now()
