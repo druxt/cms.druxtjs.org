@@ -40,8 +40,21 @@ describe('SOURCES', () => {
           { attributes: { title: 'Borscht', path: { alias: '/recipes/borscht' } } },
           { attributes: { title: 'No alias', path: {} } },
         ])
-      if (url.includes('/configurable_language/'))
-        return { ok: false, status: 404, json: async () => ({}) }
+      // The index names the resources a backend has; only Umami has languages.
+      if (url === '/jsonapi')
+        return { ok: true, json: async () => ({ links: { 'node--doc_page': {} } }) }
+      if (url === '/umami/jsonapi')
+        return {
+          ok: true,
+          json: async () => ({ links: { 'configurable_language--configurable_language': {} } }),
+        }
+      if (url.includes('/configurable_language/')) {
+        return jsonapi([
+          { attributes: { drupal_internal__id: 'en', label: 'English', locked: false } },
+          { attributes: { drupal_internal__id: 'es', label: 'Spanish', locked: false } },
+          { attributes: { drupal_internal__id: 'und', label: 'Not specified', locked: true } },
+        ])
+      }
       if (url.includes('/menu/menu'))
         return jsonapi([{ attributes: { drupal_internal__id: 'main', label: 'Main navigation' } }])
       throw new Error('unexpected ' + url)
@@ -66,8 +79,16 @@ describe('SOURCES', () => {
     assert.match(calls[0], /^\/umami\/jsonapi\/node\/recipe\?/)
   })
 
-  test('languages offers nothing on a backend that exposes none', async () => {
+  test('languages offers nothing on a backend whose index has none, without asking for it', async () => {
     assert.deepEqual(await m.SOURCES.languages('/jsonapi'), [])
+    assert.deepEqual(calls, ['/jsonapi'])
+  })
+
+  test('languages lists the unlocked ones on a backend that has them', async () => {
+    assert.deepEqual(
+      (await m.SOURCES.languages('/umami/jsonapi')).map((o) => o.value),
+      ['en', 'es']
+    )
   })
 
   test('menus are labelled the way the Storybook stories name them', async () => {
