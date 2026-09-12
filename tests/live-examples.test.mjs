@@ -246,3 +246,81 @@ describe('pages', () => {
     assert.equal(m.knowsComponent('DruxtEntityMixin'), false)
   })
 })
+
+describe("a reader's own Drupal", () => {
+  test('parseOrigin keeps an origin, adds https, and refuses what a https page cannot fetch', () => {
+    assert.deepEqual(m.parseOrigin('https://example.com/some/path'), {
+      origin: 'https://example.com',
+    })
+    assert.deepEqual(m.parseOrigin('example.com'), { origin: 'https://example.com' })
+    assert.deepEqual(m.parseOrigin('http://example.com', 'http:'), { origin: 'http://example.com' })
+    assert.match(m.parseOrigin('http://example.com').error, /https/)
+    assert.match(m.parseOrigin('not a url at all ://').error, /not a URL/)
+  })
+
+  test('customBackend talks to the origin directly, with no proxy', () => {
+    const b = m.customBackend('https://drupal.example')
+    assert.equal(b.api, 'https://drupal.example/jsonapi')
+    assert.equal(b.proxyRoot, 'https://drupal.example')
+    assert.equal(b.baseUrl, 'https://drupal.example')
+    assert.equal(b.label, 'drupal.example')
+  })
+
+  // A Drupal with JSON:API, blocks, menus and views, but neither Decoupled
+  // Router nor JSON:API Views, and menu items answering.
+  const drupal = (url) => {
+    const ok = (body) => ({ ok: true, status: 200, json: async () => body })
+    if (url === 'https://drupal.example/jsonapi')
+      return ok({
+        links: { 'node--article': {}, 'block--block': {}, 'menu--menu': {}, 'view--view': {} },
+      })
+    if (url.startsWith('https://drupal.example/router/translate-path')) return { status: 404 }
+    if (url.startsWith('https://drupal.example/jsonapi/menu/menu'))
+      return ok({ data: [{ attributes: { drupal_internal__id: 'footer' } }] })
+    if (url === 'https://drupal.example/jsonapi/menu_items/footer') return { status: 400 }
+    if (url.startsWith('https://drupal.example/jsonapi/view/view'))
+      return ok({
+        data: [{ attributes: { drupal_internal__id: 'content', display: { page_1: {} } } }],
+      })
+    if (url === 'https://drupal.example/jsonapi/views/content/page_1') return { status: 404 }
+    throw new Error('unexpected ' + url)
+  }
+
+  test('probeBackend asks for what the index cannot say, and names what each missing module costs', async () => {
+    const calls = []
+    globalThis.fetch = async (url) => {
+      calls.push(url)
+      return drupal(url)
+    }
+    try {
+      const { backend } = await m.probeBackend('https://drupal.example')
+      assert.equal(backend.nodeBundle, 'article')
+      assert.equal(backend.reasons.DruxtBlock, undefined)
+      assert.equal(backend.reasons.DruxtMenu, undefined)
+      assert.match(backend.reasons.DruxtRouter, /Decoupled Router/)
+      assert.match(backend.reasons.DruxtSite, /Decoupled Router/)
+      assert.match(backend.reasons.DruxtView, /JSON:API Views/)
+      assert.ok(calls.includes('https://drupal.example/jsonapi/menu_items/footer'))
+      assert.ok(calls.includes('https://drupal.example/jsonapi/views/content/page_1'))
+    } finally {
+      delete globalThis.fetch
+    }
+  })
+
+  test('probeBackend tells CORS from a missing JSON:API', async () => {
+    globalThis.fetch = async () => {
+      throw new TypeError('Failed to fetch')
+    }
+    try {
+      await assert.rejects(m.probeBackend('https://drupal.example'), /allow this origin/)
+    } finally {
+      delete globalThis.fetch
+    }
+    globalThis.fetch = async () => ({ ok: false, status: 404, json: async () => ({}) })
+    try {
+      await assert.rejects(m.probeBackend('https://drupal.example'), /No JSON:API answered/)
+    } finally {
+      delete globalThis.fetch
+    }
+  })
+})
