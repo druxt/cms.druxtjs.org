@@ -76,7 +76,7 @@ $db_file_php = var_export($db_file, TRUE);
 // A throwaway site needs no secret salt, only a present one.
 $hash_salt_php = var_export(hash('sha256', $db_file), TRUE);
 file_put_contents('web/sites/default/settings.local.php', sprintf(
-  "<?php\n\n/**\n * @file\n * Provision-only override, written fresh each run by .devtools/provision.\n * Gitignored - never committed.\n */\n\n\$databases['default']['default'] = [\n  'driver' => 'sqlite',\n  'database' => %s,\n];\n\n\$settings['hash_salt'] = %s;\n\$settings['config_sync_directory'] = '../config/sync';\n",
+  "<?php\n\n/**\n * @file\n * Provision-only override, written fresh each run by .devtools/provision.\n * Gitignored - never committed.\n */\n\n\$databases['default']['default'] = [\n  'driver' => 'sqlite',\n  'database' => %s,\n];\n\n\$settings['hash_salt'] = %s;\n\$settings['config_sync_directory'] = '../config/sync';\n\n// A local tunnel reaches the built-in server over loopback; trusting it\n// keeps generated links on the tunnel's https scheme and host.\n\$settings['reverse_proxy'] = TRUE;\n\$settings['reverse_proxy_addresses'] = ['127.0.0.1', '::1'];\n\n// The admin names the environment, so a local site is never taken for the\n// live one.\n\$config['environment_indicator.indicator'] = ['name' => 'Local', 'fg_color' => '#ffffff', 'bg_color' => '#108775'];\n\n// Anonymous visitors to the root or a page go to that path on the frontend.\n\$settings['druxt_docs_frontend_url'] = 'https://druxtjs.org';\n\n// Drupal 12's default, set here so forms are tested without the browser's\n// own validation before the upgrade makes it so.\n\$settings['enable_html5_validation'] = FALSE;\n\n// The hosts a local site answers to: loopback, and a quick tunnel.\n\$settings['trusted_host_patterns'] = ['^127\\.0\\.0\\.1\$', '^localhost\$', '\\.trycloudflare\\.com\$'];\n",
   $db_file_php,
   $hash_salt_php
 ));
@@ -132,6 +132,14 @@ else {
 TASK('Rebuilding caches.');
 drush('cache:rebuild');
 PASS('Caches rebuilt.');
+
+// OAuth keys live outside the web root and are never committed, so each
+// site makes its own; a hosted environment keeps its keys between deploys.
+if ($has_config && str_contains((string) file_get_contents('config/sync/core.extension.yml'), "\n  simple_oauth: ")) {
+  TASK('Generating OAuth keys in ../keys if there are none.');
+  drush('php:eval %s', ['$dir = DRUPAL_ROOT . "/../keys"; if (!is_file("$dir/private.key")) { @mkdir($dir, 0700, TRUE); \Drupal::service("simple_oauth.key.generator")->generateKeys($dir); }']);
+  PASS('OAuth keys in place.');
+}
 
 echo PHP_EOL;
 echo '===============================' . PHP_EOL;
