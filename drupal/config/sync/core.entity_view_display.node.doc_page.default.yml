@@ -1,0 +1,33 @@
+uuid: d7052a70-6faa-4f91-b32a-79396b0582c4
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.doc_page.field_content
+    - field.field.node.doc_page.field_description
+    - field.field.node.doc_page.field_is_landing
+    - field.field.node.doc_page.field_section
+    - field.field.node.doc_page.field_source_path
+    - field.field.node.doc_page.field_toc
+    - field.field.node.doc_page.field_weight
+    - node.type.doc_page
+  module:
+    - user
+id: node.doc_page.default
+targetEntityType: node
+bundle: doc_page
+mode: default
+content:
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  field_content: true
+  field_description: true
+  field_is_landing: true
+  field_section: true
+  field_source_path: true
+  field_toc: true
+  field_weight: true
