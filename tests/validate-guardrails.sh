@@ -148,7 +148,7 @@ entities[`media.${uuid(91)}`] = {
   bundle: [{ target_id: 'image', target_type: 'media_type' }],
   field_media_image: [{ alt: 'A diagram', target_type: 'file', target_uuid: uuid(90) }],
 }
-write('files/proxy.png', 'not really a png')
+write('files/public/proxy.png', 'not really a png')
 
 const proxyParagraphs = [
   paragraph(10, 'docs_text', { field_text: [{ value: 'Proxy requests through Nuxt.', format: 'markdown' }] }),
@@ -200,6 +200,15 @@ const fs = require("fs"); const f = process.argv[1]
 const baseline = JSON.parse(fs.readFileSync(f)); baseline.ref = process.argv[2]
 fs.writeFileSync(f, JSON.stringify(baseline, null, 2) + "\n")' "$dir/baseline.json" "$(git -C "$dir/source" rev-parse HEAD)"
   printf '%s' "$dir"
+}
+
+# The corpus half of the gate: the three checks that compare the IR against
+# the checkout and the baseline, with no entity data involved. Run on their
+# own before an import, so they can catch a build that produced fewer
+# documents than the corpus has pages.
+run_corpus() {
+  local dir="$1"
+  timeout 60 node "$VALIDATE" --corpus --root "$dir" --ir ir --source source --baseline baseline.json 2>&1
 }
 
 run_validate() {
@@ -314,7 +323,7 @@ output="$(run_validate "$dir")"
 assert_fail "image alt text differs" "$output" $? 'alt "A picture" != "A diagram"'
 
 dir="$(fixture)"
-rm "$dir/files/proxy.png"
+rm "$dir/files/public/proxy.png"
 output="$(run_validate "$dir")"
 assert_fail "image file missing from the files directory" "$output" $? "proxy.png not in"
 
@@ -325,6 +334,33 @@ const node = JSON.parse(fs.readFileSync(f)); node.field_is_landing = [{ value: f
 fs.writeFileSync(f, JSON.stringify(node))' "$dir"/content/node.*000000000031.json
 output="$(run_validate "$dir")"
 assert_fail "landing page not flagged" "$output" $? "tutorials/README.md: is a landing page"
+
+# --------------------------------------------------------------------------
+# The corpus checks, which run before anything is imported. The import
+# asserts its page count against the IR document count, and both come from
+# the same build, so these are what notices a build that lost a page.
+# --------------------------------------------------------------------------
+
+dir="$(fixture)"
+output="$(run_corpus "$dir")"
+assert_pass "corpus matches the checkout" "$output" $?
+
+dir="$(fixture)"
+rm "$dir"/ir/*.json
+output="$(run_corpus "$dir")"
+assert_fail "corpus with no documents" "$output" $? "0 IR documents for 2 tracked pages"
+
+dir="$(fixture)"
+rm "$(ls "$dir"/ir/*.json | head -1)"
+output="$(run_corpus "$dir")"
+assert_fail "corpus one document short" "$output" $? "1 IR documents for 2 tracked pages"
+
+# The corpus checks must not need the content directory, or they cannot run
+# before the import.
+dir="$(fixture)"
+rm -rf "$dir/content" "$dir/files"
+output="$(run_corpus "$dir")"
+assert_pass "corpus checks without a content directory" "$output" $?
 
 printf '\n%d passed, %d failed\n' "$pass" "$fail"
 [ "$fail" -eq 0 ]
