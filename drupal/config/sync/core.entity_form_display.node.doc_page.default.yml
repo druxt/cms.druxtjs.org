@@ -13,7 +13,7 @@ dependencies:
     - node.type.doc_page
   module:
     - field_group
-    - paragraphs
+    - layout_paragraphs
     - path
 third_party_settings:
   field_group:
@@ -47,22 +47,16 @@ content:
     settings: {  }
     third_party_settings: {  }
   field_content:
-    type: paragraphs
+    type: layout_paragraphs
     weight: 5
     region: content
     settings:
-      title: Block
-      title_plural: Blocks
-      edit_mode: closed
-      closed_mode: summary
-      autocollapse: none
-      closed_mode_threshold: 0
-      add_mode: modal
+      view_mode: default
+      preview_view_mode: preview
       form_display_mode: default
-      default_paragraph_type: _none
-      features:
-        collapse_edit_all: collapse_edit_all
-        duplicate: duplicate
+      nesting_depth: 0
+      require_layouts: 1
+      empty_message: 'Add a section and choose its layout, then add blocks to its regions.'
     third_party_settings: {  }
   field_description:
     type: string_textarea
@@ -71,7 +65,11 @@ content:
     settings:
       rows: 3
       placeholder: ''
-    third_party_settings: {  }
+    third_party_settings:
+      maxlength:
+        maxlength_js: 160
+        maxlength_js_label: 'Shown as the page summary and in search results: <strong>@remaining</strong> of @limit characters left.'
+        maxlength_js_enforce: false
   field_is_landing:
     type: boolean_checkbox
     weight: 4

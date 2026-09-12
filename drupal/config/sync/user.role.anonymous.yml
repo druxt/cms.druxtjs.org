@@ -3,6 +3,7 @@ langcode: en
 status: true
 dependencies:
   module:
+    - decoupled_settings
     - druxt
     - media
     - system
@@ -15,4 +16,5 @@ is_admin: false
 permissions:
   - 'access content'
   - 'access druxt resources'
+  - 'read decoupled settings'
   - 'view media'
