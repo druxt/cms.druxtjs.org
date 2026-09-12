@@ -3,6 +3,7 @@ label: 'Documentation pages'
 migration_group: druxt_docs
 migration_dependencies:
   required:
+    - docs_user
     - docs_section
     - docs_paragraph_text
     - docs_paragraph_code
@@ -11,6 +12,8 @@ migration_dependencies:
     - docs_paragraph_image
 source:
   plugin: docs_document
+  constants:
+    author: stuart-clark
 process:
   uuid:
     plugin: docs_identity
@@ -24,8 +27,10 @@ process:
     plugin: default_value
     default_value: 1
   uid:
-    plugin: default_value
-    default_value: 0
+    plugin: migration_lookup
+    migration: docs_user
+    source: constants/author
+    no_stub: true
   field_description: description
   field_weight: weight
   field_source_path: source
