@@ -253,11 +253,13 @@ export default {
       const { readContent } = require('./lib/content-index')
       const { buildLlmsTxt } = require('./lib/llms-txt')
       const { buildSitemap } = require('./lib/sitemap')
+      const { buildLlmsFullTxt } = require('./lib/llms-full-txt')
 
       const { srcDir, generate } = generator.nuxt.options
       const docs = readContent(path.join(srcDir, 'content'))
 
       await fs.promises.writeFile(path.join(generate.dir, 'llms.txt'), buildLlmsTxt(docs))
+      await fs.promises.writeFile(path.join(generate.dir, 'llms-full.txt'), buildLlmsFullTxt(docs))
       await fs.promises.writeFile(path.join(generate.dir, 'sitemap.xml'), buildSitemap(docs))
 
       // A child process, not a require: satori and resvg crash under the esm
@@ -269,7 +271,7 @@ export default {
         path.join(generate.dir, 'og'),
       ], { stdio: ['ignore', 'pipe', 'inherit'] }).toString().trim()
 
-      console.log('SEO: wrote llms.txt, sitemap.xml and ' + cards + ' share cards for ' + docs.length + ' documents')
+      console.log('SEO: wrote llms.txt, llms-full.txt, sitemap.xml and ' + cards + ' share cards for ' + docs.length + ' documents')
     },
   },
 
