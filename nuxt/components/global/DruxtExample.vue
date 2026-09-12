@@ -387,10 +387,13 @@ export default {
   created() {
     // A Vue instance, kept off the reactive data.
     this.sandbox = null
+    // What a shared playground URL asks for, applied on the first fill and then dropped.
+    this.initial = {}
   },
 
   mounted() {
     this.enhanceMarkup()
+    if (this.placement === 'playground') this.readUrl()
     if (this.name) {
       this.reset()
       this.track('example_component')
@@ -407,6 +410,25 @@ export default {
 
   methods: {
     pageFor,
+
+    /**
+     * The playground's state in its URL, so a card can be shared: the
+     * component and backend, every value chosen, and the wrapper when off.
+     */
+    readUrl() {
+      const { component, backend, wrapper, ...rest } = this.$route.query || {}
+      if (component && COMPONENTS[component]) this.name = component
+      if (backend && BACKENDS[backend]) this.backend = backend
+      this.initial = { ...rest, ...(wrapper === 'false' ? { wrapper: false } : {}) }
+    },
+
+    writeUrl() {
+      if (this.placement !== 'playground' || !this.name) return
+      const query = { component: this.name, backend: this.backend }
+      for (const [key, value] of Object.entries(this.values)) if (value !== undefined && value !== '' && key !== 'wrapper') query[key] = String(value)
+      if (!this.wrapper) query.wrapper = 'false'
+      if (JSON.stringify(query) !== JSON.stringify(this.$route.query)) this.$router.replace({ query }).catch(() => {})
+    },
 
     /** The docs' copy button on the markup line, once its code block exists. */
     enhanceMarkup() {
@@ -523,6 +545,7 @@ export default {
 
     /** What a select prefers on its own: `prefer` (a value, or a function of the card), else its documented default. */
     preferred(prop) {
+      if (this.initial[prop.name] !== undefined) return this.initial[prop.name]
       const want = prop.prefer !== undefined ? prop.prefer : prop.default
       return typeof want === 'function' ? want(this) : want
     },
@@ -565,6 +588,12 @@ export default {
           if (preferred) this.$set(this.values, prop.name, preferred.value)
         }
       }
+      // The rest of a shared URL: plain props, the shared rows, the wrapper.
+      for (const [key, value] of Object.entries(this.initial)) {
+        if (key === 'wrapper') this.wrapper = value !== false
+        else if (this.values[key] === undefined && this.rows.some((r) => r.name === key)) this.$set(this.values, key, value)
+      }
+      this.initial = {}
       this.rerender()
     },
 
@@ -657,6 +686,7 @@ export default {
         })
         this.sandbox.$mount(el)
         this.readResolution(key)
+        this.writeUrl()
       } catch (e) {
         this.error = e.message
       }
