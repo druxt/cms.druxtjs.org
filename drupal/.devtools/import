@@ -301,6 +301,47 @@ if ($imported !== count($documents)) {
 }
 PASS('%d documentation pages.', $imported);
 
+// field_toc is computed from a page's paragraphs whenever it is read, and
+// build-ir.mjs computes the same headings from the markdown. They are two
+// implementations of one rule, so a page they disagree about stops the run,
+// the way a drifted stylesheet does above.
+TASK('Checking every page\'s computed table of contents against the IR.');
+$toc_file = $ir_dir . '/.toc.json';
+$expression = sprintf(
+  '$t = []; foreach (\Drupal::entityTypeManager()->getStorage("node")->loadByProperties(["type" => "doc_page"]) as $n) { $t[$n->get("field_source_path")->value] = $n->get("field_toc")->getValue(); } file_put_contents(%s, json_encode($t));',
+  var_export($toc_file, TRUE),
+);
+drush('php:eval %s', [$expression]);
+$computed = json_decode((string) @file_get_contents($toc_file), TRUE);
+@unlink($toc_file);
+if (!is_array($computed)) {
+  FAIL('Could not read the computed tables of contents back from the site.');
+}
+$show = static fn(?array $entry): string => $entry === NULL ? 'nothing' : (string) json_encode($entry, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+$drifted = [];
+$entries = 0;
+foreach ($documents as $file) {
+  $document = json_decode((string) file_get_contents($file), TRUE);
+  $expected = $document['toc'] ?? [];
+  $actual = $computed[$document['source']] ?? [];
+  $entries += count($expected);
+  for ($i = 0; $i < max(count($expected), count($actual)); $i++) {
+    if (($expected[$i] ?? NULL) !== ($actual[$i] ?? NULL)) {
+      $drifted[] = sprintf('%s, entry %d: the IR has %s, the site computes %s', $document['source'], $i + 1, $show($expected[$i] ?? NULL), $show($actual[$i] ?? NULL));
+      break;
+    }
+  }
+}
+if ($drifted !== []) {
+  FAIL_NO_EXIT('The site computes a different table of contents from the IR on %d page(s):', count($drifted));
+  foreach ($drifted as $line) {
+    echo '  ' . $line . PHP_EOL;
+  }
+  NOTE('TableOfContents in druxt_docs and buildToc() in scripts/build-ir.mjs have to change together. On a site an editor has worked in, their edits show here too.');
+  quit(1);
+}
+PASS('%d pages, %d entries, all as the IR has them.', count($documents), $entries);
+
 echo PHP_EOL;
 echo '===============================' . PHP_EOL;
 echo '     📥 IMPORT COMPLETE  ✅   ' . PHP_EOL;
