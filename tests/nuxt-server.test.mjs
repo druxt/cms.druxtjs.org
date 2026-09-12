@@ -229,6 +229,30 @@ describe('createHandler', () => {
     })
   })
 
+  test('bypasses the store for live=1 only, not for any query string', async () => {
+    const dir = tempDir()
+    try {
+      const cache = createPageCache({
+        dir,
+        ttl: 60000,
+        render: async () => ({ html: '<p>stored</p>' }),
+      })
+      await cache.store('/page')
+      await withServer(createHandler({ cache, live: live() }), async (base) => {
+        const tagged = await request(`${base}/page?utm_source=test`)
+        assert.equal(tagged.headers['x-docs-cache'], 'HIT')
+        assert.equal(tagged.body, '<p>stored</p>')
+        const fresh = await request(`${base}/page?live=1`)
+        assert.equal(fresh.headers['x-docs-cache'], undefined)
+        assert.equal(fresh.body, 'live')
+        const both = await request(`${base}/page?a=1&live=1`)
+        assert.equal(both.body, 'live')
+      })
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
   test('renders a missing page live, then serves it stored', async () => {
     const dir = tempDir()
     try {
@@ -333,21 +357,6 @@ describe('createHandler', () => {
         assert.equal(res.headers['x-docs-cache'], 'STALE')
         assert.equal(res.body, 'render 1')
         assert.ok(await until(() => renders === 2))
-      })
-    } finally {
-      rmSync(dir, { recursive: true, force: true })
-    }
-  })
-
-  test('renders a page with a query string live', async () => {
-    const dir = tempDir()
-    try {
-      const cache = createPageCache({ dir, ttl: 60000, render: async () => ({ html: 'stored' }) })
-      await cache.store('/page')
-      await withServer(createHandler({ cache, live: live() }), async (base) => {
-        const res = await request(`${base}/page?preview=1`)
-        assert.equal(res.body, 'live')
-        assert.equal(res.headers['x-docs-cache'], undefined)
       })
     } finally {
       rmSync(dir, { recursive: true, force: true })
