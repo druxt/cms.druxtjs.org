@@ -98,6 +98,34 @@ describe('COMPONENTS', () => {
   })
 })
 
+describe('pickOption', () => {
+  const list = [{ value: 'a', label: 'Alpha (a)' }, { value: 'b', label: 'Bravo (b)' }]
+  test('takes the value asked for, or the first', () => {
+    assert.equal(m.pickOption(list, 'b'), 'b')
+    assert.equal(m.pickOption(list, 'zzz'), 'a')
+    assert.equal(m.pickOption(list), 'a')
+    assert.equal(m.pickOption([], 'a'), undefined)
+  })
+  test('takes the option whose label matches a pattern', () => {
+    assert.equal(m.pickOption(list, /Bravo/), 'b')
+    assert.equal(m.pickOption(list, /nothing/), 'a')
+  })
+})
+
+describe('demo defaults', () => {
+  const step = (name, key) => name.chain.steps.find((s) => s.name === key)
+  test('each backend prefers what demos best', () => {
+    const block = m.COMPONENTS.DruxtBlock.props.find((p) => p.name === 'uuid')
+    assert.equal(m.pickOption([{ value: '1', label: 'umami_branding' }, { value: '2', label: 'umami_banner_recipes' }], block.prefer({ backend: 'umami' })), '2')
+    assert.equal(m.pickOption([{ value: '1', label: 'druxtjs_branding' }, { value: '2', label: 'druxtjs_docs_menu' }], block.prefer({ backend: 'site' })), '1')
+    assert.equal(step(m.COMPONENTS.DruxtBlockRegion, 'name').prefer({ backend: 'umami' }), 'banner_top')
+    assert.equal(step(m.COMPONENTS.DruxtEntity, 'bundle').prefer({ backend: 'umami' }), 'recipe')
+    assert.equal(m.pickOption([{ value: 'x', label: 'Borscht (x)' }, { value: 'y', label: 'Deep mediterranean quiche (y)' }], step(m.COMPONENTS.DruxtEntity, 'uuid').prefer({ backend: 'umami' })), 'y')
+    const path = m.COMPONENTS.DruxtRouter.props.find((p) => p.name === 'path')
+    assert.equal(m.pickOption([{ value: '/a', label: 'A (/tutorials/authentication)' }, { value: '/g', label: 'G (/tutorials/getting-started)' }], path.prefer({ backend: 'site' })), '/g')
+  })
+})
+
 describe('pages', () => {
   test('a module page lists the package components that render on their own', () => {
     assert.deepEqual(m.liveComponentsOf('blocks'), ['DruxtBlock', 'DruxtBlockRegion'])
