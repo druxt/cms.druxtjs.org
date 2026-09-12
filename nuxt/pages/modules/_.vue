@@ -8,6 +8,12 @@
 
     <AppProse v-if="document" :document="document" />
 
+    <!-- The module's own components, live, on its root page. -->
+    <section v-if="pkg && inModuleHeader && liveComponents.length" class="mt-12">
+      <h2 class="text-xl font-semibold">Try it</h2>
+      <DruxtExample :pkg="pkg" />
+    </section>
+
     <AppApiIndex v-if="pkg" :pkg="pkg" class="mt-12" />
 
     <AppDocFooter :edit-path="editPath" />
@@ -17,6 +23,7 @@
 <script>
 import { seoHead } from '~/utils/seo'
 import { documentDescription, extractHero } from '~/utils/content'
+import { liveComponentsOf } from '~/utils/live-examples'
 import { isPackageRoot } from '~/components/app/icon/module'
 
 export default {
@@ -66,6 +73,9 @@ export default {
 
     /** Whether the layout header above already names this page. */
     inModuleHeader: ({ $route }) => isPackageRoot($route.path),
+
+    /** The package's components that render on their own. */
+    liveComponents: ({ pkg }) => liveComponentsOf(pkg),
   },
 }
 </script>

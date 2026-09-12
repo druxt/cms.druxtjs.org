@@ -172,10 +172,22 @@ export default {
 
   // changeOrigin: false keeps the browser's host, so Drupal's JSON:API links
   // point at this origin. Registered before Druxt's own proxy entries.
-  proxy: ['/jsonapi', '/router/translate-path', '/sites/default/files'].map((context) => [
-    context,
-    { target: DRUXT_BASE_URL, changeOrigin: false },
-  ]),
+  proxy: [
+    ...['/jsonapi', '/router/translate-path', '/sites/default/files'].map((context) => [
+      context,
+      { target: DRUXT_BASE_URL, changeOrigin: false },
+    ]),
+    // The Umami demo backend, for the live component examples. Proxied so the
+    // browser stays on this origin and Umami's CORS allowlist never applies.
+    [
+      '/umami-jsonapi',
+      {
+        target: 'https://demo-api.druxtjs.org',
+        pathRewrite: { '^/umami-jsonapi': '/jsonapi' },
+        changeOrigin: true,
+      },
+    ],
+  ],
 
   content: {
     markdown: {
