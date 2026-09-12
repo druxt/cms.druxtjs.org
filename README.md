@@ -138,6 +138,7 @@ covers what a deployment does.
 | ------------------------ | ----------------------------------------------------- |
 | `npm run setup`          | Install and import the backend, then start it         |
 | `npm run dev`            | Nuxt dev server against the backend                   |
+| `npm run storybook`      | Storybook on port 3030, against the backend           |
 | `npm run start` / `stop` | Start or stop Drupal                                  |
 | `npm run info`           | Where Drupal is, and the versions it runs             |
 | `npm run login`          | One-time login link for Drupal                        |

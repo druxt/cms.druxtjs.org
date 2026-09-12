@@ -401,13 +401,15 @@ export default {
      */
     storybook() {
       const b = this.backends[this.backend]
-      if (!b.storybook || !this.name) return null
+      // This site's Storybook lives at the environment's route; the demo's is fixed.
+      const host = b.storybook || (this.backend === 'site' ? this.$config.storybookUrl : '')
+      if (!host || !this.name) return null
       const slug = (...parts) => parts.filter(Boolean).join('/').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
       const option = (value) => Object.values(this.options).flat().find((o) => o.value === value) || {}
       const v = this.values
       const label = (value) => (option(value).label || '').replace(/ \([^)]*\)$/, '')
       const link = (id, args) => ({
-        href: `${b.storybook}?path=/story/${id}${args ? '&args=' + encodeURIComponent(args) : ''}`,
+        href: `${host.replace(/\/?$/, '/')}?path=/story/${id}${args ? '&args=' + encodeURIComponent(args) : ''}`,
         label: `Open this ${this.name} in ${b.storybookLabel} Storybook`,
       })
       switch (this.name) {
