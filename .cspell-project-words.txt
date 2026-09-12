@@ -37,6 +37,7 @@ libjpeg
 libsqlite
 libwebp
 linkit
+llms
 lndo
 loglevel
 markdownlint
@@ -56,6 +57,8 @@ setuptools
 starterkit
 toplevel
 unindexed
+urandom
+uselagoon
 vfox
 webp
 yarnrc
