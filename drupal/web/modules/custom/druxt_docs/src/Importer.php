@@ -45,33 +45,6 @@ final class Importer {
   ];
 
   /**
-   * The vocabulary the documentation sections live in.
-   */
-  private const SECTION_VOCABULARY = 'documentation_section';
-
-  /**
-   * The documentation sections, in sidebar order.
-   *
-   * Terms are content, not configuration, so a provisioned site has none
-   * and the importer creates them. The machine name is stored in the
-   * description because that is what a route segment is matched against.
-   *
-   * Written out rather than derived from each section's landing page.
-   * Three of the four landing titles happen to equal their term today and
-   * the modules one does not: its page is titled "Druxt modules" and its
-   * term is "Modules". Deriving would rename that term now, and would
-   * rename any other the day someone retitles a landing page, which is a
-   * documentation edit nobody would expect to migrate data. A section this
-   * map does not name fails the run instead.
-   */
-  private const SECTIONS = [
-    'tutorials' => ['name' => 'Tutorials', 'weight' => -10],
-    'how-to' => ['name' => 'How-to guides', 'weight' => -9],
-    'explanation' => ['name' => 'Concepts', 'weight' => -8],
-    'modules' => ['name' => 'Modules', 'weight' => -7],
-  ];
-
-  /**
    * The keys each block type must carry.
    */
   private const BLOCK_KEYS = [
@@ -155,8 +128,8 @@ final class Importer {
       if (!is_string($machine) || $machine === '') {
         throw new ImportException(sprintf('%s: no section.', $document['source']));
       }
-      if (!isset(self::SECTIONS[$machine])) {
-        throw new ImportException(sprintf('%s: "%s" is not a documentation section. Add it to Importer::SECTIONS, or correct the source.', $document['source'], $machine));
+      if (!isset(Sections::ALL[$machine])) {
+        throw new ImportException(sprintf('%s: "%s" is not a documentation section. Add it to Sections::ALL, or correct the source.', $document['source'], $machine));
       }
     }
   }
@@ -174,10 +147,10 @@ final class Importer {
       if (isset($terms[$machine])) {
         continue;
       }
-      $definition = self::SECTIONS[$machine];
+      $definition = Sections::ALL[$machine];
       $term = $this->load('taxonomy_term', Identity::section($machine))
         ?? $this->entityTypeManager->getStorage('taxonomy_term')->create([
-          'vid' => self::SECTION_VOCABULARY,
+          'vid' => Sections::VOCABULARY,
           'uuid' => Identity::section($machine),
         ]);
       $this->apply($term, [

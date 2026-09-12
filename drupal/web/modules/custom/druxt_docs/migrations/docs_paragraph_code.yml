@@ -1,0 +1,22 @@
+id: docs_paragraph_code
+label: 'Documentation code blocks'
+migration_group: druxt_docs
+source:
+  plugin: docs_block
+  types:
+    - code
+process:
+  uuid:
+    plugin: docs_identity
+    kind: paragraph
+    source:
+      - page
+      - index
+  langcode:
+    plugin: default_value
+    default_value: en
+  field_code: code
+  field_language: language
+destination:
+  plugin: entity_reference_revisions:paragraph
+  default_bundle: docs_code

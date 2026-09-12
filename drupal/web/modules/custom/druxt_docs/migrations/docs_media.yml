@@ -1,0 +1,32 @@
+id: docs_media
+label: 'Documentation images'
+migration_group: druxt_docs
+migration_dependencies:
+  required:
+    - docs_file
+source:
+  plugin: docs_image
+process:
+  uuid:
+    plugin: docs_identity
+    kind: media
+    source: src
+  name: basename
+  langcode:
+    plugin: default_value
+    default_value: en
+  status:
+    plugin: default_value
+    default_value: 1
+  uid:
+    plugin: default_value
+    default_value: 0
+  'field_media_image/target_id':
+    plugin: migration_lookup
+    migration: docs_file
+    source: src
+    no_stub: true
+  'field_media_image/alt': alt
+destination:
+  plugin: entity:media
+  default_bundle: image

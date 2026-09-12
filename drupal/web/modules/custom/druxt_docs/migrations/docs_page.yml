@@ -1,0 +1,54 @@
+id: docs_page
+label: 'Documentation pages'
+migration_group: druxt_docs
+migration_dependencies:
+  required:
+    - docs_section
+    - docs_paragraph_text
+    - docs_paragraph_code
+    - docs_paragraph_diagram
+    - docs_paragraph_callout
+    - docs_paragraph_image
+source:
+  plugin: docs_document
+process:
+  uuid:
+    plugin: docs_identity
+    kind: page
+    source: source
+  title: title
+  langcode:
+    plugin: default_value
+    default_value: en
+  status:
+    plugin: default_value
+    default_value: 1
+  uid:
+    plugin: default_value
+    default_value: 0
+  field_description: description
+  field_weight: weight
+  field_source_path: source
+  field_is_landing: isLanding
+  field_section:
+    plugin: migration_lookup
+    migration: docs_section
+    source: section
+    no_stub: true
+  # The table of contents is computed at build time and stored, rather than
+  # derived in the browser, so a deep link works on first paint.
+  field_toc: toc
+  # Ordered by the page's own block list, never by the map. See the plugin.
+  field_content:
+    plugin: docs_paragraph_references
+    source: blocks
+    migrations:
+      - docs_paragraph_text
+      - docs_paragraph_code
+      - docs_paragraph_diagram
+      - docs_paragraph_callout
+      - docs_paragraph_image
+  # Written by the alias migration, which needs the node id this produces.
+destination:
+  plugin: entity:node
+  default_bundle: doc_page

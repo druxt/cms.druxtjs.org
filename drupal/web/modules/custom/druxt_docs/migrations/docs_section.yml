@@ -1,0 +1,30 @@
+id: docs_section
+label: 'Documentation sections'
+migration_group: druxt_docs
+source:
+  plugin: docs_section
+process:
+  uuid:
+    plugin: docs_identity
+    kind: section
+    source: machine
+  vid:
+    plugin: default_value
+    default_value: documentation_section
+  name: name
+  weight: weight
+  langcode:
+    plugin: default_value
+    default_value: en
+  status:
+    plugin: default_value
+    default_value: 1
+  # The machine name lives in the description because that is the value a
+  # route segment is matched against. Odd, and load-bearing.
+  'description/value': machine
+  'description/format':
+    plugin: default_value
+    default_value: plain_text
+destination:
+  plugin: entity:taxonomy_term
+  default_bundle: documentation_section
