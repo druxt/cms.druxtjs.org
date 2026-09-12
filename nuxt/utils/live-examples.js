@@ -254,7 +254,8 @@ export const COMPONENTS = {
       steps: [
         { name: 'theme', source: 'themes', required: true, prefer: siteTheme },
         // The header on both: a banner region's blocks show only on their own pages.
-        { name: 'name', source: 'regions', needs: ['theme'], prefer: 'header' },
+        // The content region: the header would show the very block the block example does.
+        { name: 'name', source: 'regions', needs: ['theme'], prefer: 'content' },
       ],
     },
     props: [],
