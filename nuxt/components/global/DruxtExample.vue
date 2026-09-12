@@ -220,6 +220,7 @@ import {
 } from '~/utils/live-examples'
 import { addCopyButton } from '~/utils/copy-button'
 import { createRuntime } from '~/utils/druxt-runtime'
+import mutations from '~/store/mutations'
 
 // The props every module component shares. `value` and `settings` are
 // objects, so they are set in code rather than from a control.
@@ -624,7 +625,7 @@ export default {
         // This site's own state, minus the Druxt modules the runtime brings of its own.
         const own = new Set(['druxt', 'druxtRouter', 'druxtSchema', 'druxtMenu', 'druxtViews'])
         const state = Object.fromEntries(Object.entries(this.$store.state).filter(([k]) => !own.has(k)))
-        const runtime = createRuntime({ baseUrl: b.baseUrl || settings.baseUrl || window.location.origin, proxyRoot: b.proxyRoot, settings, state })
+        const runtime = createRuntime({ baseUrl: b.baseUrl || settings.baseUrl || window.location.origin, proxyRoot: b.proxyRoot, settings, state, mutations })
         runtime.axios.interceptors.request.use((config) => {
           const url = /^https?:/.test(config.url || '') ? config.url : [config.baseURL || '', config.url || ''].map((part, i) => (i ? part.replace(/^\/+/, '') : part.replace(/\/+$/, ''))).filter(Boolean).join('/')
           this.requests.push(`${(config.method || 'get').toUpperCase()} ${url.replace(/^https?:\/\/[^/]+/, '')}`)
