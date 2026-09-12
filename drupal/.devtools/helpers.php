@@ -458,7 +458,11 @@ function drush(string $command, mixed $args = NULL, ?int &$exit_code = NULL): st
     FAIL('Drush command failed: %s', $command);
   }
 
-  return $output ?: '';
+  // Not `?: ''`. ob_get_clean() returns FALSE only when no buffer is
+  // active, and "0" is falsy, so the shorthand turns a command whose whole
+  // output is zero into an empty string. Every caller that counts
+  // something then reads "no answer" exactly when the answer is none.
+  return $output === FALSE ? '' : $output;
 }
 
 /**
