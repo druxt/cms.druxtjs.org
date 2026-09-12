@@ -14,7 +14,7 @@ const DRUPAL_SECTIONS = ["/tutorials", "/how-to", "/explanation"];
  * @param {Function} commit - The store's commit.
  */
 const addDrupalSectionChildren = async (druxtMenu, commit) => {
-  const { entities = [] } = (await druxtMenu.get("docs")) || {};
+  const { entities = [] } = (await druxtMenu.get("docs", { requiredOnly: true })) || {};
   const items = entities.map((o) => ({ id: o.id, ...(o.attributes || o) }));
   for (const section of items.filter((o) => !o.parent && DRUPAL_SECTIONS.includes(o.url))) {
     const children = items
