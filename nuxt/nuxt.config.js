@@ -1,6 +1,7 @@
 // GA4, as a plain gtag.js snippet: the Nuxt analytics modules need either
 // Universal Analytics or Nuxt 3.
 const GA_MEASUREMENT_ID = 'G-Y1ZRHGDGSD'
+const { serviceRoute } = require('./server/backend')
 const { syncDruxtComponents } = require('./lib/sync-druxt-components')
 
 // The id is interpolated into an inline script, so check its shape first.
@@ -34,6 +35,8 @@ export default {
     druxtVersion,
     // "markdown" reads the authored pages from content/ instead of Drupal.
     docsSource: process.env.DOCS_SOURCE || 'drupal',
+    // The environment's Storybook, when it has one: linked from the footer and the playground.
+    storybookUrl: serviceRoute(process.env.LAGOON_ROUTES, 'storybook') || process.env.STORYBOOK_URL || (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3030'),
   },
 
   head: {

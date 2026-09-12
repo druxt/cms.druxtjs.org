@@ -24,6 +24,10 @@ rather than released, so there are no version numbers yet.
   radios and checkboxes, language, references, media, path and moderation.
 - Redirects for the old guide and reference paths, and for the package
   subdomains.
+- A Storybook service beside the site, with stories for the `dui`
+  components and the ones Druxt writes from the backend. Production serves it
+  at `storybook.druxtjs.org`; the footer and the playground link to the
+  environment's own.
 
 - `npm run setup` and `npm run dev`, which bring up the backend and the
   frontend together, with `npm run login` for a one-time login link and

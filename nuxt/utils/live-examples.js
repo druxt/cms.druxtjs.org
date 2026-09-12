@@ -13,7 +13,8 @@
  * `proxyRoot`.
  */
 export const BACKENDS = {
-  site: { label: 'Druxtjs.org', api: '/jsonapi', baseUrl: null, proxyRoot: '', nodeBundles: ['doc_page'] },
+  // Its Storybook is the environment's own, read from the runtime config.
+  site: { label: 'Druxtjs.org', api: '/jsonapi', baseUrl: null, proxyRoot: '', nodeBundles: ['doc_page'], storybookLabel: 'Druxtjs.org' },
   umami: {
     label: 'Umami demo',
     api: '/umami/jsonapi',

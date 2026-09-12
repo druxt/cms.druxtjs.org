@@ -14,17 +14,21 @@ the end is what the cutover needs.
 One environment runs the whole site. `docker-compose.yml` names the
 services, and `.lagoon.yml` adds the post-rollout task.
 
-| Service   | Built from                             | What it does                                        |
-| --------- | -------------------------------------- | --------------------------------------------------- |
-| `nuxt`    | `lagoon/nuxt.dockerfile`, Node 16      | Serves the site, and proxies Drupal's API and files |
-| `nginx`   | `lagoon/nginx.dockerfile`              | Serves Drupal, including its admin pages            |
-| `php`     | `lagoon/php.dockerfile`, PHP 8.3       | Runs Drupal for `nginx`, in the same pod            |
-| `cli`     | `lagoon/cli.dockerfile`                | Runs the post-rollout task, and `drush` over SSH    |
-| `mariadb` | `uselagoon/mariadb-10.11-drupal` image | Drupal's database, with no route                    |
+| Service     | Built from                             | What it does                                                                 |
+| ----------- | -------------------------------------- | ---------------------------------------------------------------------------- |
+| `nuxt`      | `lagoon/nuxt.dockerfile`, Node 16      | Serves the site, and proxies Drupal's API and files                          |
+| `storybook` | `lagoon/storybook.dockerfile`, Node 16 | Storybook for the site's components and Druxt's, started once Drupal answers |
+| `nginx`     | `lagoon/nginx.dockerfile`              | Serves Drupal, including its admin pages                                     |
+| `php`       | `lagoon/php.dockerfile`, PHP 8.3       | Runs Drupal for `nginx`, in the same pod                                     |
+| `cli`       | `lagoon/cli.dockerfile`                | Runs the post-rollout task, and `drush` over SSH                             |
+| `mariadb`   | `uselagoon/mariadb-10.11-drupal` image | Drupal's database, with no route                                             |
 
-`nuxt` and `nginx` each get a route, named after the service:
+`nuxt`, `nginx` and `storybook` each get a route, named after the service:
 `https://nuxt.<environment>.<project>.<cluster domain>` for the site, and
-the same with `nginx` for Drupal.
+the same with `nginx` for Drupal and `storybook` for Storybook. The site
+reads its Storybook's route from `LAGOON_ROUTES` and links to it from the
+footer and the playground. Production's hosts, `druxtjs.org`,
+`storybook.druxtjs.org` and the package subdomains, are set in `.lagoon.yml`.
 
 ## Deployment steps
 

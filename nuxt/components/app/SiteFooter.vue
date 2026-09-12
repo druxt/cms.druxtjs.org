@@ -19,6 +19,13 @@
             to="/api/packages/druxt/CHANGELOG"
             :title="'Druxt ' + version + ' release notes'"
           >{{ version }}</NuxtLink>
+          <a
+            v-if="$config.storybookUrl"
+            class="badge badge-sm badge-outline min-h-[24px] ml-2 hover:border-primary hover:text-primary-focus"
+            :href="$config.storybookUrl"
+            target="_blank"
+            rel="noopener"
+          >Storybook</a>
         </p>
       </div>
 
