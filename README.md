@@ -18,7 +18,7 @@ documents.
 | `drupal/` | The Drupal codebase, configuration and importer |
 | `drupal/.devtools/` | Provisioning scripts: PHP and SQLite, no Docker |
 | `drupal/config/sync/` | Exported site configuration |
-| `drupal/content/` | A Tome export of the content, kept as a backup. Not what the site installs from |
+| `drupal/content/` | A Tome export of the content from before the database became canonical, kept as a backup. Nothing writes to it |
 | `docs-source.json` | The documentation repository and commit the content is seeded from |
 | `scripts/` | The IR builder, the corpus survey and its baseline, content validation |
 | `tests/` | Unit tests for the corpus reader, guardrail tests for the scripts |
@@ -40,28 +40,18 @@ falls back to a bare site when there is none, so that the scripts work on
 every commit. It gives you an empty site; run the importer to put the
 documentation in it.
 
-### Check `git status` after touching a local site
+### Export configuration after changing it
 
-`tome_sync` is installed, and it exports every entity to `drupal/content/`
-as the entity is saved. The importer suppresses that around its own run, so
-importing leaves the directory alone. Nothing suppresses it for anything
-else.
-
-So saving or deleting a node, a term or a media item by any other route,
-through the admin UI, through `drush`, through a test, rewrites the
-committed export underneath you. There is no warning and nothing fails.
-Deleting one node, for example, silently removes that node and its path
-alias from `drupal/content/` and rewrites `content/meta/index.json`.
-
-Nothing is lost, because it is all in git:
+A change made through the admin UI or `drush` stays in the database until
+you export it:
 
 ```sh
-git status -- drupal/content drupal/files
-git checkout -- drupal/content drupal/files
+vendor/bin/drush config:export
+git status -- config/sync
 ```
 
-Make that check a habit before committing anything from a working tree
-where you have run the site.
+Content is not exported. The database is the source of truth, and the
+importer seeds it from the pinned documentation.
 
 ## The documentation source
 
