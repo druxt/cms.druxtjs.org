@@ -37,6 +37,14 @@ button:focus-visible,
   color: hsl(var(--bc) / 0.7);
 }
 
+/* And again for padding: `.menu li>:where(a)` sets 1.25rem sides and beats the
+   `px-*` utilities on the item. Seven header items at 1.25rem overflow a
+   1280px viewport by 28px; .75rem fits with room for the search box. */
+.menu.menu-horizontal :where(li) > a {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
 /* Smooth in-page scrolling: anchor jumps, TOC links and programmatic
    scrolls glide site-wide. Route changes opt out in layouts/default.vue,
    and the reduced-motion block below forces this back to instant. */
@@ -527,4 +535,55 @@ html {
 }
 .prose :is(s, del) a {
   color: inherit;
+}
+
+/* Live example, raw output: Druxt's own unwrapped rendering, only tidied.
+   In development Druxt's debug details show; in production they render
+   nothing, and the card says so. */
+.druxt-raw > div > * + * {
+  margin-top: 0.75rem;
+}
+.druxt-raw details {
+  border: 1px dashed hsl(var(--b3));
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+}
+.druxt-raw details summary {
+  cursor: pointer;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: hsl(var(--bc) / 0.68);
+}
+.druxt-raw details pre {
+  margin-top: 8px;
+  font-size: 11px;
+  max-height: 240px;
+  overflow: auto;
+}
+.druxt-raw details small {
+  display: block;
+  margin-top: 8px;
+  color: hsl(var(--bc) / 0.5);
+}
+
+/* The live example's markup line borrows the prose code styling without the
+   prose margins around it. */
+.prose.druxt-markup pre {
+  margin: 0;
+  /* Room for the Copy button when the line wraps. */
+  padding-right: 3.5rem;
+}
+
+/* Props rows: label over control on a phone, side by side from `sm`. Plain
+   CSS because this Tailwind version drops multi-token arbitrary values. */
+.druxt-props-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 640px) {
+  .druxt-props-row {
+    grid-template-columns: 176px minmax(0, 1fr);
+  }
 }
