@@ -13,13 +13,13 @@
  * `proxyRoot`.
  */
 export const BACKENDS = {
-  site: { label: 'Druxtjs.org', api: '/jsonapi', baseUrl: null, proxyRoot: '', nodeBundle: 'doc_page' },
+  site: { label: 'Druxtjs.org', api: '/jsonapi', baseUrl: null, proxyRoot: '', nodeBundles: ['doc_page'] },
   umami: {
     label: 'Umami demo',
     api: '/umami/jsonapi',
     baseUrl: 'https://demo-api.druxtjs.org',
     proxyRoot: '/umami',
-    nodeBundle: 'recipe',
+    nodeBundles: ['recipe', 'article', 'page'],
     storybook: 'https://storybook.umami.demo.druxtjs.org/',
     storybookLabel: 'Umami',
   },
@@ -96,9 +96,9 @@ export const probeBackend = async (origin) => {
   const display = Object.keys(view.display || {})[0]
   if (!display || !(await answers(`${backend.api}/views/${view.drupal_internal__id}/${display}`))) reasons.DruxtView = 'needs JSON:API Views on that Drupal'
   if (!links['block--block']) reasons.DruxtBlock = reasons.DruxtBlockRegion = 'exposes no blocks over JSON:API'
-  // The content type the router examples list: the first node type it has.
-  const node = Object.keys(links).map((k) => k.match(/^node--(.+)$/)).find(Boolean)
-  return { backend: { ...backend, nodeBundle: node ? node[1] : undefined, reasons }, links }
+  // The content types the router examples list: every node type it has.
+  const nodeBundles = Object.keys(links).map((k) => k.match(/^node--(.+)$/)).filter(Boolean).map((m) => m[1])
+  return { backend: { ...backend, nodeBundles: nodeBundles.length ? nodeBundles : undefined, reasons }, links }
 }
 
 const label = (o) => {
@@ -193,13 +193,13 @@ export const SOURCES = {
     return data.filter((o) => !o.attributes.locked).map((o) => ({ value: o.attributes.drupal_internal__id, label: `${o.attributes.label} (${o.attributes.drupal_internal__id})` }))
   },
 
-  // Paths the router can resolve: this backend's content, by title.
+  // Paths the router can resolve: this backend's content, by title, a group per content type.
   paths: async (api, deps, backend) => {
-    const bundle = (backend || {}).nodeBundle || 'page'
-    const { data } = await get(api, `/node/${bundle}?page%5Blimit%5D=50&sort=title&fields%5Bnode--${bundle}%5D=title,path`)
-    return data
+    const bundles = (backend || {}).nodeBundles || ['page']
+    const lists = await Promise.all(bundles.map((bundle) => get(api, `/node/${bundle}?page%5Blimit%5D=50&sort=title&fields%5Bnode--${bundle}%5D=title,path`).catch(() => ({ data: [] }))))
+    return lists.flatMap(({ data }, i) => data
       .filter((o) => (o.attributes.path || {}).alias)
-      .map((o) => ({ value: o.attributes.path.alias, label: `${o.attributes.title} (${o.attributes.path.alias})` }))
+      .map((o) => ({ value: o.attributes.path.alias, label: `${o.attributes.title} (${o.attributes.path.alias})`, ...(bundles.length > 1 ? { group: bundles[i] } : {}) })))
   },
 
   displays: async (api, { viewId }) => {
@@ -341,7 +341,8 @@ export const COMPONENTS = {
     story: 'druxt-router-druxtrouter--default',
     args: [],
     props: [
-      { name: 'path', type: 'string', control: 'select', source: 'paths', required: true, prefer: perBackend(/getting-started/, /deep-mediterranean-quiche/), description: 'The path to resolve; the current route when unset.' },
+      // A short page: the card shows the router resolving a path, not a long read.
+      { name: 'path', type: 'string', control: 'select', source: 'paths', required: true, prefer: perBackend('/explanation/drupal-for-nuxt-developers', '/about-umami'), description: 'The path to resolve; the current route when unset.' },
     ],
   },
 

@@ -40,6 +40,9 @@ describe('SOURCES', () => {
           { attributes: { title: 'Borscht', path: { alias: '/recipes/borscht' } } },
           { attributes: { title: 'No alias', path: {} } },
         ])
+      if (url.includes('/node/article')) return jsonapi([])
+      if (url.includes('/node/page'))
+        return jsonapi([{ attributes: { title: 'About', path: { alias: '/about' } } }])
       // The index names the resources a backend has; only Umami has languages.
       if (url === '/jsonapi')
         return { ok: true, json: async () => ({ links: { 'node--doc_page': {} } }) }
@@ -73,9 +76,12 @@ describe('SOURCES', () => {
     assert.equal(list[1].label, 'Recipes (recipes)')
   })
 
-  test('paths come from the backend content bundle and skip nodes without an alias', async () => {
+  test('paths list every content type of the backend, grouped, and skip nodes without an alias', async () => {
     const list = await m.SOURCES.paths('/umami/jsonapi', {}, m.BACKENDS.umami)
-    assert.deepEqual(list, [{ value: '/recipes/borscht', label: 'Borscht (/recipes/borscht)' }])
+    assert.deepEqual(list, [
+      { value: '/recipes/borscht', label: 'Borscht (/recipes/borscht)', group: 'recipe' },
+      { value: '/about', label: 'About (/about)', group: 'page' },
+    ])
     assert.match(calls[0], /^\/umami\/jsonapi\/node\/recipe\?/)
   })
 
@@ -212,17 +218,25 @@ describe('demo defaults', () => {
       ),
       'y'
     )
+    // The router shows a path resolving, so it prefers a short page over a long read.
     const path = m.COMPONENTS.DruxtRouter.props.find((p) => p.name === 'path')
     assert.equal(
       m.pickOption(
         [
-          { value: '/a', label: 'A (/tutorials/authentication)' },
-          { value: '/g', label: 'G (/tutorials/getting-started)' },
+          {
+            value: '/tutorials/getting-started',
+            label: 'Getting started (/tutorials/getting-started)',
+          },
+          {
+            value: '/explanation/drupal-for-nuxt-developers',
+            label: 'Drupal for Nuxt developers (/explanation/drupal-for-nuxt-developers)',
+          },
         ],
         path.prefer({ backend: 'site' })
       ),
-      '/g'
+      '/explanation/drupal-for-nuxt-developers'
     )
+    assert.equal(path.prefer({ backend: 'umami' }), '/about-umami')
   })
 })
 
@@ -294,7 +308,7 @@ describe("a reader's own Drupal", () => {
     }
     try {
       const { backend } = await m.probeBackend('https://drupal.example')
-      assert.equal(backend.nodeBundle, 'article')
+      assert.deepEqual(backend.nodeBundles, ['article'])
       assert.equal(backend.reasons.DruxtBlock, undefined)
       assert.equal(backend.reasons.DruxtMenu, undefined)
       assert.match(backend.reasons.DruxtRouter, /Decoupled Router/)
