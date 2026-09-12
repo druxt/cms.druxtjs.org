@@ -15,6 +15,12 @@
 // with the file and line named, because a page that migrates with a section
 // quietly missing looks exactly like one that did not.
 //
+// Each page also carries its earlier versions from the documentation's git
+// history, parsed by the same code, for the importer to save as dated
+// revisions. An earlier version cannot be edited, so a defect in one is
+// noted rather than fatal. What it cannot do is lose content: a version its
+// blocks do not rebuild stops the run, as the current version does.
+//
 // Usage:
 //   node scripts/build-ir.mjs --source <checkout> [--out <dir>] [--check]
 //
@@ -24,18 +30,15 @@
 //             directory and never the checkout.
 //   --check   round-trip every page and report, writing nothing.
 
-import { execFileSync } from 'node:child_process'
-import { copyFileSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { createRequire } from 'node:module'
-import { assertFullHistory, history } from './lib/history.mjs'
+import { Defects, buildBlocks, normalise, serialise } from './lib/blocks.mjs'
+import { assertFullHistory, contentAt, dates, log, versions } from './lib/history.mjs'
+import { revisions } from './lib/revisions.mjs'
 import {
-  CODE_LANGUAGES,
   CONTENT_DIR,
-  DIAGRAM_SYNTAXES,
   STATIC_DIR,
-  calloutType,
-  classify,
   extractImages,
   extractLinks,
   isGeneratedPath,
@@ -44,171 +47,14 @@ import {
   trackedContentFiles,
 } from './lib/corpus.mjs'
 
+export { normalise, serialise }
+
 const require = createRequire(import.meta.url)
 
 // github-slugger, the same implementation @nuxt/content reaches through
 // remark-slug, so stored anchors and the ids the current site renders agree
 // by construction rather than by a reimplementation that drifts.
 const GithubSlugger = require('github-slugger')
-
-/** A defect that stops the run, collected so one pass reports all of them. */
-class Defects {
-  constructor() {
-    this.items = []
-  }
-
-  add(file, line, message) {
-    this.items.push({ file, line, message })
-  }
-
-  get failed() {
-    return this.items.length > 0
-  }
-
-  report() {
-    for (const { file, line, message } of this.items) {
-      process.stderr.write(`${file}:${line}: ${message}\n`)
-    }
-    process.stderr.write(`\n${this.items.length} defects; nothing written.\n`)
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Blocks
-// ---------------------------------------------------------------------------
-
-/**
- * Turns one tokenized block into its IR form.
- *
- * Returns null when the block joins the prose accumulating around it, which
- * is how headings, lists, tables and ordinary blockquotes reach the model:
- * inside a text block, not beside one.
- *
- * @param {object} block - A tokenized block.
- * @param {object} context - `{file, defects, groups}`.
- * @returns {object|null} The IR block, or null to accumulate as prose.
- */
-function toBlock(block, context) {
-  const kind = classify(block)
-
-  switch (kind) {
-    case 'code': {
-      if (!block.lang) {
-        context.defects.add(context.file, block.line, 'fenced code with no language')
-        return null
-      }
-      if (!CODE_LANGUAGES.includes(block.lang)) {
-        context.defects.add(
-          context.file,
-          block.line,
-          `fence language "${block.lang}" is outside the model's set (${CODE_LANGUAGES.join(', ')})`,
-        )
-        return null
-      }
-      if (!block.closed) {
-        context.defects.add(context.file, block.line, 'unclosed fence')
-        return null
-      }
-      return { type: 'code', language: block.lang, code: block.code }
-    }
-
-    case 'diagram': {
-      if (!DIAGRAM_SYNTAXES.includes(block.lang)) return null
-      return { type: 'diagram', syntax: block.lang, source: block.code }
-    }
-
-    case 'image': {
-      const [image] = extractImages(block.lines[0])
-      if (!image.alt.trim()) {
-        context.defects.add(context.file, block.line, `image with no alt text: ${image.src}`)
-        return null
-      }
-      return { type: 'image', src: image.src, alt: image.alt }
-    }
-
-    case 'callout': {
-      const type = calloutType(block)
-      if (!type) {
-        context.defects.add(
-          context.file,
-          block.line,
-          `callout lead not recognised: ${block.lines[0].slice(0, 60)}`,
-        )
-        return null
-      }
-      return { type: 'callout', callout: type, markdown: block.lines.join('\n') }
-    }
-
-    case 'output':
-      return { type: 'callout', callout: 'output', markdown: block.lines.join('\n') }
-
-    case 'html': {
-      const raw = block.lines.join('\n')
-      if (/^<div\b/.test(raw.trim())) return { type: '__wrapper', open: true, raw }
-      if (/^<\/div>/.test(raw.trim())) return { type: '__wrapper', open: false, raw }
-      context.defects.add(context.file, block.line, `raw HTML block: ${block.lines[0].slice(0, 60)}`)
-      return null
-    }
-
-    default:
-      return null
-  }
-}
-
-/**
- * Builds the ordered block list for a document.
- *
- * Prose accumulates until something typed interrupts it, which is what keeps
- * a heading with the paragraphs beneath it and a list with the fences its
- * steps contain.
- *
- * @param {object} doc - A document from readDocument().
- * @param {Defects} defects - Collector.
- * @returns {object[]} The IR blocks.
- */
-function buildBlocks(doc, defects) {
-  const context = { file: doc.file, defects }
-  const blocks = []
-  const presentation = []
-  let prose = []
-  let group = null
-  let groupCount = 0
-
-  const flushProse = () => {
-    if (!prose.length) return
-    blocks.push({ type: 'text', markdown: prose.join('\n\n') })
-    prose = []
-  }
-
-  for (const block of doc.blocks) {
-    const built = toBlock(block, context)
-
-    if (built && built.type === '__wrapper') {
-      // Layout, not content: recorded with the block index it sits in front
-      // of, so the source can be rebuilt exactly, while the model stores only
-      // the group id it implies. Flushed first, because the wrapper belongs
-      // between the prose above it and the diagrams below.
-      flushProse()
-      group = built.open ? `group-${(groupCount += 1)}` : null
-      presentation.push({ before: blocks.length, raw: built.raw })
-      continue
-    }
-
-    if (!built) {
-      // A fence only comes back null with a defect recorded, and the run
-      // fails before anything is written, so there is no prose to keep.
-      if (block.kind !== 'fence') prose.push(block.lines.join('\n'))
-      continue
-    }
-
-    flushProse()
-    if (built.type === 'diagram' && group) built.group = group
-    blocks.push(built)
-  }
-  flushProse()
-
-  return { blocks, presentation }
-}
 
 // ---------------------------------------------------------------------------
 // Table of contents
@@ -242,67 +88,6 @@ function buildToc(doc) {
 }
 
 // ---------------------------------------------------------------------------
-// Round-trip
-// ---------------------------------------------------------------------------
-
-/**
- * Rebuilds a page's markdown from its IR blocks.
- *
- * @param {object[]} blocks - IR blocks.
- * @param {object[]} presentation - Wrappers the model does not store, with
- *   the block index each sits in front of.
- * @returns {string} The reconstructed body.
- */
-export function serialise(blocks, presentation = []) {
-  const pieces = blocks
-    .map((block) => {
-      switch (block.type) {
-        case 'code':
-          return '```' + block.language + '\n' + block.code + '\n```'
-        case 'diagram':
-          return '```' + block.syntax + '\n' + block.source + '\n```'
-        case 'image':
-          return `![${block.alt}](${block.src})`
-        case 'callout':
-          return block.markdown
-        default:
-          return block.markdown
-      }
-    })
-
-  // Reinserted from the end, so an earlier index is not shifted by a later
-  // insertion.
-  for (const entry of [...presentation].sort((a, b) => b.before - a.before)) {
-    pieces.splice(entry.before, 0, entry.raw)
-  }
-
-  return pieces.join('\n\n')
-}
-
-/**
- * The only differences a round-trip is allowed to forgive.
- *
- * Written down and bounded on purpose: a comparison whose normalisation can
- * be widened until it passes is not a comparison. Adding to this list is a
- * finding, not a fix.
- *
- *   1. Trailing whitespace on a line.
- *   2. Runs of blank lines collapsed to one.
- *   3. Leading and trailing blank lines.
- *
- * @param {string} markdown - Either side of the comparison.
- * @returns {string} The normalised form.
- */
-export function normalise(markdown) {
-  return markdown
-    .split('\n')
-    .map((line) => line.replace(/\s+$/, ''))
-    .join('\n')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim()
-}
-
-// ---------------------------------------------------------------------------
 // Documents
 // ---------------------------------------------------------------------------
 
@@ -310,14 +95,17 @@ export function normalise(markdown) {
  * Builds the IR for every authored page.
  *
  * @param {string} root - Root of the documentation checkout.
- * @returns {{documents: object[], defects: Defects}} The result.
+ * @returns {{documents: object[], defects: Defects, notes: object[]}} The
+ *   result, with what earlier versions kept as prose and why.
  */
 export function build(root) {
   assertFullHistory(root)
   const defects = new Defects()
+  const notes = []
   const files = trackedContentFiles(root)
   const routes = new Set(files.map(routeFor))
   const documents = []
+  const commits = new Map()
 
   for (const file of files) {
     const doc = readDocument(root, file)
@@ -343,6 +131,7 @@ export function build(root) {
     }
 
     const { blocks, presentation } = buildBlocks(doc, defects)
+    commits.set(file, log(root, file))
 
     documents.push({
       source: file,
@@ -353,7 +142,7 @@ export function build(root) {
       description: doc.frontmatter.description ?? null,
       weight: doc.frontmatter.weight ?? null,
       toc: buildToc(doc),
-      ...history(root, file),
+      ...dates(commits.get(file)),
       links: extractLinks(doc.body).map((link) => ({
         ...link,
         resolves: link.kind !== 'internal'
@@ -369,7 +158,30 @@ export function build(root) {
     })
   }
 
-  return { documents, defects }
+  // Earlier versions come after every current page, because whether an
+  // image in one can point at today's media depends on every image the
+  // current corpus migrates.
+  const images = new Map(documents.flatMap((doc) => doc.blocks
+    .filter((block) => block.type === 'image')
+    .map((block) => [block.src, block.alt])))
+
+  for (const doc of documents) {
+    const earlier = versions(commits.get(doc.source), (commit) => contentAt(root, commit))
+    // The newest version is the page as read, unless the checkout holds an
+    // edit git has not recorded. That edit is then the current version, and
+    // every committed version is history.
+    if (earlier.at(-1)?.content === readFileSync(path.join(root, doc.source), 'utf8')) earlier.pop()
+    const built = revisions(earlier, images, doc.title)
+    for (const entry of built) {
+      notes.push(...entry.notes)
+      if (!entry.rebuilds) {
+        defects.add(`${entry.revision.path}@${entry.revision.sha.slice(0, 12)}`, 1, 'an earlier version its blocks do not rebuild, so its revision would not say what the page said')
+      }
+    }
+    doc.revisions = built.map((entry) => entry.revision)
+  }
+
+  return { documents, defects, notes }
 }
 
 // ---------------------------------------------------------------------------
@@ -391,7 +203,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     process.exit(2)
   }
 
-  const { documents, defects } = build(source)
+  const { documents, defects, notes } = build(source)
 
   // An empty corpus is a wrong checkout, not a documentation set with no
   // pages: the importer must not be handed nothing and read it as success.
@@ -403,6 +215,12 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   if (defects.failed) {
     defects.report()
     process.exit(1)
+  }
+
+  // Reported, not fatal: an earlier version cannot be fixed, and what it
+  // kept as prose is still in its revision.
+  for (const { file, line, message } of notes) {
+    process.stderr.write(`note: ${file}:${line}: ${message}\n`)
   }
 
   let mismatched = 0
@@ -428,6 +246,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     process.exit(1)
   }
 
+  const earlier = documents.reduce((count, doc) => count + doc.revisions.length, 0)
   const out = flag('out')
   if (args.includes('--check') || !out) {
     process.stdout.write(`${documents.length} pages, all round-trip.\n`)
@@ -438,6 +257,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     for (const [type, count] of Object.entries(blocks).sort((a, b) => b[1] - a[1])) {
       process.stdout.write(`  ${type.padEnd(10)} ${count}\n`)
     }
+    process.stdout.write(`${earlier} earlier versions, all rebuilt from their blocks.\n`)
     process.exit(0)
   }
 
@@ -460,4 +280,5 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     copyFileSync(path.join(source, STATIC_DIR, src), target)
   }
   process.stdout.write(`${documents.length} documents and ${images.size} images written to ${out}\n`)
+  process.stdout.write(`${earlier} earlier versions carried for the importer to save as revisions.\n`)
 }
