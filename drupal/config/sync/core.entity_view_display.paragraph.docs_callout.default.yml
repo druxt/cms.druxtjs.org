@@ -6,11 +6,26 @@ dependencies:
     - field.field.paragraph.docs_callout.field_callout
     - field.field.paragraph.docs_callout.field_callout_type
     - paragraphs.paragraphs_type.docs_callout
+  module:
+    - options
+    - text
 id: paragraph.docs_callout.default
 targetEntityType: paragraph
 bundle: docs_callout
 mode: default
-content: {  }
-hidden:
-  field_callout: true
-  field_callout_type: true
+content:
+  field_callout:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_callout_type:
+    type: list_default
+    label: inline
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden: {  }

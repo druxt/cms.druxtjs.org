@@ -8,20 +8,26 @@ dependencies:
     - media.type.image
     - node.type.doc_page
   module:
+    - coffee
+    - environment_indicator
     - filter
+    - jsonapi_node_preview_tab
     - media
+    - navigation
     - node
     - system
-    - toolbar
 id: contributor
 label: Contributor
 weight: 2
 is_admin: false
 permissions:
+  - 'access coffee'
   - 'access content'
   - 'access content overview'
+  - 'access environment indicator'
+  - 'access jsonapi preview tab'
   - 'access media overview'
-  - 'access toolbar'
+  - 'access navigation'
   - 'create doc_page content'
   - 'create image media'
   - 'edit own doc_page content'

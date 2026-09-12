@@ -9,6 +9,14 @@ id: paragraph.docs_image.default
 targetEntityType: paragraph
 bundle: docs_image
 mode: default
-content: {  }
-hidden:
-  field_media: true
+content:
+  field_media:
+    type: entity_reference_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden: {  }
