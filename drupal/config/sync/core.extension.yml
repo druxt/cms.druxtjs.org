@@ -5,6 +5,7 @@ module:
   dblog: 0
   decoupled_router: 0
   druxt: 0
+  druxt_docs: 0
   dynamic_page_cache: 0
   entity_reference_revisions: 0
   field: 0
