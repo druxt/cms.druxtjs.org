@@ -8,6 +8,23 @@ rather than released, so there are no version numbers yet.
 
 ### Added
 
+- The site runs on Lagoon as one environment, Drupal beside Nuxt. Nuxt
+  serves pre-rendered pages first and renders the rest live, behind a
+  starting page while the app builds; `?live=1` renders past the store.
+  `docs/hosting.md` covers a deployment.
+- A live component playground at `/playground`, and a "Try it" card on
+  each module and component reference page. Every Druxt component renders
+  against this site's Drupal, the Umami demo, or a reader's own Drupal,
+  which the card probes for the modules each component needs. The props
+  are the controls, the requests are listed, the markup can be copied, and
+  the URL holds the card's state so it can be shared.
+- `sitemap.xml`, `llms.txt` and `llms-full.txt`, written when the server
+  starts, and share cards for every page.
+- Form widgets for the playground's entity forms: text, number, options,
+  radios and checkboxes, language, references, media, path and moderation.
+- Redirects for the old guide and reference paths, and for the package
+  subdomains.
+
 - `npm run setup` and `npm run dev`, which bring up the backend and the
   frontend together, with `npm run login` for a one-time login link and
   `npm run docs:generate` for the generated reference pages.
@@ -25,6 +42,16 @@ rather than released, so there are no version numbers yet.
 
 ### Changed
 
+- Each page asks Drupal only for the fields its displays render, and each
+  menu only for what a menu needs. The inline page state is about a fifth
+  smaller.
+- Druxt's components load with the page rather than as chunks, so the
+  server-rendered markup hydrates instead of being rendered again.
+- A request for a page in another letter case is redirected to the alias
+  Drupal resolves; a query string other than `live=1` gets the stored page.
+- Module pages list their "Try it" and API reference sections in the table
+  of contents. Component reference pages put the card after the reference.
+
 - The root tooling runs on Node 16.20.1, the Node Nuxt 2 builds with, and
   `.nvmrc` is kept at the root only.
 - A Drupal 11 backend replaces the Drupal 9 site. An importer seeds it from a
@@ -35,6 +62,13 @@ rather than released, so there are no version numbers yet.
   `druxtjs_org` consumer.
 
 ### Fixed
+
+- Drupal media images render with the alt text set on their reference, not
+  their filename as a heading.
+- The page body no longer re-renders in the browser after hydration, and the
+  docs menu is no longer fetched again on every page.
+- The playground's controls are labelled, show their focus, and stay at 16
+  px on tablets. Its backend reasons are text rather than a title attribute.
 
 - The private-host lint read a private address written as an IPv4-mapped IPv6
   literal as a public one. It now reads the IPv4 address inside.
