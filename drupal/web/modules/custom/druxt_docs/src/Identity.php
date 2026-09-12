@@ -74,10 +74,33 @@ final class Identity {
   }
 
   /**
+   * A layout section on a page, by its position among the page's sections.
+   *
+   * Named apart from a block's paragraph so the two can never collide.
+   */
+  public static function sectionParagraph(string $source, int $position): string {
+    return self::uuid("paragraph:section:$source:$position");
+  }
+
+  /**
+   * A menu link, by its menu and a key unique within that menu.
+   */
+  public static function menuLink(string $menu, string $key): string {
+    return self::uuid("menu_link_content:$menu:$key");
+  }
+
+  /**
    * An author, by the identifier the user migration gives them.
    */
   public static function user(string $id): string {
     return self::uuid("user:$id");
+  }
+
+  /**
+   * The UUID of an OAuth consumer, by its client ID.
+   */
+  public static function consumer(string $client_id): string {
+    return self::uuid("consumer:$client_id");
   }
 
   /**
