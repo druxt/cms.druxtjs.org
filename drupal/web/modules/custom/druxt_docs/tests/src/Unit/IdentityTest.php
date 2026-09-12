@@ -1,0 +1,52 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\Tests\druxt_docs\Unit;
+
+use Drupal\druxt_docs\Identity;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+
+#[CoversClass(Identity::class)]
+#[Group('druxt_docs')]
+final class IdentityTest extends UnitTestCase {
+
+  /**
+   * The committed section terms carry these UUIDs.
+   *
+   * They were derived when the content model was built. If this fails, the
+   * derivation changed and every committed identifier is orphaned.
+   */
+  public function testSectionMatchesCommittedTerms(): void {
+    $this->assertSame('4f80265c-02fd-5652-8970-c0bf9eaf5e5b', Identity::section('explanation'));
+  }
+
+  /**
+   * The result is a version 5 UUID.
+   */
+  public function testUuidIsVersionFive(): void {
+    $uuid = Identity::uuid('anything');
+    $this->assertMatchesRegularExpression('/^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $uuid);
+    $this->assertSame($uuid, Identity::uuid('anything'));
+  }
+
+  /**
+   * Each kind of entity derives from its own name, so none can collide.
+   */
+  public function testKindsDoNotCollide(): void {
+    $source = 'docs/nuxt/content/how-to/theming.md';
+    $uuids = [
+      Identity::page($source),
+      Identity::paragraph($source, 0),
+      Identity::paragraph($source, 1),
+      Identity::alias($source),
+      Identity::media('/images/theming.png'),
+      Identity::file('/images/theming.png'),
+      Identity::section('how-to'),
+    ];
+    $this->assertCount(count($uuids), array_unique($uuids));
+  }
+
+}
