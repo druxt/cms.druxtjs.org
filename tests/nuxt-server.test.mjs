@@ -463,20 +463,28 @@ describe('proxy', () => {
   test('hands a request to the other server and streams its answer back', async () => {
     const { createProxyHandler } = await import('../nuxt/server/proxy.js')
     const target = http.createServer((req, res) => {
-      res.writeHead(201, { 'Content-Type': 'text/plain', 'X-Seen': req.url })
+      res.writeHead(201, {
+        'Content-Type': 'text/plain',
+        'X-Seen': req.url,
+        'X-Host': req.headers.host,
+      })
       res.end(`hello from ${req.method}`)
     })
     await new Promise((resolve) => target.listen(0, '127.0.0.1', resolve))
     try {
-      await withServer(
-        createProxyHandler({ host: '127.0.0.1', port: target.address().port }),
-        async (base) => {
-          const res = await request(`${base}/iframe.html?id=x`)
-          assert.equal(res.status, 201)
-          assert.equal(res.headers['x-seen'], '/iframe.html?id=x')
-          assert.equal(res.body, 'hello from GET')
-        }
-      )
+      const url = `http://127.0.0.1:${target.address().port}`
+      await withServer(createProxyHandler(url), async (base) => {
+        const res = await request(`${base}/iframe.html?id=x`)
+        assert.equal(res.status, 201)
+        assert.equal(res.headers['x-seen'], '/iframe.html?id=x')
+        assert.equal(res.headers['x-host'], new URL(url).host)
+        assert.equal(res.body, 'hello from GET')
+      })
+      // Drupal writes links to the host it is asked for, so the browser's stays on.
+      await withServer(createProxyHandler(url, { keepHost: true }), async (base) => {
+        const res = await request(`${base}/jsonapi`, { headers: { host: 'storybook.example' } })
+        assert.equal(res.headers['x-host'], 'storybook.example')
+      })
     } finally {
       target.close()
     }
@@ -484,9 +492,24 @@ describe('proxy', () => {
 
   test('answers 502 while the other server is not there', async () => {
     const { createProxyHandler } = await import('../nuxt/server/proxy.js')
-    await withServer(createProxyHandler({ host: '127.0.0.1', port: 1 }), async (base) => {
+    await withServer(createProxyHandler('http://127.0.0.1:1'), async (base) => {
       assert.equal((await request(`${base}/`)).status, 502)
     })
+  })
+
+  test("knows which paths are Drupal's", async () => {
+    const { isBackendPath } = await import('../nuxt/server/proxy.js')
+    for (const p of [
+      '/jsonapi',
+      '/jsonapi/node/article?x=1',
+      '/router/translate-path?path=/',
+      '/sites/default/files/a.png',
+      '/_decoupled/logo',
+    ]) {
+      assert.equal(isBackendPath(p), true, p)
+    }
+    for (const p of ['/', '/iframe.html', '/sb-manager/x.js', '/jsonapix'])
+      assert.equal(isBackendPath(p), false, p)
   })
 })
 

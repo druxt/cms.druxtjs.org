@@ -11,7 +11,7 @@ const http = require('http')
 const path = require('path')
 const { spawn } = require('child_process')
 const { getJson, waitForBackend } = require('./backend')
-const { createProxyHandler } = require('./proxy')
+const { createProxyHandler, isBackendPath } = require('./proxy')
 const { createStartingHandler } = require('./starting')
 
 const env = process.env
@@ -26,8 +26,10 @@ const setPhase = (phase) => {
   state.phase = phase
   state.since = new Date().toISOString()
 }
+// Drupal's paths go to Drupal from this origin, as they do on the site; the rest to Storybook once it answers.
+const backend = createProxyHandler(baseUrl, { keepHost: true })
 let handler = createStartingHandler(state)
-const server = http.createServer((req, res) => handler(req, res))
+const server = http.createServer((req, res) => (isBackendPath(req.url) ? backend : handler)(req, res))
 
 /** Resolves once Storybook answers on its own port. */
 const waitForStorybook = async () => {
@@ -67,7 +69,7 @@ const main = async () => {
 
   await waitForStorybook()
   setPhase('starting')
-  handler = createProxyHandler({ host: '127.0.0.1', port: inner })
+  handler = createProxyHandler(`http://127.0.0.1:${inner}`)
   log(`serving Storybook from port ${inner}`)
 }
 

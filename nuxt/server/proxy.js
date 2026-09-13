@@ -1,28 +1,49 @@
 /**
- * A request listener that hands every request to another local server and
- * streams the answer back: the port stays open while the real server builds.
+ * Request listeners that hand a request to another server and stream the
+ * answer back: the port stays open while the real server builds, and the
+ * backend's paths reach Drupal from the same origin.
  */
 const http = require('http')
+const https = require('https')
+
+/** The paths the browser sends to Drupal: Druxt's API, the router, files and the decoupled settings. */
+const BACKEND_PATHS = ['/jsonapi', '/router', '/sites', '/_decoupled']
 
 /**
- * @param {object} target - Where requests go.
- * @param {string} target.host - The host, usually 127.0.0.1.
- * @param {number} target.port - The port.
- * @returns {Function} A request listener.
+ * Whether a request path belongs to Drupal rather than the app in front of it.
+ *
+ * @param {string} url - The request URL.
+ * @returns {boolean} True for the backend's paths.
  */
-const createProxyHandler = ({ host, port }) => (req, res) => {
-  const upstream = http.request(
-    { host, port, method: req.method, path: req.url, headers: { ...req.headers, host: `${host}:${port}` } },
-    (answer) => {
-      res.writeHead(answer.statusCode, answer.headers)
-      answer.pipe(res)
-    },
-  )
-  upstream.on('error', () => {
-    if (!res.headersSent) res.writeHead(502, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' })
-    res.end('Bad Gateway')
-  })
-  req.pipe(upstream)
+const isBackendPath = (url) => {
+  const path = String(url || '').split('?')[0]
+  return BACKEND_PATHS.some((prefix) => path === prefix || path.startsWith(`${prefix}/`))
 }
 
-module.exports = { createProxyHandler }
+/**
+ * @param {string} target - The server to hand requests to, as an origin such as `http://127.0.0.1:3001`.
+ * @param {object} [options] - Options.
+ * @param {boolean} [options.keepHost] - Send the browser's Host header on, so the answer's links keep this origin.
+ * @returns {Function} A request listener.
+ */
+const createProxyHandler = (target, { keepHost = false } = {}) => {
+  const origin = new URL(target)
+  const client = origin.protocol === 'https:' ? https : http
+  return (req, res) => {
+    const headers = { ...req.headers, host: keepHost ? req.headers.host : origin.host }
+    const upstream = client.request(
+      { host: origin.hostname, port: origin.port || (origin.protocol === 'https:' ? 443 : 80), method: req.method, path: req.url, headers },
+      (answer) => {
+        res.writeHead(answer.statusCode, answer.headers)
+        answer.pipe(res)
+      },
+    )
+    upstream.on('error', () => {
+      if (!res.headersSent) res.writeHead(502, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' })
+      res.end('Bad Gateway')
+    })
+    req.pipe(upstream)
+  }
+}
+
+module.exports = { BACKEND_PATHS, createProxyHandler, isBackendPath }
