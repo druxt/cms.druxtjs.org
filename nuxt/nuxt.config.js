@@ -192,7 +192,7 @@ export default {
     [
       '/umami',
       {
-        target: 'https://demo-api.druxtjs.org',
+        target: 'https://api.umami.demo.druxtjs.org',
         pathRewrite: { '^/umami': '' },
         changeOrigin: true,
       },

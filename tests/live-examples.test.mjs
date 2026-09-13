@@ -119,7 +119,7 @@ describe('BACKENDS', () => {
     assert.equal(m.BACKENDS.site.proxyRoot, '')
     assert.equal(m.BACKENDS.umami.api, '/umami/jsonapi')
     assert.equal(m.BACKENDS.umami.proxyRoot, '/umami')
-    assert.equal(m.BACKENDS.umami.baseUrl, 'https://demo-api.druxtjs.org')
+    assert.equal(m.BACKENDS.umami.baseUrl, 'https://api.umami.demo.druxtjs.org')
   })
 })
 

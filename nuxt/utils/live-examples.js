@@ -18,7 +18,7 @@ export const BACKENDS = {
   umami: {
     label: 'Umami demo',
     api: '/umami/jsonapi',
-    baseUrl: 'https://demo-api.druxtjs.org',
+    baseUrl: 'https://api.umami.demo.druxtjs.org',
     proxyRoot: '/umami',
     nodeBundles: ['recipe', 'article', 'page'],
     storybook: 'https://storybook.umami.demo.druxtjs.org/',
