@@ -92,6 +92,16 @@ function buildToc(doc) {
 // ---------------------------------------------------------------------------
 
 /**
+ * The file an image's src names under the static directory, or null when
+ * the src reaches outside it.
+ */
+function staticFile(root, src) {
+  const dir = path.resolve(root, STATIC_DIR)
+  const file = path.resolve(dir, `.${src}`)
+  return file.startsWith(`${dir}${path.sep}`) ? file : null
+}
+
+/**
  * Builds the IR for every authored page.
  *
  * @param {string} root - Root of the documentation checkout.
@@ -129,7 +139,8 @@ export function build(root) {
     }
 
     for (const image of extractImages(doc.body)) {
-      if (!image.src.startsWith('/') || !existsSync(path.join(root, STATIC_DIR, image.src))) {
+      const found = image.src.startsWith('/') && staticFile(root, image.src)
+      if (!found || !existsSync(found)) {
         defects.add(file, 1, `image is not a file under ${STATIC_DIR}: ${image.src}`)
       }
     }
@@ -303,7 +314,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   for (const src of images) {
     const target = path.join(out, 'static', src)
     mkdirSync(path.dirname(target), { recursive: true })
-    copyFileSync(path.join(source, STATIC_DIR, src), target)
+    const from = staticFile(source, src)
+    if (!from) throw new Error(`image reaches outside ${STATIC_DIR}: ${src}`)
+    copyFileSync(from, target)
   }
   process.stdout.write(
     `${documents.length} documents and ${images.size} images written to ${out}\n`

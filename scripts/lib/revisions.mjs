@@ -76,10 +76,13 @@ export function rebuilds(body, blocks, presentation) {
  *   the version.
  */
 export function revision(version, images, next) {
-  const { frontmatter, body } = splitFrontmatter(version.content)
+  const { frontmatter, body, unparsed } = splitFrontmatter(version.content)
   const tokens = tokenize(body).blocks
   const notes = new Defects()
   const file = `${version.path}@${version.sha.slice(0, 12)}`
+  for (const line of unparsed) {
+    notes.add(file, 1, `frontmatter this parser does not understand: ${line}`)
+  }
   const { blocks, presentation } = buildBlocks({ file, blocks: tokens }, notes, {
     keepRefused: true,
     images,
