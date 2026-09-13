@@ -459,6 +459,37 @@ describe('backend', () => {
   })
 })
 
+describe('proxy', () => {
+  test('hands a request to the other server and streams its answer back', async () => {
+    const { createProxyHandler } = await import('../nuxt/server/proxy.js')
+    const target = http.createServer((req, res) => {
+      res.writeHead(201, { 'Content-Type': 'text/plain', 'X-Seen': req.url })
+      res.end(`hello from ${req.method}`)
+    })
+    await new Promise((resolve) => target.listen(0, '127.0.0.1', resolve))
+    try {
+      await withServer(
+        createProxyHandler({ host: '127.0.0.1', port: target.address().port }),
+        async (base) => {
+          const res = await request(`${base}/iframe.html?id=x`)
+          assert.equal(res.status, 201)
+          assert.equal(res.headers['x-seen'], '/iframe.html?id=x')
+          assert.equal(res.body, 'hello from GET')
+        }
+      )
+    } finally {
+      target.close()
+    }
+  })
+
+  test('answers 502 while the other server is not there', async () => {
+    const { createProxyHandler } = await import('../nuxt/server/proxy.js')
+    await withServer(createProxyHandler({ host: '127.0.0.1', port: 1 }), async (base) => {
+      assert.equal((await request(`${base}/`)).status, 502)
+    })
+  })
+})
+
 describe('starting page', () => {
   const newState = () => ({ phase: 'waiting', since: '2026-09-12T00:00:00.000Z' })
 
