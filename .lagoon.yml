@@ -15,6 +15,7 @@ environments:
     routes:
       - nuxt:
           - druxtjs.org
+          - www.druxtjs.org
           - blocks.druxtjs.org
           - breadcrumb.druxtjs.org
           - entity.druxtjs.org

@@ -139,19 +139,23 @@ the driver fails to install on that database.
 
 What the cutover from the druxt.js build needs, in order.
 
-1. Point the production route at this project's `nuxt` service, with the
-   package subdomains (`blocks.druxtjs.org` and the others) as routes on
-   the same service; the server answers each with a redirect to
-   `druxtjs.org`.
-2. Set `LAGOON_ENVIRONMENT_TYPE=production` on that environment: it turns on
+1. Point the production route at this project's `nuxt` service, with
+   `www.druxtjs.org` and the package subdomains (`blocks.druxtjs.org` and
+   the others) as routes on the same service; the server answers each
+   subdomain with a redirect to `druxtjs.org`.
+2. Give `storybook.druxtjs.org` a DNS record. The other hosts are CNAME
+   records to the platform's CDN, which answers TLS only for hostnames it
+   knows, so a new hostname is registered with the platform first or its
+   record points at the cluster's ingress instead.
+3. Set `LAGOON_ENVIRONMENT_TYPE=production` on that environment: it turns on
    the GA4 tag and turns off the `noindex` header previews send.
-3. Confirm the Drupal environment variables the settings file reads, and that
+4. Confirm the Drupal environment variables the settings file reads, and that
    the site mail address is one the domain's SPF record allows to send.
-4. After the first deployment, check `sitemap.xml`, `robots.txt`,
+5. After the first deployment, check `sitemap.xml`, `robots.txt`,
    `llms.txt` and `llms-full.txt`, and that an old path such as
    `/guide/getting-started` and a legacy reference path such as
    `/api/components/DruxtEntity.html` redirect.
-5. Watch the first deployment's rollout: every restart serves errors for
+6. Watch the first deployment's rollout: every restart serves errors for
    about a minute, then the starting page, until the app has built.
 
 ## Not done yet
