@@ -291,7 +291,7 @@ describe("a reader's own Drupal", () => {
     if (url.startsWith('https://drupal.example/router/translate-path')) return { status: 404 }
     if (url.startsWith('https://drupal.example/jsonapi/menu/menu'))
       return ok({ data: [{ attributes: { drupal_internal__id: 'footer' } }] })
-    if (url === 'https://drupal.example/jsonapi/menu_items/footer') return { status: 400 }
+    if (url === 'https://drupal.example/jsonapi/menu_items/footer') return ok({ data: [] })
     if (url.startsWith('https://drupal.example/jsonapi/view/view'))
       return ok({
         data: [{ attributes: { drupal_internal__id: 'content', display: { page_1: {} } } }],
@@ -316,6 +316,18 @@ describe("a reader's own Drupal", () => {
       assert.match(backend.reasons.DruxtView, /JSON:API Views/)
       assert.ok(calls.includes('https://drupal.example/jsonapi/menu_items/footer'))
       assert.ok(calls.includes('https://drupal.example/jsonapi/views/content/page_1'))
+    } finally {
+      delete globalThis.fetch
+    }
+  })
+
+  test('probeBackend tells a refusing Drupal from a missing module', async () => {
+    globalThis.fetch = async (url) =>
+      url === 'https://drupal.example/jsonapi/menu_items/footer' ? { status: 403 } : drupal(url)
+    try {
+      const { backend } = await m.probeBackend('https://drupal.example')
+      assert.match(backend.reasons.DruxtMenu, /answers 403 for JSON:API Menu Items/)
+      assert.match(backend.reasons.DruxtView, /needs JSON:API Views/)
     } finally {
       delete globalThis.fetch
     }

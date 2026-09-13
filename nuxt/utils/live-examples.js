@@ -84,18 +84,25 @@ export const probeBackend = async (origin) => {
   }
   const links = index.links || {}
   const reasons = {}
-  // Anything but a 404 is the module answering: a 400 or 403 is still there.
-  const answers = (url) => fetch(url, { headers: { Accept: 'application/vnd.api+json' } }).then((r) => r.status !== 404, () => false)
+  // A module is there when its endpoint answers 2xx. A 404 means it is missing; anything else is that Drupal refusing.
+  const answers = async (url, what) => {
+    const status = await fetch(url, { headers: { Accept: 'application/vnd.api+json' } }).then((r) => r.status, () => 0)
+    if (status >= 200 && status < 300) return null
+    return status === 404 || status === 0 ? `needs ${what} on that Drupal` : `that Drupal answers ${status} for ${what}`
+  }
   // The first of a collection, for a request that needs a real name.
   const first = async (path) => (((await get(backend.api, path).catch(() => ({}))).data || [])[0] || {}).attributes || {}
   // The router: one path resolved, whatever it answers with.
-  if (!(await answers(`${origin}/router/translate-path?path=/`))) reasons.DruxtRouter = reasons.DruxtBreadcrumb = reasons.DruxtSite = 'needs Decoupled Router on that Drupal'
+  const router = await answers(`${origin}/router/translate-path?path=/`, 'Decoupled Router')
+  if (router) reasons.DruxtRouter = reasons.DruxtBreadcrumb = reasons.DruxtSite = router
   // Menu items and views add nothing to the index; ask for one of each.
   const menu = links['menu--menu'] ? (await first('/menu/menu?page%5Blimit%5D=1&fields%5Bmenu--menu%5D=drupal_internal__id')).drupal_internal__id : null
-  if (!menu || !(await answers(`${backend.api}/menu_items/${menu}`))) reasons.DruxtMenu = 'needs JSON:API Menu Items on that Drupal'
+  const menuReason = menu ? await answers(`${backend.api}/menu_items/${menu}`, 'JSON:API Menu Items') : 'needs JSON:API Menu Items on that Drupal'
+  if (menuReason) reasons.DruxtMenu = menuReason
   const view = links['view--view'] ? await first('/view/view?page%5Blimit%5D=1&fields%5Bview--view%5D=drupal_internal__id,display') : {}
   const display = Object.keys(view.display || {})[0]
-  if (!display || !(await answers(`${backend.api}/views/${view.drupal_internal__id}/${display}`))) reasons.DruxtView = 'needs JSON:API Views on that Drupal'
+  const viewReason = display ? await answers(`${backend.api}/views/${view.drupal_internal__id}/${display}`, 'JSON:API Views') : 'needs JSON:API Views on that Drupal'
+  if (viewReason) reasons.DruxtView = viewReason
   if (!links['block--block']) reasons.DruxtBlock = reasons.DruxtBlockRegion = 'exposes no blocks over JSON:API'
   // The content types the router examples list: every node type it has.
   const nodeBundles = Object.keys(links).map((k) => k.match(/^node--(.+)$/)).filter(Boolean).map((m) => m[1])

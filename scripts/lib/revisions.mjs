@@ -80,8 +80,13 @@ export function revision(version, images, next) {
   const tokens = tokenize(body).blocks
   const notes = new Defects()
   const file = `${version.path}@${version.sha.slice(0, 12)}`
+  const lines = version.content.split('\n')
   for (const line of unparsed) {
-    notes.add(file, 1, `frontmatter this parser does not understand: ${line}`)
+    notes.add(
+      file,
+      lines.indexOf(line) + 1 || 1,
+      `frontmatter this parser does not understand: ${line}`
+    )
   }
   const { blocks, presentation } = buildBlocks({ file, blocks: tokens }, notes, {
     keepRefused: true,

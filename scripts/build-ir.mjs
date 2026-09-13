@@ -30,7 +30,15 @@
 //             directory and never the checkout.
 //   --check   round-trip every page and report, writing nothing.
 
-import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  realpathSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
 import path from 'node:path'
 import { createRequire } from 'node:module'
 import { Defects, buildBlocks, normalise, serialise } from './lib/blocks.mjs'
@@ -98,7 +106,9 @@ function buildToc(doc) {
 function staticFile(root, src) {
   const dir = path.resolve(root, STATIC_DIR)
   const file = path.resolve(dir, `.${src}`)
-  return file.startsWith(`${dir}${path.sep}`) ? file : null
+  if (!file.startsWith(`${dir}${path.sep}`) || !existsSync(file)) return null
+  // A symlink is followed on the copy, so what it points at has to be inside too.
+  return realpathSync(file).startsWith(`${realpathSync(dir)}${path.sep}`) ? file : null
 }
 
 /**
@@ -139,8 +149,7 @@ export function build(root) {
     }
 
     for (const image of extractImages(doc.body)) {
-      const found = image.src.startsWith('/') && staticFile(root, image.src)
-      if (!found || !existsSync(found)) {
+      if (!image.src.startsWith('/') || !staticFile(root, image.src)) {
         defects.add(file, 1, `image is not a file under ${STATIC_DIR}: ${image.src}`)
       }
     }
