@@ -408,6 +408,10 @@ export default {
       const option = (value) => Object.values(this.options).flat().find((o) => o.value === value) || {}
       const v = this.values
       const label = (value) => (option(value).label || '').replace(/ \([^)]*\)$/, '')
+      // Storybook reads only letters, digits, spaces, underscores and dashes from
+      // a URL's args, so a path or a uuid with anything else stays behind.
+      const encodable = (value) => /^[a-zA-Z0-9 _-]*$/.test(String(value))
+      const argsOf = (values) => Object.entries(values).filter(([, v]) => encodable(v)).map(([k, v]) => `${k}:${v}`).join(';')
       const link = (id, args) => ({
         href: `${host.replace(/\/?$/, '/')}?path=/story/${id}${args ? '&args=' + encodeURIComponent(args) : ''}`,
         label: `Open this ${this.name} in ${b.storybookLabel} Storybook`,
@@ -429,7 +433,7 @@ export default {
         case 'DruxtView':
           return v.viewId && v.displayId ? link(`${slug('druxt', 'views', label(v.viewId))}--${slug(v.displayId)}`) : null
         default:
-          return this.schema.story ? link(this.schema.story) : null
+          return this.schema.story ? link(this.schema.story, argsOf(this.renderProps)) : null
       }
     },
   },
