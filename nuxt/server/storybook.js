@@ -26,8 +26,9 @@ const setPhase = (phase) => {
   state.phase = phase
   state.since = new Date().toISOString()
 }
-// Drupal's paths go to Drupal from this origin, as they do on the site; the rest to Storybook once it answers.
-const backend = createProxyHandler(baseUrl, { keepHost: true })
+// Drupal's paths go to Drupal from this origin, as they do on the site, and
+// under Drupal's own host: this one is not among the hosts it trusts.
+const backend = createProxyHandler(baseUrl)
 let handler = createStartingHandler(state)
 const server = http.createServer((req, res) => (isBackendPath(req.url) ? backend : handler)(req, res))
 
