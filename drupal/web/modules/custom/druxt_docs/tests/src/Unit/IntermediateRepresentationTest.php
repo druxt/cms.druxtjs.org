@@ -108,6 +108,41 @@ final class IntermediateRepresentationTest extends UnitTestCase {
   }
 
   /**
+   * A source that is not a path is a validation error, not a crash.
+   */
+  public function testSourceMustBePath(): void {
+    $this->write('a.json', ['source' => []] + $this->document());
+    $this->assertNull(IntermediateRepresentation::load($this->directory, $error));
+    $this->assertStringContainsString('source is not a path', $error);
+  }
+
+  /**
+   * Two landing pages for one section would fight over its other pages.
+   */
+  public function testTwoLandingPagesForOneSectionAreRefused(): void {
+    $documents = [
+      'how-to/README.md' => ['isLanding' => TRUE] + $this->document('how-to/README.md'),
+      'how-to/index.md' => ['isLanding' => TRUE] + $this->document('how-to/index.md'),
+      'how-to/theming.md' => $this->document(),
+    ];
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessageMatches('/Two landing pages claim the how-to section: how-to\/README\.md and how-to\/index\.md/');
+    IntermediateRepresentation::landings($documents);
+  }
+
+  /**
+   * One landing page per section is the map the document source builds on.
+   */
+  public function testLandingsKeyEachSectionBySource(): void {
+    $documents = [
+      'how-to/README.md' => ['isLanding' => TRUE] + $this->document('how-to/README.md'),
+      'how-to/theming.md' => $this->document(),
+      'tutorials/README.md' => ['isLanding' => TRUE, 'section' => 'tutorials'] + $this->document('tutorials/README.md'),
+    ];
+    $this->assertSame(['how-to' => 'how-to/README.md', 'tutorials' => 'tutorials/README.md'], IntermediateRepresentation::landings($documents));
+  }
+
+  /**
    * A document without its history must not import as a page with none.
    *
    * An empty history is a page with one version. A missing one is a builder

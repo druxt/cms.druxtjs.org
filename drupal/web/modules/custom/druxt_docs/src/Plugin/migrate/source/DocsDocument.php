@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\druxt_docs\Plugin\migrate\source;
 
 use Drupal\druxt_docs\History;
+use Drupal\druxt_docs\IntermediateRepresentation;
 use Drupal\druxt_docs\Layout;
 use Drupal\druxt_docs\Sections;
 use Drupal\migrate\Attribute\MigrateSource;
@@ -61,11 +62,11 @@ final class DocsDocument extends DocsSourceBase {
   protected function initializeIterator(): \Iterator {
     $documents = $this->documents();
     // Each section's landing page, which its other pages sit under.
-    $landings = [];
-    foreach ($documents as $page => $document) {
-      if (!empty($document['isLanding'])) {
-        $landings[$document['section']] = $page;
-      }
+    try {
+      $landings = IntermediateRepresentation::landings($documents);
+    }
+    catch (\InvalidArgumentException $exception) {
+      throw new MigrateException(sprintf('%s: %s', $this->pluginId, $exception->getMessage()));
     }
 
     $landing = $this->configuration['landing'] ?? NULL;

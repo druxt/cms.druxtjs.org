@@ -95,6 +95,9 @@ final class History {
       if (trim($revision['title']) === '') {
         throw new \InvalidArgumentException(sprintf('%s: an empty title.', $label));
       }
+      if (array_key_exists('path', $revision) && $revision['path'] !== $page) {
+        throw new \InvalidArgumentException(sprintf('%s: a version of %s, not of this page.', $label, is_string($revision['path']) ? $revision['path'] : json_encode($revision['path'])));
+      }
       $description = $revision['description'] ?? NULL;
       if ($description !== NULL && !is_string($description)) {
         throw new \InvalidArgumentException(sprintf('%s: a description that is not text.', $label));

@@ -78,6 +78,11 @@ final class IntermediateRepresentation {
         return NULL;
       }
 
+      if (!is_string($document['source']) || $document['source'] === '') {
+        $error = sprintf('%s: source is not a path.', $file);
+        return NULL;
+      }
+
       if (isset($documents[$document['source']])) {
         $error = sprintf('Two documents claim the same source: %s', $document['source']);
         return NULL;
@@ -89,6 +94,34 @@ final class IntermediateRepresentation {
     ksort($documents);
 
     return $documents;
+  }
+
+  /**
+   * Each section's landing page, keyed by section.
+   *
+   * @param array<string, array> $documents
+   *   The documents, keyed by source.
+   *
+   * @return array<string, string>
+   *   The landing page's source per section.
+   *
+   * @throws \InvalidArgumentException
+   *   When two landing pages claim one section: the other pages of that
+   *   section would sit under whichever came last.
+   */
+  public static function landings(array $documents): array {
+    $landings = [];
+    foreach ($documents as $page => $document) {
+      if (empty($document['isLanding'])) {
+        continue;
+      }
+      $section = (string) ($document['section'] ?? '');
+      if (isset($landings[$section])) {
+        throw new \InvalidArgumentException(sprintf('Two landing pages claim the %s section: %s and %s.', $section, $landings[$section], $page));
+      }
+      $landings[$section] = (string) $page;
+    }
+    return $landings;
   }
 
 }

@@ -57,7 +57,12 @@ final class DocsImage extends DocsSourceBase {
           throw new MigrateException(sprintf('%s block %d: %s already has the alt text %s, and this use gives it %s. One image carries one alt text.', $page, $index, $src, json_encode($images[$src]['alt']), json_encode($alt)));
         }
         $basename = basename($src);
-        $path = rtrim($directory, '/') . '/static/' . ltrim($src, '/');
+        try {
+          $path = self::imagePath($directory, $src);
+        }
+        catch (\InvalidArgumentException $exception) {
+          throw new MigrateException(sprintf('%s block %d: %s', $page, $index, $exception->getMessage()));
+        }
         if (!is_file($path)) {
           throw new MigrateException(sprintf('%s block %d: %s is not in the intermediate representation at %s.', $page, $index, $src, $path));
         }
@@ -69,6 +74,31 @@ final class DocsImage extends DocsSourceBase {
     }
     ksort($images);
     return new \ArrayIterator(array_values($images));
+  }
+
+  /**
+   * Where an image's file is, inside the intermediate representation.
+   *
+   * @param string $directory
+   *   The intermediate representation directory.
+   * @param string $src
+   *   The image's src, a path under its static directory.
+   *
+   * @return string
+   *   The file's path, which may not exist.
+   *
+   * @throws \InvalidArgumentException
+   *   When the src reaches outside the static directory.
+   */
+  public static function imagePath(string $directory, string $src): string {
+    $static = rtrim($directory, '/') . '/static';
+    $path = $static . '/' . ltrim($src, '/');
+    $realStatic = realpath($static);
+    $realPath = realpath($path);
+    if ($realStatic !== FALSE && $realPath !== FALSE && !str_starts_with($realPath, $realStatic . '/')) {
+      throw new \InvalidArgumentException(sprintf('%s reaches outside the intermediate representation.', $src));
+    }
+    return $path;
   }
 
 }
