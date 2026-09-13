@@ -508,7 +508,7 @@ describe('proxy', () => {
     ]) {
       assert.equal(isBackendPath(p), true, p)
     }
-    for (const p of ['/', '/iframe.html', '/sb-manager/x.js', '/jsonapix'])
+    for (const p of ['/', '/iframe.html', '/sb-manager/x.js', '/jsonapi-like'])
       assert.equal(isBackendPath(p), false, p)
   })
 })
