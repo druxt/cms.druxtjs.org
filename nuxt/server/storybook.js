@@ -16,10 +16,11 @@ const log = (message) => console.log(`[storybook] ${message}`)
 const main = async () => {
   await waitForBackend(baseUrl, { log })
   log(`Drupal is ready at ${baseUrl}`)
-  const bin = path.join(__dirname, '..', 'node_modules', 'nuxt', 'bin', 'nuxt.js')
-  const child = spawn(process.execPath, [bin, 'storybook', '--port', String(port), '--ci'], {
+  // `nuxt storybook` hands over to this binary, and finds it only on yarn's PATH.
+  const bin = path.join(__dirname, '..', 'node_modules', '@nuxtjs', 'storybook', 'bin', 'nuxt-storybook.js')
+  const child = spawn(process.execPath, [bin, '--port', String(port), '--host', env.HOST || '0.0.0.0', '--ci'], {
     cwd: path.join(__dirname, '..'),
-    env: { ...env, HOST: env.HOST || '0.0.0.0' },
+    env,
     stdio: 'inherit',
   })
   child.on('exit', (code, signal) => process.exit(signal ? 1 : code || 0))
