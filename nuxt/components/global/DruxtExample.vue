@@ -10,27 +10,41 @@
         {{ error ? 'Not live' : 'Live' }}
       </span>
 
-      <code v-if="fixed" class="text-[13px] text-primary-focus">&lt;{{ name }}&gt;</code>
+      <code v-if="fixed || picker.length === 1" class="text-[13px] text-primary-focus">&lt;{{ name }}&gt;</code>
       <label v-else class="flex items-center gap-2 text-sm">
         <span class="sr-only sm:not-sr-only text-base-content/70">Component</span>
         <!-- Capped: the disabled options' reasons would otherwise set the width. -->
-        <select v-model="name" data-testid="component" class="select select-sm select-bordered h-[30px] min-h-0 rounded-md w-[15rem] max-w-full text-base sm:text-sm">
+        <select v-model="name" data-testid="component" class="select select-sm select-bordered h-[30px] min-h-0 rounded-md w-[15rem] max-w-full text-base lg:text-sm">
           <option value="" disabled>Pick one</option>
-          <option v-for="n in picker" :key="n" :value="n">{{ n }}</option>
+          <optgroup v-for="g in pickerGroups" :key="g.pkg" :label="g.pkg">
+            <option v-for="n in g.names" :key="n" :value="n">{{ n }}</option>
+          </optgroup>
         </select>
       </label>
 
       <!-- Right on a wide band; left under the picker when the band wraps. -->
       <label v-if="live" class="sm:ml-auto flex items-center gap-2 text-sm">
         <span class="text-base-content/70">Backend</span>
-        <select v-model="backend" data-testid="backend" class="select select-sm select-bordered h-[30px] min-h-0 rounded-md text-base sm:text-sm">
-          <!-- Short, so the reason never widens the select on a phone; it is the option's title. -->
-          <option v-for="(b, key) in backends" :key="key" :value="key" :disabled="!available(key)" :title="available(key) ? null : schema.backends[key]">
+        <select data-testid="backend" class="select select-sm select-bordered h-[30px] min-h-0 rounded-md text-base lg:text-sm" :value="customOpen ? 'other' : backend" @change="pickBackend($event.target.value)">
+          <!-- Short, so the reason never widens the select on a phone; the reason is said below. -->
+          <option v-for="(b, key) in backends" :key="key" :value="key" :disabled="!available(key)">
             {{ b.label }}{{ available(key) ? '' : ' (n/a)' }}
           </option>
+          <option value="other">Your own Drupal</option>
         </select>
       </label>
     </div>
+
+    <!-- A reader's Drupal: its origin, checked for what it offers before it is used. -->
+    <form v-if="live && customOpen" class="flex flex-wrap items-center gap-2 px-3.5 pb-2.5 text-sm" data-testid="custom-backend" @submit.prevent="useCustom">
+      <input v-model="customInput" type="url" aria-label="The origin of your Drupal" placeholder="https://drupal.example" class="input input-sm input-bordered h-[30px] min-h-0 rounded-md w-full sm:w-[260px] font-mono text-base lg:text-[12.5px]" :disabled="customBusy" />
+      <button type="submit" class="btn btn-sm btn-outline h-[30px] min-h-0" :disabled="customBusy || !customInput">{{ customBusy ? 'Checking' : 'Use it' }}</button>
+      <p class="basis-full text-[11.5px]" :class="customError ? 'text-error' : 'text-base-content/70'" role="status">
+        {{ customError || 'The browser talks to it directly, so it has to allow this origin (CORS in its services.yml). What it lacks greys out the components that need it.' }}
+      </p>
+    </form>
+    <!-- Why a backend is greyed out: the option's title, said in text. -->
+    <p v-if="live && unavailable" class="px-3.5 pb-2 -mt-1 text-[11.5px] text-base-content/70">{{ unavailable }}</p>
 
     <!-- A component that is not live on its own: one line, and a way in. -->
     <div v-if="name && !live" class="border-t border-base-300 bg-base-100 px-3.5 py-3 text-sm">
@@ -61,7 +75,7 @@
       <div data-testid="preview" class="druxt-preview bg-base-100 border-t border-base-300 px-[18px] py-5 max-h-[380px] overflow-y-auto">
         <div v-if="error" class="text-sm">
           <p class="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-error">Backend not responding</p>
-          <p class="mt-1 text-base-content/70">The {{ backends[backend].label }} did not answer. The controls keep their values, so nothing is lost.</p>
+          <p class="mt-1 text-base-content/70">{{ backends[backend].label }} did not answer. The controls keep their values, so nothing is lost.</p>
           <p class="mt-2 font-mono text-[12px] text-base-content/70">{{ error }}</p>
           <button type="button" class="btn btn-sm btn-outline mt-3" @click="retry">Try again</button>
         </div>
@@ -106,7 +120,8 @@
               <select
                 :key="step.name"
                 :data-testid="'step-' + step.name"
-                class="select select-sm select-bordered h-[30px] min-h-0 rounded-md font-mono text-base sm:text-[12.5px] w-full sm:w-auto sm:max-w-full"
+                :aria-label="step.name"
+                class="select select-sm select-bordered h-[30px] min-h-0 rounded-md font-mono text-base lg:text-[12.5px] w-full sm:w-auto sm:max-w-full"
                 :value="values[step.name] || ''"
                 :disabled="!stepEnabled(step)"
                 @change="setStep(i, $event.target.value)"
@@ -132,7 +147,7 @@
               </button>
             </div>
             <span v-else-if="prop.control === 'select' && !loading[prop.source] && !ungrouped(prop).length" class="text-[12.5px] text-base-content/70 italic">{{ prop.name === 'langcode' ? 'one language on this backend' : 'nothing to choose on this backend' }}</span>
-            <select v-else-if="prop.control === 'select'" :data-testid="'prop-' + prop.name" class="select select-sm select-bordered h-[30px] min-h-0 rounded-md w-full sm:w-[200px] font-mono text-base sm:text-[12.5px]" :value="values[prop.name] || ''" @change="setValue(prop.name, $event.target.value)">
+            <select v-else-if="prop.control === 'select'" :data-testid="'prop-' + prop.name" :aria-label="prop.name" class="select select-sm select-bordered h-[30px] min-h-0 rounded-md w-full sm:w-[200px] font-mono text-base lg:text-[12.5px]" :value="values[prop.name] || ''" @change="setValue(prop.name, $event.target.value)">
               <option v-if="!values[prop.name]" value="" disabled>{{ loading[prop.source] ? 'loading' : 'choose' }}</option>
               <template v-if="grouped(prop).length">
                 <optgroup v-for="g in grouped(prop)" :key="g.group" :label="g.group">
@@ -142,11 +157,11 @@
               <option v-for="o in ungrouped(prop)" v-else :key="o.value" :value="o.value">{{ o.label }}</option>
             </select>
             <label v-else-if="prop.control === 'toggle'" class="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" class="toggle toggle-sm toggle-primary" :checked="toggleValue(prop)" @change="setValue(prop.name, $event.target.checked)" />
+              <input type="checkbox" class="toggle toggle-sm toggle-primary" :aria-label="prop.name" :checked="toggleValue(prop)" @change="setValue(prop.name, $event.target.checked)" />
               <span class="text-[12px]">{{ toggleValue(prop) ? 'on' : 'off' }}</span>
             </label>
-            <input v-else-if="prop.control === 'number'" type="number" class="input input-sm input-bordered h-[30px] min-h-0 rounded-md w-[72px] font-mono text-base sm:text-[12.5px]" :placeholder="prop.default == null ? '' : String(prop.default)" :value="values[prop.name] == null ? '' : values[prop.name]" @change="setValue(prop.name, $event.target.value === '' ? undefined : Number($event.target.value))" />
-            <input v-else type="text" class="input input-sm input-bordered h-[30px] min-h-0 rounded-md w-full font-mono text-base sm:text-[12.5px]" :placeholder="prop.default == null ? '' : String(prop.default)" :value="values[prop.name] || ''" @change="setValue(prop.name, $event.target.value || undefined)" />
+            <input v-else-if="prop.control === 'number'" type="number" :aria-label="prop.name" class="input input-sm input-bordered h-[30px] min-h-0 rounded-md w-[72px] font-mono text-base lg:text-[12.5px]" :placeholder="prop.default == null ? '' : String(prop.default)" :value="values[prop.name] == null ? '' : values[prop.name]" @change="setValue(prop.name, $event.target.value === '' ? undefined : Number($event.target.value))" />
+            <input v-else type="text" :aria-label="prop.name" class="input input-sm input-bordered h-[30px] min-h-0 rounded-md w-full font-mono text-base lg:text-[12.5px]" :placeholder="prop.default == null ? '' : String(prop.default)" :value="values[prop.name] || ''" @change="setValue(prop.name, $event.target.value || undefined)" />
             <span v-if="prop.note" class="text-[12px] text-base-content/70">{{ prop.note }}</span>
           </div>
         </div>
@@ -167,20 +182,26 @@
 
         <!-- Resolution: closed, its answer; open, the list. -->
         <div class="pt-2.5" data-testid="resolution">
-          <div class="flex items-center gap-2 min-h-[20px] text-[12.5px]">
-            <button type="button" class="text-base-content/50 text-[10px]" :aria-expanded="String(openResolution)" @click="openResolution = !openResolution">{{ openResolution ? '▾' : '▸' }}</button>
-            <span class="text-base-content/70">{{ resolutionLine }}</span>
-          </div>
+          <button type="button" class="flex items-center gap-2 min-h-[24px] text-left text-[12.5px] text-base-content/70" :aria-expanded="String(openResolution)" @click="openResolution = !openResolution">
+            <span class="text-base-content/50 text-[10px]" aria-hidden="true">{{ openResolution ? '▾' : '▸' }}</span>
+            <span>{{ resolutionLine }}</span>
+          </button>
           <div v-if="openResolution" class="mt-2 pl-5 text-xs space-y-2">
             <ol class="font-mono space-y-0.5 list-none pl-0">
               <li v-for="(n, i) in resolution.options" :key="n" :class="n === resolution.is ? 'font-semibold' : 'text-base-content/70'">{{ i + 1 }}. {{ n }}</li>
             </ol>
+            <a href="/explanation/component-resolution" class="text-primary-focus">How wrapper resolution works</a>
             <!-- Every request the instance made, as it made it. -->
             <p class="text-base-content/70">{{ requests.length ? 'Requests' : 'No requests: the data was already in the store.' }}</p>
             <ul v-if="requests.length" class="font-mono space-y-0.5 list-none pl-0 break-all" data-testid="requests">
               <li v-for="r in requests" :key="r" class="text-base-content/70">{{ r }}</li>
             </ul>
           </div>
+        </div>
+
+        <!-- From a module or reference page: this card, on its own page, as set here. -->
+        <div v-if="placement !== 'playground'" class="pt-2.5 flex items-center gap-2 min-h-[20px] pl-5">
+          <NuxtLink :to="{ path: '/playground', query: shareQuery }" class="text-primary-focus text-[12.5px] font-medium" @click.native="track('example_open_playground')">Open in the playground</NuxtLink>
         </div>
 
         <!-- Open in Storybook: follows the backend, absent where none exists. -->
@@ -223,7 +244,9 @@ import {
   liveComponentsOf,
   packageOf,
   pageFor,
+  parseOrigin,
   pickOption,
+  probeBackend,
 } from '~/utils/live-examples'
 import { COPY_STATES, copyText } from '~/utils/copy-button'
 import { createRuntime } from '~/utils/druxt-runtime'
@@ -265,6 +288,12 @@ export default {
     return {
       name: this.component || liveComponentsOf(this.pkg)[0] || '',
       backend: 'site',
+      // A reader's own Drupal, once probed; and the form that asks for it.
+      custom: null,
+      customOpen: false,
+      customInput: '',
+      customBusy: false,
+      customError: '',
       values: {},
       options: {},
       loading: {},
@@ -282,7 +311,9 @@ export default {
   },
 
   computed: {
-    backends: () => BACKENDS,
+    backends: ({ custom }) => (custom ? { ...BACKENDS, custom } : BACKENDS),
+    /** The backend in a URL: its key, or a reader's origin. */
+    backendId: ({ backend, custom }) => (backend === 'custom' && custom ? custom.baseUrl : backend),
     copyStates: () => COPY_STATES,
     fixed: ({ component }) => !!component,
     live: ({ name }) => !!COMPONENTS[name],
@@ -295,6 +326,28 @@ export default {
 
     /** Only components that render on their own; the others have their own pages. */
     picker: ({ pkg }) => COMPONENT_NAMES.filter((n) => !pkg || packageOf(n) === pkg),
+
+    /** The picker's components by package, the way the Modules list orders them. */
+    pickerGroups: ({ picker }) => {
+      const groups = {}
+      for (const n of picker) (groups[packageOf(n)] = groups[packageOf(n)] || []).push(n)
+      return Object.keys(groups).sort().map((pkg) => ({ pkg, names: groups[pkg].sort() }))
+    },
+
+    /** The card's state as a playground URL query, for sharing and for the link below. */
+    shareQuery: ({ name, backendId, values, wrapper }) => {
+      const query = { component: name, backend: backendId }
+      for (const [key, value] of Object.entries(values)) if (value !== undefined && value !== '' && key !== 'wrapper') query[key] = String(value)
+      if (!wrapper) query.wrapper = 'false'
+      return query
+    },
+
+    /** Each backend that cannot serve the component, with its reason: the descriptor's, or the probe's. */
+    unavailable: ({ backends, schema, name }) => Object.keys(backends)
+      .map((key) => [key, key === 'custom' ? (backends.custom.reasons || {})[name] : schema.backends && schema.backends[key] !== true && schema.backends[key]])
+      .filter(([, reason]) => reason)
+      .map(([key, reason]) => `${backends[key].label}: ${reason}.`)
+      .join(' '),
 
     rows: ({ schema, name }) => [
       ...(schema.props || []),
@@ -347,14 +400,20 @@ export default {
      * and view, titled from their names.
      */
     storybook() {
-      const b = BACKENDS[this.backend]
-      if (!b.storybook || !this.name) return null
+      const b = this.backends[this.backend]
+      // This site's Storybook lives at the environment's route; the demo's is fixed.
+      const host = b.storybook || (this.backend === 'site' ? this.$config.storybookUrl : '')
+      if (!host || !this.name) return null
       const slug = (...parts) => parts.filter(Boolean).join('/').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
       const option = (value) => Object.values(this.options).flat().find((o) => o.value === value) || {}
       const v = this.values
       const label = (value) => (option(value).label || '').replace(/ \([^)]*\)$/, '')
+      // Storybook reads only letters, digits, spaces, underscores and dashes from
+      // a URL's args, so a path or a uuid with anything else stays behind.
+      const encodable = (value) => /^[a-zA-Z0-9 _-]*$/.test(String(value))
+      const argsOf = (values) => Object.entries(values).filter(([, v]) => encodable(v)).map(([k, v]) => `${k}:${v}`).join(';')
       const link = (id, args) => ({
-        href: `${b.storybook}?path=/story/${id}${args ? '&args=' + encodeURIComponent(args) : ''}`,
+        href: `${host.replace(/\/?$/, '/')}?path=/story/${id}${args ? '&args=' + encodeURIComponent(args) : ''}`,
         label: `Open this ${this.name} in ${b.storybookLabel} Storybook`,
       })
       switch (this.name) {
@@ -374,7 +433,7 @@ export default {
         case 'DruxtView':
           return v.viewId && v.displayId ? link(`${slug('druxt', 'views', label(v.viewId))}--${slug(v.displayId)}`) : null
         default:
-          return this.schema.story ? link(this.schema.story) : null
+          return this.schema.story ? link(this.schema.story, argsOf(this.renderProps)) : null
       }
     },
   },
@@ -400,8 +459,13 @@ export default {
     this.initial = {}
   },
 
-  mounted() {
+  async mounted() {
     if (this.placement === 'playground') this.readUrl()
+    if (this.customInput) {
+      this.customOpen = true
+      await this.useCustom()
+      if (this.backend === 'custom') return
+    }
     if (this.name) {
       this.reset()
       this.track('example_component')
@@ -423,14 +487,48 @@ export default {
       const { component, backend, wrapper, ...rest } = this.$route.query || {}
       if (component && COMPONENTS[component]) this.name = component
       if (backend && BACKENDS[backend]) this.backend = backend
+      // A reader's Drupal in a shared link: probed once the card is up.
+      if (backend && /^https?:\/\//.test(backend)) this.customInput = backend
       this.initial = { ...rest, ...(wrapper === 'false' ? { wrapper: false } : {}) }
+    },
+
+    /** The backend select: a known one, or the form for a reader's own. */
+    pickBackend(value) {
+      if (value === 'other') {
+        this.customOpen = true
+        return
+      }
+      this.customOpen = false
+      this.backend = value
+    },
+
+    /** Check the typed origin, and render against it if it answers. */
+    async useCustom() {
+      const { origin, error } = parseOrigin(this.customInput, window.location.protocol)
+      if (error) {
+        this.customError = error
+        return
+      }
+      this.customBusy = true
+      this.customError = ''
+      try {
+        const { backend } = await probeBackend(origin)
+        this.custom = backend
+        this.customOpen = false
+        this.track('example_custom_backend')
+        // The watcher renders; a change of origin on the same key must too.
+        if (this.backend === 'custom') this.reset()
+        else this.backend = 'custom'
+      } catch (e) {
+        this.customError = e.message
+      } finally {
+        this.customBusy = false
+      }
     },
 
     writeUrl() {
       if (this.placement !== 'playground' || !this.name) return
-      const query = { component: this.name, backend: this.backend }
-      for (const [key, value] of Object.entries(this.values)) if (value !== undefined && value !== '' && key !== 'wrapper') query[key] = String(value)
-      if (!this.wrapper) query.wrapper = 'false'
+      const query = this.shareQuery
       if (JSON.stringify(query) !== JSON.stringify(this.$route.query)) this.$router.replace({ query }).catch(() => {})
     },
 
@@ -444,6 +542,7 @@ export default {
 
     /** Whether a backend can serve the component; the reason it cannot is the descriptor's. */
     available(backend) {
+      if (backend === 'custom') return !!this.custom && !(this.custom.reasons || {})[this.name]
       const only = this.schema.backends
       return !only || only[backend] === true
     },
@@ -495,7 +594,7 @@ export default {
     async reset() {
       if (!this.available(this.backend)) {
         // The watcher brings us back here.
-        this.backend = Object.keys(BACKENDS).find((key) => this.available(key)) || 'site'
+        this.backend = Object.keys(this.backends).find((key) => this.available(key)) || 'site'
         return
       }
       this.error = null
@@ -521,7 +620,8 @@ export default {
       const key = this.optionsKey(source, deps)
       this.$set(this.loading, source, true)
       try {
-        const list = await cached(`${this.backend}:${key}`, () => SOURCES[source](BACKENDS[this.backend].api, deps, BACKENDS[this.backend]))
+        const b = this.backends[this.backend]
+        const list = await cached(`${this.backendId}:${key}`, () => SOURCES[source](b.api, deps, b))
         this.$set(this.options, key, list)
         return list
       } finally {
@@ -651,7 +751,7 @@ export default {
       this.unmount()
       if (!this.ready) return
       this.requests = []
-      const b = BACKENDS[this.backend]
+      const b = this.backends[this.backend]
       const key = ++this.renderKey
       try {
         const settings = (this.$druxt || {}).settings || {}
@@ -661,7 +761,7 @@ export default {
         const runtime = createRuntime({ baseUrl: b.baseUrl || settings.baseUrl || window.location.origin, proxyRoot: b.proxyRoot, settings, state, mutations })
         runtime.axios.interceptors.request.use((config) => {
           const url = /^https?:/.test(config.url || '') ? config.url : [config.baseURL || '', config.url || ''].map((part, i) => (i ? part.replace(/^\/+/, '') : part.replace(/\/+$/, ''))).filter(Boolean).join('/')
-          this.requests.push(`${(config.method || 'get').toUpperCase()} ${url.replace(/^https?:\/\/[^/]+/, '')}`)
+          this.requests.push(`${(config.method || 'get').toUpperCase()} /${url.replace(/^https?:\/\/[^/]+/, '').replace(/^\/+/, '')}`)
           return config
         })
         this.primed = true

@@ -17,6 +17,7 @@
     "info": "cd drupal && .devtools/info",
     "login": "sh scripts/login.sh",
     "dev": "sh scripts/dev.sh",
+    "storybook": "cd nuxt && yarn storybook --port 3030",
     "docs:generate": "sh scripts/docs-generate.sh",
     "hooks:install": "git config core.hooksPath .githooks",
     "lint": "npm run lint:js && npm run lint:format && npm run lint:md && npm run lint:cspell && npm run lint:private && npm run lint:attribution && npm run lint:knip",

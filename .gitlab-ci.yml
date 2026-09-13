@@ -326,7 +326,10 @@ test:validate-guardrails:
     - apk add --no-cache git unzip sqlite-dev libpng-dev libjpeg-turbo-dev libwebp-dev freetype-dev $PHPIZE_DEPS
     - docker-php-ext-configure gd --with-jpeg --with-webp --with-freetype
     - docker-php-ext-install pdo_sqlite gd
-    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    - curl -fsSLo composer-setup.php https://getcomposer.org/installer
+    - curl -fsSLo composer-setup.sig https://composer.github.io/installer.sig
+    - php -r 'if (hash_file("sha384", "composer-setup.php") !== trim(file_get_contents("composer-setup.sig"))) { fwrite(STDERR, "The Composer installer does not match its signature.\n"); exit(1); }'
+    - php composer-setup.php --install-dir=/usr/local/bin --filename=composer && rm composer-setup.php composer-setup.sig
     - section_end "toolchain"
 
 test:phpunit:
