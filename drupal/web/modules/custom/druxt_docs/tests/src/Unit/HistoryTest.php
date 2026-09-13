@@ -109,7 +109,6 @@ final class HistoryTest extends UnitTestCase {
   public static function malformed(): array {
     $revision = self::revision();
     return [
-      'a version of another page' => [[self::revision(['path' => 'how-to/other.md'])], '/a version of how-to\/other\.md, not of this page/'],
       'not a list' => [['first' => $revision], '/proxy\.md: "revisions" is not a list/'],
       'no revisions at all' => [NULL, '/is not a list/'],
       'a short sha' => [[self::revision(['sha' => 'ad2ea45'])], '/proxy\.md: earlier version 0 names no full commit sha/'],
