@@ -10,7 +10,7 @@
 const http = require('http')
 const path = require('path')
 const { spawn } = require('child_process')
-const { getJson, waitForBackend } = require('./backend')
+const { waitForBackend } = require('./backend')
 const { createProxyHandler, isBackendPath } = require('./proxy')
 const { createStartingHandler } = require('./starting')
 
@@ -50,7 +50,7 @@ const waitForStorybook = async () => {
 const main = async () => {
   await new Promise((resolve) => server.listen(port, host, resolve))
   log(`starting page on http://${host}:${port}`)
-  await waitForBackend(baseUrl, { log, ready: (url) => getJson(new URL('/jsonapi', url).href).then(Boolean) })
+  await waitForBackend(baseUrl, { log })
   log(`Drupal is ready at ${baseUrl}`)
   setPhase('building')
 

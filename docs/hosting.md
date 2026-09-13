@@ -23,6 +23,11 @@ services, and `.lagoon.yml` adds the post-rollout task.
 | `cli`       | `lagoon/cli.dockerfile`                | Runs the post-rollout task, and `drush` over SSH                             |
 | `mariadb`   | `uselagoon/mariadb-10.11-drupal` image | Drupal's database, with no route                                             |
 
+Storybook writes its Druxt stories from Drupal when its container starts,
+and the task that runs after the rollout imports the configuration later. So
+a change to something those stories read, such as a menu's description,
+shows on the rollout after the one that imports it.
+
 `nuxt`, `nginx` and `storybook` each get a route, named after the service:
 `https://nuxt.<environment>.<project>.<cluster domain>` for the site, and
 the same with `nginx` for Drupal and `storybook` for Storybook. The site
