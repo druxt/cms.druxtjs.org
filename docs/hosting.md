@@ -33,7 +33,8 @@ shows on the rollout after the one that imports it.
 the same with `nginx` for Drupal and `storybook` for Storybook. The site
 reads its Storybook's route from `LAGOON_ROUTES` and links to it from the
 footer and the playground. Production's hosts, `druxtjs.org`,
-`storybook.druxtjs.org` and the package subdomains, are set in `.lagoon.yml`.
+`storybook.druxtjs.org`, `cms.druxtjs.org` for Drupal and the package
+subdomains, are set in `.lagoon.yml`.
 
 ## Deployment steps
 
@@ -143,10 +144,10 @@ What the cutover from the druxt.js build needs, in order.
    `www.druxtjs.org` and the package subdomains (`blocks.druxtjs.org` and
    the others) as routes on the same service; the server answers each
    subdomain with a redirect to `druxtjs.org`.
-2. Give `storybook.druxtjs.org` a DNS record. The other hosts are CNAME
-   records to the platform's CDN, which answers TLS only for hostnames it
-   knows, so a new hostname is registered with the platform first or its
-   record points at the cluster's ingress instead.
+2. Give `storybook.druxtjs.org` and `cms.druxtjs.org` DNS records. The
+   other hosts are CNAME records to the platform's CDN, which answers TLS
+   only for hostnames it knows, so a new hostname is registered with the
+   platform first or its record points at the cluster's ingress instead.
 3. Set `LAGOON_ENVIRONMENT_TYPE=production` on that environment: it turns on
    the GA4 tag and turns off the `noindex` header previews send.
 4. Confirm the Drupal environment variables the settings file reads, and that

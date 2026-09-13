@@ -26,6 +26,8 @@ environments:
           - views.druxtjs.org
       - storybook:
           - storybook.druxtjs.org
+      - nginx:
+          - cms.druxtjs.org
 
 tasks:
   post-rollout:
