@@ -5,9 +5,9 @@ How druxtjs.org runs on [Lagoon](https://docs.lagoon.sh). The
 
 ## Status
 
-Deployed to a development environment from `feature/lagoon`. The live site
-still runs from the druxt.js repository until the cutover; the checklist at
-the end is what the cutover needs.
+Lagoon builds `feature/lagoon` into a development environment and `main`
+into production. The checklist at the end is what the first production
+deployment needs.
 
 ## Services
 

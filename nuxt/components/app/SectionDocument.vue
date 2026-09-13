@@ -6,7 +6,7 @@
     <AppProse v-else :key="document.path" :title="document.title">
       <DruxtEntity :type="document.type" :uuid="document.uuid" mode="full" />
     </AppProse>
-    <AppDocFooter :edit-path="editPath" :prev="prev" :next="next" />
+    <AppDocFooter :prev="prev" :next="next" />
   </article>
 </template>
 
@@ -75,7 +75,6 @@ export default {
     })
   },
   computed: {
-    editPath: ({ drupal, section, document }) => (drupal ? null : section + document.path.replace(`/${section}`, '') + '.md'),
     position: ({ siblings, current }) => siblings.findIndex((o) => o.to === current),
     prev: ({ siblings, position }) => (position > 0 ? siblings[position - 1] : null),
     next: ({ siblings, position }) => (position > -1 && position < siblings.length - 1 ? siblings[position + 1] : null),

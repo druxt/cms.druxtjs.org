@@ -53,6 +53,8 @@ rather than released, so there are no version numbers yet.
   server-rendered markup hydrates instead of being rendered again.
 - A request for a page in another letter case is redirected to the alias
   Drupal resolves; a query string other than `live=1` gets the stored page.
+- The page footer no longer offers to edit the page in druxt.js. Pages are
+  edited in Drupal, and the database is the source of truth.
 - Module pages list their "Try it" and API reference sections in the table
   of contents. Component reference pages put the card after the reference.
 

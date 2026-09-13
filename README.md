@@ -30,13 +30,13 @@ three ways.
 
 ### Dev container
 
-[![Open in DevPod!](https://devpod.sh/assets/open-in-devpod.svg)](https://devpod.sh/open#https://github.com/druxt/cms.druxtjs.org)
+[![Open in DevPod!](https://devpod.sh/assets/open-in-devpod.svg)](https://devpod.sh/open#https://github.com/druxt/druxtjs.org)
 
-| Tool                        | How                                                                          |
-| --------------------------- | ---------------------------------------------------------------------------- |
-| VS Code                     | Clone the repository, open it, then choose **Reopen in Container**           |
-| GitHub Codespaces           | On the repository page, open **Code** and choose **Codespaces**              |
-| [DevPod](https://devpod.sh) | Click the badge, or run `devpod up https://github.com/druxt/cms.druxtjs.org` |
+| Tool                        | How                                                                      |
+| --------------------------- | ------------------------------------------------------------------------ |
+| VS Code                     | Clone the repository, open it, then choose **Reopen in Container**       |
+| GitHub Codespaces           | On the repository page, open **Code** and choose **Codespaces**          |
+| [DevPod](https://devpod.sh) | Click the badge, or run `devpod up https://github.com/druxt/druxtjs.org` |
 
 The container has Node 16.20.1, PHP 8.4, Composer and mise. Creating it runs
 `npm install` and `npm run setup`, so Drupal is running when it opens. Then run
@@ -99,11 +99,11 @@ checkout. It installs and builds druxt.js first, so the first run is slow.
 
 ### Where changes go
 
-| Change                                               | Where it goes                                                                                                      |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| The content model, the editor or the site's settings | Export them with `vendor/bin/drush config:export` in `drupal/`, and commit `drupal/config/sync/` in a pull request |
-| The frontend                                         | A pull request with the change in `nuxt/`                                                                          |
-| The text of a page                                   | A pull request to [druxt/druxt.js](https://github.com/druxt/druxt.js), where the documentation is still written    |
+| Change                                               | Where it goes                                                                                                          |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| The content model, the editor or the site's settings | Export them with `vendor/bin/drush config:export` in `drupal/`, and commit `drupal/config/sync/` in a pull request     |
+| The frontend                                         | A pull request with the change in `nuxt/`                                                                              |
+| The text of a page                                   | Drupal, where editors change it. The database is the source of truth, and page text is not taken as a pull request yet |
 
 The site's content is stored in its database, and `npm run setup` seeds that
 database from a pinned commit of druxt.js. Edits in your local Drupal stay
@@ -151,7 +151,7 @@ covers what a deployment does.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for commit messages, checks and what
 never goes in a file. Open issues and pull requests on
-[druxt/cms.druxtjs.org](https://github.com/druxt/cms.druxtjs.org).
+[druxt/druxtjs.org](https://github.com/druxt/druxtjs.org).
 [docs/backend.md](docs/backend.md) covers the importer and page history.
 
 ## License

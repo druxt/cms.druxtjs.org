@@ -7,12 +7,12 @@ configuration.
 
 ## Repositories
 
-| Change                                                                                            | Where it goes                                                                                                                                         |
-| ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| The text of a documentation page                                                                  | [druxt/druxt.js](https://github.com/druxt/druxt.js), where the pages are written. This site seeds its content from a pinned commit of that repository |
-| A Druxt Nuxt module                                                                               | [druxt/druxt.js](https://github.com/druxt/druxt.js)                                                                                                   |
-| The Druxt Drupal module                                                                           | [drupal.org/project/druxt](https://www.drupal.org/project/druxt)                                                                                      |
-| The frontend, the content model, the importer, the editing experience or the site's configuration | This repository. Open an issue or a pull request on [druxt/cms.druxtjs.org](https://github.com/druxt/cms.druxtjs.org)                                 |
+| Change                                                                                            | Where it goes                                                                                                                                                |
+| ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| The text of a documentation page                                                                  | Drupal, where editors change it. The database is the source of truth, and page text is not taken as a pull request yet, so report a mistake as an issue here |
+| A Druxt Nuxt module                                                                               | [druxt/druxt.js](https://github.com/druxt/druxt.js)                                                                                                          |
+| The Druxt Drupal module                                                                           | [drupal.org/project/druxt](https://www.drupal.org/project/druxt)                                                                                             |
+| The frontend, the content model, the importer, the editing experience or the site's configuration | This repository. Open an issue or a pull request on [druxt/druxtjs.org](https://github.com/druxt/druxtjs.org)                                                |
 
 ## Getting set up
 
